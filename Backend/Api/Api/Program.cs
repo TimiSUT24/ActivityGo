@@ -1,4 +1,8 @@
 
+using Domain.Models;
+using Infrastructure.Persistence;
+using Microsoft.EntityFrameworkCore;
+
 namespace Api
 {
     public class Program
@@ -7,10 +11,12 @@ namespace Api
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // Add services to the container.
+            var cs = builder.Configuration.GetConnectionString("DefaultConnection");
 
+            // Add services to the container.
+            builder.Services.AddDbContext<AppDbContext>(opt => opt.UseSqlServer(cs));
+            builder.Services.AddIdentityCore<User>().AddEntityFrameworkStores<AppDbContext>();
             builder.Services.AddControllers();
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
