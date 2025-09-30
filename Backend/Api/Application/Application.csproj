@@ -26,11 +26,9 @@
 
   <ItemGroup>
     <Folder Include="DTOs\" />
-    <Folder Include="Interfaces\" />
-    <Folder Include="Mapping\" />
     <Folder Include="Exceptions\" />
+    <Folder Include="Mapping\NewFolder\" />
     <Folder Include="Validators\" />
-    <Folder Include="Services\" />
   </ItemGroup>
 
   <ItemGroup>
