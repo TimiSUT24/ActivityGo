@@ -7,6 +7,18 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="DTOs\**" />
+    <Compile Remove="Exceptions\**" />
+    <Compile Remove="Validators\**" />
+    <EmbeddedResource Remove="DTOs\**" />
+    <EmbeddedResource Remove="Exceptions\**" />
+    <EmbeddedResource Remove="Validators\**" />
+    <None Remove="DTOs\**" />
+    <None Remove="Exceptions\**" />
+    <None Remove="Validators\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="AutoMapper" Version="15.0.1" />
     <PackageReference Include="FluentValidation" Version="12.0.0" />
     <PackageReference Include="FluentValidation.AspNetCore" Version="11.3.1" />
@@ -25,12 +37,20 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="DTOs\" />
-    <Folder Include="Interfaces\" />
-    <Folder Include="Mapping\" />
-    <Folder Include="Exceptions\" />
-    <Folder Include="Validators\" />
-    <Folder Include="Services\" />
+    <Folder Include="ActivityOccurrence\DTO\" />
+    <Folder Include="ActivityOccurrence\Validator\" />
+    <Folder Include="Activity\DTO\" />
+    <Folder Include="Activity\Validator\" />
+    <Folder Include="Auth\DTO\" />
+    <Folder Include="Auth\Validator\" />
+    <Folder Include="Booking\DTO\" />
+    <Folder Include="Booking\Validator\" />
+    <Folder Include="Place\DTO\" />
+    <Folder Include="Place\Validator\" />
+    <Folder Include="Statistics\DTO\" />
+    <Folder Include="Statistics\Validator\" />
+    <Folder Include="Weather\DTO\" />
+    <Folder Include="Weather\Validator\" />
   </ItemGroup>
 
   <ItemGroup>
