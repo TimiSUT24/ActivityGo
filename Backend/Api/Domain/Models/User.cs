@@ -1,6 +1,6 @@
 namespace Domain.Models;
 
-public class User : BaseEntity
+public class User : IdentityUser
 {
     public string UserName { get; set; } = string.Empty;
     public string Email { get; set; } = string.Empty;
