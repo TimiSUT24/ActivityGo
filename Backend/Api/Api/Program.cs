@@ -14,7 +14,7 @@ namespace Api
             var cs = builder.Configuration.GetConnectionString("DefaultConnection");
 
             // Add services to the container.
-            builder.Services.AddDbContext<AppDbContext>(opt => opt.UseSqlServer(cs));
+            builder.Services.AddDbContext<AppDbContext>(opt => opt.UseSqlServer(cs, b => b.MigrationsAssembly("Api")));
             builder.Services.AddIdentityCore<User>().AddEntityFrameworkStores<AppDbContext>();
             builder.Services.AddControllers();
             builder.Services.AddEndpointsApiExplorer();

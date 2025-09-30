@@ -416,3 +416,6 @@ FodyWeavers.xsd
 *.msix
 *.msm
 *.msp
+/Backend/Api/Api/Properties/launchSettings.json
+/Backend/Api/Api/appsettings.json
+/Backend/Api/Api/appsettings.json
