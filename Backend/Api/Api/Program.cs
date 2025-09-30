@@ -50,17 +50,17 @@ namespace Api
                 // optional: additional configuration here
             },typeof(ActivityProfile), typeof(ActivityOccurrenceProfile), typeof(AuthProfile), typeof(BookingProfile), typeof(PlaceProfile), typeof(StatisticsProfile), typeof(WeatherProfile));
 
-            // === 1) Connection string + DbContext (SQL Server) ===
+            // ===  Connection string + DbContext (SQL Server) ===
             builder.Services.AddDbContext<AppDbContext>(opts =>
                 opts.UseSqlServer(
                     builder.Configuration.GetConnectionString("DefaultConnection")
                 )
             );           
 
-            // === 2) Lägg till TimeProvider så Identity inte kraschar vid design-time ===
+            // ===  Lägg till TimeProvider så Identity inte kraschar vid design-time ===
             builder.Services.AddSingleton<TimeProvider>(TimeProvider.System);
 
-            // === 3) Identity (med roller) + EF stores ===
+            // ===  Identity (med roller) + EF stores ===
             builder.Services
                 .AddIdentityCore<User>(opt =>
                 {
@@ -88,7 +88,7 @@ namespace Api
 
             var app = builder.Build();
 
-            // === 7) Swagger vid utveckling ===
+            // ===  Swagger vid utveckling ===
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
