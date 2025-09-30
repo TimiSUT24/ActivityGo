@@ -11,7 +11,7 @@ public class ActivityOccurrence : BaseEntity
 
     // Kopplingar
     public Guid ActivityId { get; set; }
-    public Activity Activity { get; set; } = default!;
+    public SportActivity Activity { get; set; } = default!;
 
     public Guid PlaceId { get; set; }
     public Place Place { get; set; } = default!;
@@ -21,4 +21,6 @@ public class ActivityOccurrence : BaseEntity
 
     // Hjälpfält (beräknat i API/DTO oftast)
     public int EffectiveCapacity => CapacityOverride ?? Place.Capacity;
+
+    public decimal? PriceOverride { get; set; }
 }
