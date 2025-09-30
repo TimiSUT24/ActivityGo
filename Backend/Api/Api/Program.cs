@@ -1,5 +1,7 @@
+using Domain.Interfaces;                // IUnitOfWork
 using Domain.Models;                   // Din User : IdentityUser
 using Infrastructure.Persistence;      // Din AppDbContext
+using Infrastructure.UnitOfWork;       // Din UnitOfWork
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -36,17 +38,20 @@ namespace Api
                 .AddEntityFrameworkStores<AppDbContext>() // Identity-tabeller i samma DB
                 .AddSignInManager();
 
-            // === 4) Authorization (lägg till JWT senare) ===
+            // === 4) Unit of Work ===
+            builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+            // === 5) Authorization (lägg till JWT senare) ===
             builder.Services.AddAuthorization();
 
-            // === 5) MVC & Swagger ===
+            // === 6) MVC & Swagger ===
             builder.Services.AddControllers();
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
             var app = builder.Build();
 
-            // === 6) Swagger vid utveckling ===
+            // === 7) Swagger vid utveckling ===
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();

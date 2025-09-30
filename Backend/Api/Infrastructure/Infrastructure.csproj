@@ -28,7 +28,6 @@
   <ItemGroup>
     <Folder Include="Auth\" />
     <Folder Include="Data\" />
-    <Folder Include="UnitOfWork\" />
     <Folder Include="Repositories\" />
   </ItemGroup>
 
