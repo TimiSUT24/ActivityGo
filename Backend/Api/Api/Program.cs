@@ -11,7 +11,7 @@ namespace Api
     {
         public static void Main(string[] args)
         {
-            var builder = WebApplication.CreateBuilder(args);
+            var builder = WebApplication.CreateBuilder(args); 
 
             // === 1) Connection string + DbContext (SQL Server) ===
             builder.Services.AddDbContext<AppDbContext>(opts =>
