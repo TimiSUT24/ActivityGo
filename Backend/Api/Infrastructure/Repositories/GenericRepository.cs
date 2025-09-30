@@ -33,12 +33,11 @@ namespace Infrastructure.Repositories
         // Write
         public virtual void Add(TEntity entity)
         {
-            _dbSet.AddAsync(entity);
+            _dbSet.Add(entity);
         }
         public virtual void Update(TEntity entity)
         {
-            _dbSet.Update(entity);
-            _context.SaveChanges();
+            _context.Entry(entity).State = EntityState.Modified;
         }
 
         public virtual void Delete(TEntity entity)
@@ -51,7 +50,5 @@ namespace Infrastructure.Repositories
         {
             return await _dbSet.Where(predicate).ToListAsync();
         }
-
-
     }
 }
