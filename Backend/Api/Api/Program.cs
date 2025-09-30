@@ -1,6 +1,7 @@
 using Domain.Interfaces;                // IUnitOfWork
 using Domain.Models;                   // Din User : IdentityUser
 using Infrastructure.Persistence;      // Din AppDbContext
+using Infrastructure.Repositories;
 using Infrastructure.UnitOfWork;       // Din UnitOfWork
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -38,13 +39,13 @@ namespace Api
                 .AddEntityFrameworkStores<AppDbContext>() // Identity-tabeller i samma DB
                 .AddSignInManager();
 
-            // === 4) Unit of Work ===
+            // ===  Unit of Work + Repositorys ===
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
-
-            // === 5) Authorization (lägg till JWT senare) ===
+            builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+            // ===  Authorization (lägg till JWT senare) ===
             builder.Services.AddAuthorization();
 
-            // === 6) MVC & Swagger ===
+            // ===  MVC & Swagger ===
             builder.Services.AddControllers();
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
