@@ -1,8 +1,8 @@
-using Domain.Models.Enums;
+using Domain.Enums;
 
 namespace Domain.Models;
 
-public class Activity : BaseEntity
+public class SportActivity : BaseEntity
 {
     public string Name { get; set; } = string.Empty;
     public string? Description { get; set; }

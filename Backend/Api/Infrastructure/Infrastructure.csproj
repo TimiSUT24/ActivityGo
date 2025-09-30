@@ -25,4 +25,15 @@
     <PackageReference Include="Microsoft.Extensions.Identity.Stores" Version="8.0.19" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Auth\" />
+    <Folder Include="Data\" />
+    <Folder Include="UnitOfWork\" />
+    <Folder Include="Repositories\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Domain\Domain.csproj" />
+  </ItemGroup>
+
 </Project>

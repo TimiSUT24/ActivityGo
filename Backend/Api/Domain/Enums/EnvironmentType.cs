@@ -1,4 +1,4 @@
-namespace Domain.Models.Enums;
+namespace Domain.Enums;
 
 public enum EnvironmentType
 {
