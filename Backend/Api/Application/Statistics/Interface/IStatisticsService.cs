@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Application.Interfaces
+namespace Application.Statistics.Interface
 {
-    public interface IPlaceService
+    public interface IStatisticsService
     {
     }
 }

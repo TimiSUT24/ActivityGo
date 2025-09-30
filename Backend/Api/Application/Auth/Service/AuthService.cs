@@ -1,13 +1,13 @@
-﻿using Application.Interfaces;
+﻿using Application.Auth.Interface;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Application.Services
+namespace Application.Auth.Service
 {
-    public class BookingService : IBookingService
+    public class AuthService : IAuthService
     {
     }
 }

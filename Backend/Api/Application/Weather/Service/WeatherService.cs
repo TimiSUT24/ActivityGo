@@ -1,13 +1,13 @@
-﻿using Application.Interfaces;
+﻿using Application.Weather.Interface;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Application.Services
+namespace Application.Weather.Service
 {
-    public class AuthService : IAuthService
+    public class WeatherService : IWeatherService
     {
     }
 }

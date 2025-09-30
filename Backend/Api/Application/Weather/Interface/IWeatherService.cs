@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Application.Interfaces
+namespace Application.Weather.Interface
 {
-    public interface IActivityOccurrenceService
+    public interface IWeatherService
     {
     }
 }

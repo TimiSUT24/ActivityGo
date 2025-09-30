@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Application.Interfaces
+namespace Application.Auth.Interface
 {
-    public interface IActivityService
+    public interface IAuthService
     {
     }
 }
