@@ -2,7 +2,7 @@ using Domain.Models.Enums;
 
 namespace Domain.Models;
 
-public class Booking
+public class Booking : BaseEntity
 {
     // Kopplingar
     public Guid ActivityOccurrenceId { get; set; }
