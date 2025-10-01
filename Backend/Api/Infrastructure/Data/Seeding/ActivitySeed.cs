@@ -30,10 +30,10 @@ namespace Infrastructure.Data.Seeding
                 var place1 = new Place
                 {
                     Id = Guid.NewGuid(),
-                    Name = "Sporthallen A",
-                    Address = "Sporthallsvägen 1, Halmstad",
-                    Latitude = 56.6745,
-                    Longitude = 12.8572,
+                    Name = "Halmstad Sportcenter",
+                    Address = "Bäckagårdsvägen, Halmstad",
+                    Latitude = 56.669530186824545,
+                    Longitude = 12.795231415297764,
                     Environment = EnvironmentType.Indoor,
                     Capacity = 20,
                     IsActive = true
@@ -43,9 +43,9 @@ namespace Infrastructure.Data.Seeding
                 {
                     Id = Guid.NewGuid(),
                     Name = "Padelbanor Utomhus",
-                    Address = "Padelvägen 5, Falkenberg",
-                    Latitude = 56.9050,
-                    Longitude = 12.4911,
+                    Address = "Kattegattvägen, Falkenberg",
+                    Latitude = 56.889994,
+                    Longitude = 12.493430,
                     Environment = EnvironmentType.Outdoor,
                     Capacity = 8,
                     IsActive = true
@@ -54,10 +54,10 @@ namespace Infrastructure.Data.Seeding
                 var place3 = new Place
                 {
                     Id = Guid.NewGuid(),
-                    Name = "Utegymmet",
-                    Address = "Gymparken 12, Varberg",
-                    Latitude = 57.1060,
-                    Longitude = 12.2500,
+                    Name = "Utegym Actic Varberg Outdoor Box",
+                    Address = "Platsgatan 9, Varberg",
+                    Latitude = 57.10386721470312,
+                    Longitude = 12.244223138701877,
                     Environment = EnvironmentType.Outdoor,
                     Capacity = 15,
                     IsActive = true
