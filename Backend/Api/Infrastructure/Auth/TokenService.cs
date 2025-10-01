@@ -10,6 +10,7 @@ using Application.Auth.Interface;
 using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
+namespace Infrastructure.Auth;
 public sealed class TokenService : ITokenService
 {
     private readonly UserManager<User> _users;

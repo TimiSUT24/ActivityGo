@@ -24,6 +24,7 @@ using Domain.Models;                   // Din User : IdentityUser
 using Infrastructure.Persistence;      // Din AppDbContext
 using Infrastructure.Repositories;
 using Infrastructure.UnitOfWork;       // Din UnitOfWork
+using Infrastructure.Auth;             // <-- TokenService
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -31,6 +32,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+
+// === Swagger usings ===
+using Microsoft.OpenApi.Models;
 
 namespace Api
 {
@@ -112,7 +116,36 @@ namespace Api
             // ===  MVC & Swagger ===
             builder.Services.AddControllers();
             builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
+            builder.Services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "ActiviGo API", Version = "v1" });
+
+                // === JWT i Swagger (Authorize-knappen) ===
+                c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                {
+                    Name = "Authorization",
+                    Type = SecuritySchemeType.Http,
+                    Scheme = "bearer",
+                    BearerFormat = "JWT",
+                    In = ParameterLocation.Header,
+                    Description = "Skriv: Bearer {ditt_jwt}"
+                });
+
+                c.AddSecurityRequirement(new OpenApiSecurityRequirement
+                {
+                    {
+                        new OpenApiSecurityScheme
+                        {
+                            Reference = new OpenApiReference
+                            {
+                                Type = ReferenceType.SecurityScheme,
+                                Id = "Bearer"
+                            }
+                        },
+                        Array.Empty<string>()
+                    }
+                });
+            });
 
             var app = builder.Build();
 
