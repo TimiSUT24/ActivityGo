@@ -98,6 +98,7 @@ namespace Api
                 var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
 
                 await UserSeed.SeedUsersAndRolesAsync(userManager, roleManager);
+                await ActivitySeed.SeedAsync(services.GetRequiredService<AppDbContext>());
             }
 
                 // ===  Swagger vid utveckling ===
