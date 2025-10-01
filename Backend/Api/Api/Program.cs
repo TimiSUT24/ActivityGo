@@ -21,12 +21,14 @@ using Application.Weather.Mapper;
 using Application.Weather.Service;
 using Domain.Interfaces;                // IUnitOfWork
 using Domain.Models;                   // Din User : IdentityUser
+using Infrastructure.Data.Seeding;
 using Infrastructure.Persistence;      // Din AppDbContext
 using Infrastructure.Repositories;
 using Infrastructure.UnitOfWork;       // Din UnitOfWork
 using Infrastructure.Auth;             // <-- TokenService
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using System.Threading.Tasks;
 
 // === JWT usings ===
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -40,7 +42,7 @@ namespace Api
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
 
@@ -149,12 +151,23 @@ namespace Api
 
             var app = builder.Build();
 
-            // ===  Swagger vid utveckling ===
-            if (app.Environment.IsDevelopment())
+            //Seeding roles and users 
+            using (var scope = app.Services.CreateScope())
             {
-                app.UseSwagger();
-                app.UseSwaggerUI();
+                var services = scope.ServiceProvider;
+                var userManager = services.GetRequiredService<UserManager<User>>();
+                var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
+
+                await UserSeed.SeedUsersAndRolesAsync(userManager, roleManager);
+                await ActivitySeed.SeedAsync(services.GetRequiredService<AppDbContext>());
             }
+
+                // ===  Swagger vid utveckling ===
+                if (app.Environment.IsDevelopment())
+                {
+                    app.UseSwagger();
+                    app.UseSwaggerUI();
+                }
 
             app.UseHttpsRedirection();
 
