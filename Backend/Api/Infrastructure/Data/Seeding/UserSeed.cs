@@ -28,31 +28,39 @@ namespace Infrastructure.Data.Seeding
             {
                 var admin = new User
                 {
-                    UserName = "admin123",
+                    UserName = "admin@activigo.se",
                     Email = "admin@activigo.se",
                     Firstname = "System",
                     Lastname = "Admin", // om du har LastName i modellen
                     EmailConfirmed = true
                 };
 
-                await userManager.CreateAsync(admin, "Admin123!"); // lösenord
-                await userManager.AddToRoleAsync(admin, "Admin");
+                var result = await userManager.CreateAsync(admin, "Admin123!"); // lösenord
+                if (result.Succeeded)
+                {
+                    await userManager.AddToRoleAsync(admin, "Admin");
+                }
+               
             }
 
             // === Create Test Users ===
             var testUsers = new List<User>
             {
-                new User { UserName = "Anna1@activigo.se", Email = "Anna@activigo.se", Firstname = "Anna", Lastname = "Andersson", EmailConfirmed = true },
-                new User { UserName = "Björn2@activigo.se", Email = "Björn@activigo.se", Firstname = "Björn", Lastname = "Berg", EmailConfirmed = true },
-                new User { UserName = "Carla3@activigo.se", Email = "Carla@activigo.se", Firstname = "Carla", Lastname = "Carlsson", EmailConfirmed = true }
+                new User { UserName = "Anna@activigo.se", Email = "Anna@activigo.se", Firstname = "Anna", Lastname = "Andersson", EmailConfirmed = true },
+                new User { UserName = "Bjorn@activigo.se", Email = "Bjorn@activigo.se", Firstname = "Bjorn", Lastname = "Berg", EmailConfirmed = true },
+                new User { UserName = "Carla@activigo.se", Email = "Carla@activigo.se", Firstname = "Carla", Lastname = "Carlsson", EmailConfirmed = true }
             };
 
             foreach (var user in testUsers)
-            {
+            {               
                 if (await userManager.FindByEmailAsync(user.Email) == null)
                 {
-                    await userManager.CreateAsync(user, "User123!"); // samma lösen för enkelhet
-                    await userManager.AddToRoleAsync(user, "User");
+                   var result = await userManager.CreateAsync(user, "User123!"); // samma lösen för enkelhet
+                    if (result.Succeeded)
+                    {
+                        await userManager.AddToRoleAsync(user, "User");
+                    }
+                   
                 }
             }
         }
