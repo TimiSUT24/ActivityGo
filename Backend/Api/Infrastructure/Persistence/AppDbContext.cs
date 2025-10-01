@@ -17,6 +17,7 @@ namespace Infrastructure.Persistence
         public DbSet<Place> Places => Set<Place>();
         public DbSet<Category> Categories => Set<Category>();
         public DbSet<Booking> Bookings => Set<Booking>();
+        public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
 
         protected override void OnModelCreating(ModelBuilder b)
         {
@@ -114,6 +115,21 @@ namespace Infrastructure.Persistence
             {
                 e.Property(x => x.Firstname).HasMaxLength(100);
                 e.Property(x => x.Lastname).HasMaxLength(100);
+            });
+            
+            b.Entity<RefreshToken>(e =>
+            {
+                e.HasKey(x => x.Id);
+                e.Property(x => x.TokenHash).IsRequired().HasMaxLength(200);
+                e.Property(x => x.UserId).IsRequired();
+
+                e.HasOne(x => x.User)
+                    .WithMany(u => u.RefreshTokens)
+                    .HasForeignKey(x => x.UserId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                e.HasIndex(x => new { x.UserId, x.TokenHash }).IsUnique();
+                e.HasIndex(x => x.ExpiresAtUtc);
             });
         }
 

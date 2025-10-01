@@ -41,7 +41,6 @@
     <Folder Include="ActivityOccurrence\Validator\" />
     <Folder Include="Activity\DTO\" />
     <Folder Include="Activity\Validator\" />
-    <Folder Include="Auth\DTO\" />
     <Folder Include="Auth\Validator\" />
     <Folder Include="Booking\DTO\" />
     <Folder Include="Booking\Validator\" />
