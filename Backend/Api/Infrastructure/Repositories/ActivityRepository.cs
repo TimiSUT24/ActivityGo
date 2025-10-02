@@ -21,6 +21,11 @@ namespace Infrastructure.Repositories
             return _dbSet.AnyAsync(a => a.Name == name, cancellationToken);
         }
 
+        public async Task<IReadOnlyList<SportActivity>> GetActiveAsync(CancellationToken cancellationToken = default)
+        {
+            return await _dbSet.Where(a => a.IsActive).ToListAsync(cancellationToken);
+        }
+
         public IQueryable<SportActivity> Query()
         {
             return _dbSet.AsQueryable();

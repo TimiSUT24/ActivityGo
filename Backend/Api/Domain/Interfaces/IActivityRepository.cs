@@ -10,6 +10,7 @@ namespace Domain.Interfaces
     public interface IActivityRepository : IGenericRepository<SportActivity>
     {
         Task<bool> ExistsByNameAsync(string name, CancellationToken cancellationToken = default);
+        Task<IReadOnlyList<SportActivity>> GetActiveAsync(CancellationToken cancellationToken = default);
         IQueryable<SportActivity> Query();
     }
 }
