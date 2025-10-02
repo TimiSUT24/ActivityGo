@@ -20,12 +20,14 @@ namespace Application.Activity.Mapper
             // DTO to Entity for create
             CreateMap<ActivityCreateRequest, SportActivity>()
                 .ForMember(d => d.Id, o => o.Ignore())
+                .ForMember(d => d.CategoryId, o => o.Ignore())
                 .ForMember(d => d.CreatedAtUtc, o => o.Ignore())
                 .ForMember(d => d.UpdatedAtUtc, o => o.Ignore());
            
             // DTO to Entity for update
             CreateMap<ActivityUpdateRequest, SportActivity>()
                 .ForMember(d => d.Id, o => o.Ignore())
+                .ForMember(d => d.CategoryId, o => o.Ignore())
                 .ForMember(d => d.CreatedAtUtc, o => o.Ignore())
                 .ForMember(d => d.UpdatedAtUtc, o => o.Ignore());
         }
