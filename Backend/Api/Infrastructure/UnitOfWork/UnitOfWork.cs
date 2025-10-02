@@ -8,21 +8,21 @@ public sealed class UnitOfWork : IUnitOfWork
     private readonly AppDbContext _db;
 
     // Exponera repos här när ni skapat dem (via DI):
-    // public IActivityRepository Activities { get; }
+    public IActivityRepository Activities { get; }
     // public IPlaceRepository Places { get; }
     // public IBookingRepository Bookings { get; }
     // public IUserRepository Users { get; }
 
     public UnitOfWork(
         AppDbContext db
-        // , IActivityRepository activities
+        , IActivityRepository activities
         // , IPlaceRepository places
         // , IBookingRepository bookings
         // , IUserRepository users
     )
     {
         _db = db;
-        // Activities = activities;
+        Activities = activities;
         // Places = places;
         // Bookings = bookings;
         // Users = users;
