@@ -9,7 +9,7 @@ namespace Application.Statistics.Mapper
 {
     public class StatisticsProfile : Profile
     {
-        StatisticsProfile()
+        public StatisticsProfile()
         {
 
         }
