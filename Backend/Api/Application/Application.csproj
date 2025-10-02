@@ -39,7 +39,6 @@
   <ItemGroup>
     <Folder Include="ActivityOccurrence\DTO\" />
     <Folder Include="ActivityOccurrence\Validator\" />
-    <Folder Include="Activity\Validator\" />
     <Folder Include="Auth\Validator\" />
     <Folder Include="Booking\DTO\" />
     <Folder Include="Booking\Validator\" />
