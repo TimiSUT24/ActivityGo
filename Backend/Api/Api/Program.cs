@@ -21,22 +21,22 @@ using Application.Weather.Mapper;
 using Application.Weather.Service;
 using Domain.Interfaces;                // IUnitOfWork
 using Domain.Models;                   // Din User : IdentityUser
+using FluentValidation;
+using Infrastructure.Auth;             // <-- TokenService s
 using Infrastructure.Data.Seeding;
 using Infrastructure.Persistence;      // Din AppDbContext
 using Infrastructure.Repositories;
 using Infrastructure.UnitOfWork;       // Din UnitOfWork
-using Infrastructure.Auth;             // <-- TokenService s
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using System.Threading.Tasks;
-
 // === JWT usings ===
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
-using System.Text;
-
 // === Swagger usings ===
 using Microsoft.OpenApi.Models;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace Api
 {
@@ -60,8 +60,14 @@ namespace Api
             builder.Services.AddAutoMapper(cfg =>
             {
                 // optional: additional configuration here
-            }, typeof(ActivityProfile), typeof(ActivityOccurrenceProfile), typeof(AuthProfile),
-               typeof(BookingProfile), typeof(PlaceProfile), typeof(StatisticsProfile), typeof(WeatherProfile));
+            },
+            typeof(ActivityProfile), 
+            typeof(ActivityOccurrenceProfile), 
+            typeof(AuthProfile),
+               typeof(BookingProfile), 
+               typeof(PlaceProfile), 
+               typeof(StatisticsProfile), 
+               typeof(WeatherProfile));
 
             // ===  Connection string + DbContext (SQL Server) ===
             builder.Services.AddDbContext<AppDbContext>(opts =>
@@ -91,7 +97,10 @@ namespace Api
             // ===  Unit of Work + Repositorys ===
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
             builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+            builder.Services.AddScoped<IActivityRepository, ActivityRepository>();
 
+            // ===  Validation ===   // Glöm inte att man bara behöver registrera detta en gång då den läser av alla Validators i Application.
+            builder.Services.AddValidatorsFromAssembly(typeof(Application.Activity.Validator.ActivityCreateValidator).Assembly);
             // ===  JWT Authentication ===
             var jwt = builder.Configuration.GetSection("Jwt");
             var signingKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwt["Key"]!));
@@ -160,10 +169,11 @@ namespace Api
 
                 await UserSeed.SeedUsersAndRolesAsync(userManager, roleManager);
                 await ActivitySeed.SeedAsync(services.GetRequiredService<AppDbContext>());
+
             }
 
-                // ===  Swagger vid utveckling ===
-                if (app.Environment.IsDevelopment())
+            // ===  Swagger vid utveckling ===
+            if (app.Environment.IsDevelopment())
                 {
                     app.UseSwagger();
                     app.UseSwaggerUI();

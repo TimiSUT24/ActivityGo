@@ -9,7 +9,7 @@ namespace Application.Weather.Mapper
 {
     public class WeatherProfile : Profile
     {
-        WeatherProfile()
+        public WeatherProfile()
         {
 
         }
