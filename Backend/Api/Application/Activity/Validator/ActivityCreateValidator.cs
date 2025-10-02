@@ -23,7 +23,7 @@ namespace Application.Activity.Validator
             RuleFor(x => x.Price)
                 .GreaterThanOrEqualTo(0).WithMessage("Price must be non-negative.");
             RuleFor(x => x.Environment)
-                .InclusiveBetween(0, 1).WithMessage("Environment must be either 0(Indoor) or 1(Outdoor).");
+                .IsInEnum().WithMessage("Environment must be either Indoor or Outdoor.");
         }
     }
 }

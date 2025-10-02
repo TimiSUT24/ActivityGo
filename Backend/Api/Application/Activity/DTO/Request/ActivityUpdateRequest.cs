@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Domain.Enums;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -15,7 +16,7 @@ namespace Application.Activity.DTO.Request
         int DefaultDurationMinutes,
         decimal Price,
         string? ImageUrl,
-        int Environment,
+        EnvironmentType Environment,
         bool IsActive
     );
 
