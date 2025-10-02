@@ -32,4 +32,8 @@
     <ProjectReference Include="..\Infrastructure\Infrastructure.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Controllers\Admin\Activity\" />
+  </ItemGroup>
+
 </Project>
