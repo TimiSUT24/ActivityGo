@@ -11,6 +11,8 @@ namespace Domain.Interfaces
     {
         Task<bool> ExistsByNameAsync(string name, CancellationToken cancellationToken = default);
         Task<IReadOnlyList<SportActivity>> GetActiveAsync(CancellationToken cancellationToken = default);
+        Task<int> CountActiveAsync(CancellationToken ct);
+
         IQueryable<SportActivity> Query();
     }
 }

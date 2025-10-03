@@ -28,7 +28,7 @@ namespace Infrastructure.Repositories
 
         public virtual async Task<IEnumerable<TEntity>> GetAllAsync(CancellationToken cancellationToken = default)
         {
-            return await _dbSet.ToListAsync(cancellationToken);
+            return await _dbSet.AsNoTracking().ToListAsync(cancellationToken); // la till AsNoTracking för bättre prestanda vid läsning
         }
         public virtual async Task AddAsync(TEntity entity, CancellationToken cancellationToken = default)
         {
