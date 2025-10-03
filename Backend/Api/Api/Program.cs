@@ -98,6 +98,8 @@ namespace Api
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
             builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
             builder.Services.AddScoped<IActivityRepository, ActivityRepository>();
+            builder.Services.AddScoped<IBookingRepository, BookingRepository>();
+
 
             // ===  Validation ===   // Glöm inte att man bara behöver registrera detta en gång då den läser av alla Validators i Application.
             builder.Services.AddValidatorsFromAssembly(typeof(Application.Activity.Validator.ActivityCreateValidator).Assembly);
