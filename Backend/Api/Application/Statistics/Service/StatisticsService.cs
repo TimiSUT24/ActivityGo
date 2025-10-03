@@ -1,9 +1,10 @@
 ﻿// Application/Statistics/Service/StatisticsService.cs
 using Application.Statistics.DTO;
 using Application.Statistics.Interface;
+using AutoMapper;
 using Domain.Enums;
-using Domain.Interfaces;         // IUnitOfWork
-using System.Linq;              // Select, Average
+using Domain.Interfaces;
+using System.Linq;
 using static System.Math;
 
 namespace Application.Statistics.Service
@@ -11,7 +12,13 @@ namespace Application.Statistics.Service
     public class StatisticsService : IStatisticsService
     {
         private readonly IUnitOfWork _uow;
-        public StatisticsService(IUnitOfWork uow) => _uow = uow;
+        private readonly IMapper _mapper;
+
+        public StatisticsService(IUnitOfWork uow, IMapper mapper)
+        {
+            _uow = uow;
+            _mapper = mapper;
+        }
 
         private static (DateTime fromUtc, DateTime toUtc) Range(DateTime? from, DateTime? to)
         {
@@ -24,21 +31,17 @@ namespace Application.Statistics.Service
         {
             var (fromUtc, toUtc) = Range(from, to);
 
-            // Bas-KPI:er
             var totalUsers       = await _uow.Users.CountAsync(ct);
             var activeActivities = await _uow.Activities.CountActiveAsync(ct);
             var activePlaces     = await _uow.Places.CountActiveAsync(ct);
 
-            // Bokningar i intervallet
             var total     = await _uow.Bookings.CountInRangeAsync(fromUtc, toUtc, ct);
             var booked    = await _uow.Bookings.CountByStatusInRangeAsync(BookingStatus.Booked,    fromUtc, toUtc, ct);
             var cancelled = await _uow.Bookings.CountByStatusInRangeAsync(BookingStatus.Cancelled, fromUtc, toUtc, ct);
             var completed = await _uow.Bookings.CountByStatusInRangeAsync(BookingStatus.Completed, fromUtc, toUtc, ct);
 
-            // Intäkt (Completed) – pris = PriceOverride ?? Activity.Price
             var revenue = await _uow.Bookings.SumRevenueCompletedInRangeAsync(fromUtc, toUtc, ct);
 
-            // Beläggning (utilization): snitt av (icke-cancelled / capacity) per occurrence
             var occUtilItems = await _uow.Occurrences.GetUtilizationItemsAsync(fromUtc, toUtc, ct);
             double avgUtil = 0;
             if (occUtilItems.Count > 0)
@@ -72,14 +75,14 @@ namespace Application.Statistics.Service
         {
             var (fromUtc, toUtc) = Range(from, to);
             var buckets = await _uow.Bookings.GetBookingsPerDayAsync(fromUtc, toUtc, ct);
-            return buckets.Select(b => new BookingsPerBucketDto { Bucket = b.Bucket, Count = b.Count });
+            return _mapper.Map<IEnumerable<BookingsPerBucketDto>>(buckets);
         }
 
         public async Task<IEnumerable<RevenuePerBucketDto>> GetRevenuePerDayAsync(DateTime? from, DateTime? to, CancellationToken ct)
         {
             var (fromUtc, toUtc) = Range(from, to);
             var rows = await _uow.Bookings.GetRevenuePerDayAsync(fromUtc, toUtc, ct);
-            return rows.Select(r => new RevenuePerBucketDto { Bucket = r.Bucket, Revenue = r.Revenue });
+            return _mapper.Map<IEnumerable<RevenuePerBucketDto>>(rows);
         }
 
         public async Task<IEnumerable<TopItemDto>> GetTopActivitiesAsync(DateTime? from, DateTime? to, int take, CancellationToken ct)
@@ -87,7 +90,7 @@ namespace Application.Statistics.Service
             var (fromUtc, toUtc) = Range(from, to);
             take = Math.Clamp(take, 1, 50);
             var items = await _uow.Bookings.GetTopActivitiesAsync(fromUtc, toUtc, take, ct);
-            return items.Select(i => new TopItemDto { Id = i.Id, Name = i.Name, Count = i.Count });
+            return _mapper.Map<IEnumerable<TopItemDto>>(items);
         }
 
         public async Task<IEnumerable<TopItemDto>> GetTopPlacesAsync(DateTime? from, DateTime? to, int take, CancellationToken ct)
@@ -95,14 +98,14 @@ namespace Application.Statistics.Service
             var (fromUtc, toUtc) = Range(from, to);
             take = Math.Clamp(take, 1, 50);
             var items = await _uow.Bookings.GetTopPlacesAsync(fromUtc, toUtc, take, ct);
-            return items.Select(i => new TopItemDto { Id = i.Id, Name = i.Name, Count = i.Count });
+            return _mapper.Map<IEnumerable<TopItemDto>>(items);
         }
 
         public async Task<IEnumerable<TopItemDto>> GetBookingsByCategoryAsync(DateTime? from, DateTime? to, CancellationToken ct)
         {
             var (fromUtc, toUtc) = Range(from, to);
             var items = await _uow.Bookings.GetByCategoryAsync(fromUtc, toUtc, ct);
-            return items.Select(i => new TopItemDto { Id = i.Id, Name = i.Name, Count = i.Count });
+            return _mapper.Map<IEnumerable<TopItemDto>>(items);
         }
     }
 }
