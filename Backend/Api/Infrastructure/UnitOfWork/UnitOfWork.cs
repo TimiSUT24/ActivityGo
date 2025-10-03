@@ -9,21 +9,21 @@ public sealed class UnitOfWork : IUnitOfWork
 
     // Exponera repos här när ni skapat dem (via DI):
     public IActivityRepository Activities { get; }
-    // public IPlaceRepository Places { get; }
+    public IPlaceRepository Places { get; }
     // public IBookingRepository Bookings { get; }
     // public IUserRepository Users { get; }
 
     public UnitOfWork(
         AppDbContext db
         , IActivityRepository activities
-        // , IPlaceRepository places
+        , IPlaceRepository places
         // , IBookingRepository bookings
         // , IUserRepository users
     )
     {
         _db = db;
         Activities = activities;
-        // Places = places;
+        Places = places;
         // Bookings = bookings;
         // Users = users;
     }
