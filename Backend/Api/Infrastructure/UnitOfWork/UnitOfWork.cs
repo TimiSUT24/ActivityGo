@@ -9,6 +9,8 @@ public sealed class UnitOfWork : IUnitOfWork
 
     // Exponera repos här när ni skapat dem (via DI):
     public IActivityRepository Activities { get; }
+    // public IPlaceRepository Places { get; }
+     public IBookingRepository Bookings { get; }
     public IPlaceRepository Places { get; }
     // public IBookingRepository Bookings { get; }
     // public IUserRepository Users { get; }
@@ -16,6 +18,8 @@ public sealed class UnitOfWork : IUnitOfWork
     public UnitOfWork(
         AppDbContext db
         , IActivityRepository activities
+        // , IPlaceRepository places
+         , IBookingRepository bookings
         , IPlaceRepository places
         // , IBookingRepository bookings
         // , IUserRepository users
@@ -23,6 +27,8 @@ public sealed class UnitOfWork : IUnitOfWork
     {
         _db = db;
         Activities = activities;
+        // Places = places;
+         Bookings = bookings;
         Places = places;
         // Bookings = bookings;
         // Users = users;

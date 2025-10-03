@@ -10,6 +10,8 @@ public interface IUnitOfWork : IDisposable
     // ==============================
     // Här lägger vi till våra IRepositories
     IActivityRepository Activities { get; }
+    // IPlaceRepository Places { get; }
+     IBookingRepository Bookings { get; }
     IPlaceRepository Places { get; }
     // IBookingRepository Bookings { get; }
     // IUserRepository Users { get; }
