@@ -42,6 +42,8 @@
     <Folder Include="Auth\Validator\" />
     <Folder Include="Place\DTO\" />
     <Folder Include="Place\Validator\" />
+    <Folder Include="Booking\DTO\" />
+    <Folder Include="Booking\Validator\" />
     <Folder Include="Statistics\DTO\" />
     <Folder Include="Statistics\Validator\" />
     <Folder Include="Weather\DTO\" />

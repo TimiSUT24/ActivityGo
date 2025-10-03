@@ -11,6 +11,8 @@ public sealed class UnitOfWork : IUnitOfWork
     public IActivityRepository Activities { get; }
     // public IPlaceRepository Places { get; }
      public IBookingRepository Bookings { get; }
+    public IPlaceRepository Places { get; }
+    // public IBookingRepository Bookings { get; }
     // public IUserRepository Users { get; }
 
     public UnitOfWork(
@@ -18,6 +20,8 @@ public sealed class UnitOfWork : IUnitOfWork
         , IActivityRepository activities
         // , IPlaceRepository places
          , IBookingRepository bookings
+        , IPlaceRepository places
+        // , IBookingRepository bookings
         // , IUserRepository users
     )
     {
@@ -25,6 +29,8 @@ public sealed class UnitOfWork : IUnitOfWork
         Activities = activities;
         // Places = places;
          Bookings = bookings;
+        Places = places;
+        // Bookings = bookings;
         // Users = users;
     }
 

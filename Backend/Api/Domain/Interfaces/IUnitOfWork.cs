@@ -12,6 +12,8 @@ public interface IUnitOfWork : IDisposable
     IActivityRepository Activities { get; }
     // IPlaceRepository Places { get; }
      IBookingRepository Bookings { get; }
+    IPlaceRepository Places { get; }
+    // IBookingRepository Bookings { get; }
     // IUserRepository Users { get; }
     // ==============================
 }
