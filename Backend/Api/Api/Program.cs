@@ -100,6 +100,8 @@ namespace Api
             builder.Services.AddScoped<IActivityRepository, ActivityRepository>();
             builder.Services.AddScoped<IBookingRepository, BookingRepository>();
             builder.Services.AddScoped<IPlaceRepository, PlaceRepository>();
+            builder.Services.AddScoped<IUserRepository, UserRepository>();
+            builder.Services.AddScoped<IActivityOccurrenceRepository, ActivityOccurrenceRepository>();
 
 
             // ===  Validation ===   // Glöm inte att man bara behöver registrera detta en gång då den läser av alla Validators i Application.

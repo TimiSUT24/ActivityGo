@@ -26,9 +26,12 @@ namespace Infrastructure.Repositories
             return await _dbSet.Where(a => a.IsActive).ToListAsync(cancellationToken);
         }
 
+        public Task<int> CountActiveAsync(CancellationToken cancellationToken = default)
+            => _dbSet
+                .AsNoTracking()
+                .CountAsync(a => a.IsActive, cancellationToken);
+
         public IQueryable<SportActivity> Query()
-        {
-            return _dbSet.AsQueryable();
-        }
+            => _dbSet.AsNoTracking();
     }
 }

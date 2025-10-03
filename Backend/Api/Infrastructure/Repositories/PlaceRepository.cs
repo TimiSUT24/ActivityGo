@@ -12,11 +12,21 @@ public class PlaceRepository : GenericRepository<Place>, IPlaceRepository
     public PlaceRepository(AppDbContext db) : base(db) => _db = db;
 
     public Task<bool> ExistsByNameAsync(string name, CancellationToken ct) =>
-        _db.Places.AnyAsync(p => p.Name == name, ct);
+        _db.Places
+            .AnyAsync(p => p.Name == name, ct);
 
     public async Task<IEnumerable<Place>> GetActiveAsync(CancellationToken ct) =>
-        await _db.Places.Where(p => p.IsActive).ToListAsync(ct);
+        await _db.Places
+            .Where(p => p.IsActive).ToListAsync(ct);
 
     public override Task<Place?> GetByIdAsync(Guid id, CancellationToken ct = default) =>
-        _db.Places.FirstOrDefaultAsync(p => p.Id == id, ct);
+        _db.Places
+            .AsNoTracking()
+            .FirstOrDefaultAsync(p => p.Id == id, ct);
+    
+    
+    public Task<int> CountActiveAsync(CancellationToken cancellationToken = default)
+        => _dbSet
+            .AsNoTracking()
+            .CountAsync(p => p.IsActive, cancellationToken);
 }
