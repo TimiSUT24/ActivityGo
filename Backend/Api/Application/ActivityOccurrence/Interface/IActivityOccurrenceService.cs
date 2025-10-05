@@ -11,5 +11,7 @@ namespace Application.ActivityOccurrence.Interface
     public interface IActivityOccurrenceService
     {
         Task<ActivityOccurrenceDto> AddAsync(CreateActivityOccurenceDto dto, CancellationToken ct);
+        Task<IEnumerable<ActivityOccurrenceDto>> GetAllAsync(CancellationToken ct);
+        Task<ActivityOccurrenceDto?> GetByIdAsync(Guid id, CancellationToken ct);
     }
 }

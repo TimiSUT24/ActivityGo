@@ -31,6 +31,23 @@ namespace Application.ActivityOccurrence.Service
             return _mapper.Map<ActivityOccurrenceDto>(entity);
         }
 
+        public async Task<IEnumerable<ActivityOccurrenceDto>> GetAllAsync(CancellationToken ct)
+        {
+            var entities = await _uow.Occurrences.GetAllAsync(ct);
+            return _mapper.Map<IEnumerable<ActivityOccurrenceDto>>(entities);
+        }
+
+        public async Task<ActivityOccurrenceDto?> GetByIdAsync(Guid id, CancellationToken ct)
+        {
+            var entity = await _uow.Occurrences.GetByIdAsync(id, ct);
+            
+            if(entity == null)
+            {
+                return null;
+            }            
+            return _mapper.Map<ActivityOccurrenceDto>(entity);
+        }
+
 
     }
 }
