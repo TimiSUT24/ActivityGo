@@ -64,6 +64,17 @@ namespace Application.ActivityOccurrence.Service
             return true;
         }
 
+        public async Task<bool> DeleteAsync(Guid id, CancellationToken ct)
+        {
+            var entity = await _uow.Occurrences.GetByIdAsync(id, ct);
+            if (entity == null)
+            {
+                return false;
+            }
 
+            _uow.Occurrences.Delete(entity);
+            await _uow.SaveChangesAsync(ct);
+            return true;
+        }
     }
 }

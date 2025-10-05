@@ -68,5 +68,18 @@ namespace Api.Controllers.ActivityOccurrence
             return Ok();
         }
 
+        [HttpDelete("{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult> Delete(Guid id, CancellationToken ct = default)
+        {
+            var deleted = await _activityOccurrenceService.DeleteAsync(id, ct);
+            if (!deleted)
+            {
+                return NotFound();
+            }
+            return Ok();
+        }
+
     }
 }
