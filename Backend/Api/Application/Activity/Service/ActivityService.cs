@@ -4,6 +4,7 @@ using Application.Activity.Interface;
 using AutoMapper;
 using Domain.Interfaces;
 using Domain.Models;
+using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Identity.Client;
 using System;
@@ -18,15 +19,25 @@ namespace Application.Activity.Service
     {
         private readonly IUnitOfWork _uow;
         private readonly IMapper _mapper;
+        private readonly IValidator<ActivityCreateRequest> _createValidator;
+        private readonly IValidator<ActivityUpdateRequest> _updateValidator;
 
-        public ActivityService(IUnitOfWork uow, IMapper mapper)
+        public ActivityService(IUnitOfWork uow, IMapper mapper, IValidator<ActivityCreateRequest> createValidator, IValidator<ActivityUpdateRequest> updateValidator)
         {
             _uow = uow;
             _mapper = mapper;
+            _createValidator = createValidator;
+            _updateValidator = updateValidator;
         }
 
         public async Task<ActivityResponse> CreateAsync(ActivityCreateRequest request, CancellationToken cancellationToken)
         {
+            var validationResult = await _createValidator.ValidateAsync(request, cancellationToken);
+            if (!validationResult.IsValid)
+            {
+                throw new ValidationException(validationResult.Errors);
+            }
+
             if(await _uow.Activities.ExistsByNameAsync(request.Name, cancellationToken))
                 throw new InvalidOperationException($"An activity with the name '{request.Name}' already exists.");
 
@@ -56,6 +67,12 @@ namespace Application.Activity.Service
 
         public async Task<bool> UpdateAsync(Guid id, ActivityUpdateRequest request, CancellationToken cancellationToken)
         {
+            var validationResult = await _updateValidator.ValidateAsync(request, cancellationToken);
+            if (!validationResult.IsValid)
+            {
+                throw new ValidationException(validationResult.Errors);
+            }
+
             var entity = await _uow.Activities.GetByIdAsync(id, cancellationToken);
             if (entity == null)
             {
