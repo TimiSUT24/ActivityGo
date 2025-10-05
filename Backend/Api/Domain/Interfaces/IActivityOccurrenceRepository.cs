@@ -1,6 +1,8 @@
+using Domain.Models;
+
 namespace Domain.Interfaces;
 
-public interface IActivityOccurrenceRepository
+public interface IActivityOccurrenceRepository : IGenericRepository<ActivityOccurrence>
 {
     // används av StatisticsService för beläggning
     Task<IReadOnlyList<OccurrenceUtilItem>> GetUtilizationItemsAsync(DateTime fromUtc, DateTime toUtc, CancellationToken ct);

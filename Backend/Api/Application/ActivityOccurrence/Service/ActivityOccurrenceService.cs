@@ -1,4 +1,6 @@
-﻿using Application.ActivityOccurrence.Interface;
+﻿using Application.ActivityOccurrence.DTO.Request;
+using Application.ActivityOccurrence.DTO.Response;
+using Application.ActivityOccurrence.Interface;
 using AutoMapper;
 using Domain.Interfaces;
 using System;
@@ -18,6 +20,15 @@ namespace Application.ActivityOccurrence.Service
         {
             _uow = uow;
             _mapper = mapper;
+        }
+
+        public async Task<ActivityOccurrenceDto> AddAsync(CreateActivityOccurenceDto dto, CancellationToken ct)
+        {
+            var entity = _mapper.Map<Domain.Models.ActivityOccurrence>(dto);
+            await _uow.Occurrences.AddAsync(entity, ct);
+
+            await _uow.SaveChangesAsync(ct);
+            return _mapper.Map<ActivityOccurrenceDto>(entity);
         }
 
 
