@@ -27,5 +27,32 @@ namespace Api.Controllers.ActivityOccurrence
             var created = await _activityOccurrenceService.AddAsync(dto, ct);
             return CreatedAtAction(nameof(Create), new { id = created.Id }, created);
         }
+
+        [HttpGet]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<IEnumerable<ActivityOccurrenceDto>>> GetAll(CancellationToken ct = default)
+        {
+            var occurrences = await _activityOccurrenceService.GetAllAsync(ct);
+            if (occurrences == null || !occurrences.Any())
+            {
+                return NotFound();
+            }
+            return Ok(occurrences);
+        }
+
+        [HttpGet("{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<ActivityOccurrenceDto>> GetById(Guid id, CancellationToken ct = default)
+        {
+            var occurrence = await _activityOccurrenceService.GetByIdAsync(id, ct);
+            if (occurrence == null)
+            {
+                return NotFound();
+            }
+            return Ok(occurrence);
+        }
+
     }
 }
