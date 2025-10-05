@@ -13,5 +13,6 @@ namespace Application.ActivityOccurrence.Interface
         Task<ActivityOccurrenceDto> AddAsync(CreateActivityOccurenceDto dto, CancellationToken ct);
         Task<IEnumerable<ActivityOccurrenceDto>> GetAllAsync(CancellationToken ct);
         Task<ActivityOccurrenceDto?> GetByIdAsync(Guid id, CancellationToken ct);
+        Task<bool> UpdateAsync(UpdateActivityOccurenceDto dto, CancellationToken ct);
     }
 }

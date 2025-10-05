@@ -48,6 +48,22 @@ namespace Application.ActivityOccurrence.Service
             return _mapper.Map<ActivityOccurrenceDto>(entity);
         }
 
+        public async Task<bool> UpdateAsync(UpdateActivityOccurenceDto dto, CancellationToken ct)
+        {
+            var entity = await _uow.Occurrences.GetByIdAsync(dto.Id, ct);
+            if (entity == null)
+            {
+                return false;
+            }
+
+            _mapper.Map(dto, entity);
+            _uow.Occurrences.Update(entity);
+            entity.UpdatedAtUtc = DateTime.UtcNow;
+
+            await _uow.SaveChangesAsync(ct);
+            return true;
+        }
+
 
     }
 }

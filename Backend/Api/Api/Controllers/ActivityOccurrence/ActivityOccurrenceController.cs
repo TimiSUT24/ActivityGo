@@ -9,7 +9,7 @@ namespace Api.Controllers.ActivityOccurrence
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = "Admin")]
+    //[Authorize(Roles = "Admin")]
     public class ActivityOccurrenceController : ControllerBase
     {
         private readonly IActivityOccurrenceService _activityOccurrenceService;
@@ -52,6 +52,20 @@ namespace Api.Controllers.ActivityOccurrence
                 return NotFound();
             }
             return Ok(occurrence);
+        }
+
+        [HttpPut]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult> Update([FromBody] UpdateActivityOccurenceDto dto, CancellationToken ct = default)
+        {
+            var updated = await _activityOccurrenceService.UpdateAsync(dto, ct);
+            if (!updated)
+            {
+                return NotFound();
+            }
+            return Ok();
         }
 
     }
