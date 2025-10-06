@@ -22,6 +22,7 @@ using Application.Weather.Service;
 using Domain.Interfaces;                // IUnitOfWork
 using Domain.Models;                   // Din User : IdentityUser
 using FluentValidation;
+using FluentValidation.AspNetCore;
 using Infrastructure.Auth;             // <-- TokenService s
 using Infrastructure.Data.Seeding;
 using Infrastructure.Persistence;      // Din AppDbContext
@@ -106,6 +107,7 @@ namespace Api
 
             // ===  Validation ===   // Glöm inte att man bara behöver registrera detta en gång då den läser av alla Validators i Application.
             builder.Services.AddValidatorsFromAssembly(typeof(Application.Activity.Validator.ActivityCreateValidator).Assembly);
+            builder.Services.AddFluentValidationAutoValidation();
             // ===  JWT Authentication ===
             var jwt = builder.Configuration.GetSection("Jwt");
             var signingKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwt["Key"]!));
