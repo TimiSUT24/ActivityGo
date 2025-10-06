@@ -20,7 +20,7 @@ public class BookingRepository : GenericRepository<Booking>, IBookingRepository
 
     public async Task<bool> ExistsOverlapForUserAsync(string userId, DateTime startUtc, DateTime endUtc, CancellationToken ct) =>
         await _db.Bookings
-            .Include(b => b.ActivityOccurrence)
+            .AsNoTracking()
             .AnyAsync(b =>
                 b.UserId == userId &&
                 b.Status == BookingStatus.Booked &&
@@ -29,6 +29,8 @@ public class BookingRepository : GenericRepository<Booking>, IBookingRepository
 
     public async Task<IEnumerable<Booking>> GetByUserAsync(string userId, CancellationToken ct) =>
         await _db.Bookings
+            .AsNoTracking()
+            .AsSplitQuery()
             .Include(b => b.ActivityOccurrence).ThenInclude(o => o.Place)
             .Include(b => b.ActivityOccurrence).ThenInclude(o => o.Activity)
             .Where(b => b.UserId == userId)
@@ -37,6 +39,8 @@ public class BookingRepository : GenericRepository<Booking>, IBookingRepository
 
     public async Task<IEnumerable<Booking>> GetByUserAndStatusAsync(string userId, BookingStatus status, CancellationToken ct) =>
         await _db.Bookings
+            .AsNoTracking()
+            .AsSplitQuery()
             .Include(b => b.ActivityOccurrence).ThenInclude(o => o.Place)
             .Include(b => b.ActivityOccurrence).ThenInclude(o => o.Activity)
             .Where(b => b.UserId == userId && b.Status == status)
@@ -45,6 +49,8 @@ public class BookingRepository : GenericRepository<Booking>, IBookingRepository
 
     public async Task<Booking?> GetByIdForUserAsync(Guid id, string userId, CancellationToken ct) =>
         await _db.Bookings
+            .AsNoTracking()
+            .AsSplitQuery()
             .Include(b => b.ActivityOccurrence).ThenInclude(o => o.Place)
             .Include(b => b.ActivityOccurrence).ThenInclude(o => o.Activity)
             .FirstOrDefaultAsync(b => b.Id == id && b.UserId == userId, ct);
