@@ -27,10 +27,17 @@ public sealed class ActivityOccurrenceRepository : GenericRepository<ActivityOcc
             })
             .ToListAsync(ct);
     }
-
-    Task<IReadOnlyList<ActivityOccurrence>> GetOccurrencesBetweenDatesWithPlaceAndActivityAsync(DateTime fromDate, DateTime toDate, CancellationToken ct)
+    // Eager loading Place & Activity
+    public async Task<IReadOnlyList<ActivityOccurrence>> GetOccurrencesBetweenDatesWithPlaceAndActivityAsync(DateTime fromDate, DateTime toDate, CancellationToken ct)
     {
-
+        return await _db.ActivityOccurence
+            .Include(ao => ao.Place)
+            .Include(ao => ao.Activity)
+            .Where(ao => ao.StartUtc >= fromDate && ao.StartUtc < toDate)
+            .Where(ao => ao.Place.IsActive && ao.Activity.IsActive)
+            .OrderBy(ao => ao.StartUtc)
+            .AsNoTracking()
+            .ToListAsync(ct);
     }
 
 }
