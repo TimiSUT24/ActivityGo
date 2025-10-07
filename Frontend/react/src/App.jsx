@@ -1,5 +1,5 @@
 import { Routes, Route, Link } from "react-router-dom";
-import LoginForm from "./components/LoginForm"; 
+import LoginForm from "./Components/LoginForm"; 
 
 function Home() {
   return <h1 style={{ padding: 16 }}>Välkommen</h1>;
