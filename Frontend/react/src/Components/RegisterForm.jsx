@@ -1,5 +1,6 @@
-import {useState} from 'react'
-import axios from 'axios'
+import {useState} from 'react';
+import axios from 'axios';
+import '../CSS/RegisterForm.css';
 
 export default function RegisterForm (){
 
@@ -45,6 +46,7 @@ export default function RegisterForm (){
                 placeholder = "email"
                 value = {formData.email}
                 onChange = {handleChange}
+                className = "register-input"
                 />
 
                 <input 
@@ -53,6 +55,7 @@ export default function RegisterForm (){
                 placeholder = "password"
                 value = {formData.password}
                 onChange = {handleChange}
+                className = "register-input"
                 />
 
                 <input 
@@ -61,6 +64,7 @@ export default function RegisterForm (){
                 placeholder = "firstname"
                 value = {formData.firstname}
                 onChange = {handleChange}
+                className = "register-input"
                 />
 
                 <input 
@@ -69,6 +73,7 @@ export default function RegisterForm (){
                 placeholder = "lastname"
                 value = {formData.lastname}
                 onChange = {handleChange}
+                className = "register-input"
                 />
 
                 <button type = "submit">Register</button>
