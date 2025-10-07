@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Infrastructure.Repositories
@@ -15,6 +16,15 @@ namespace Infrastructure.Repositories
         public ActivityRepository(AppDbContext context) : base(context)
         {
         }
+
+        public async Task<SportActivity?> GetByIdAsync(Guid id, CancellationToken ct = default)
+        {
+            return await _dbSet
+                .AsNoTracking()
+                .Include(a => a.Category)
+                .FirstOrDefaultAsync(a => a.Id == id, ct);
+        }
+
 
         public Task<bool> ExistsByNameAsync(string name, CancellationToken cancellationToken = default)
         {
@@ -36,6 +46,8 @@ namespace Infrastructure.Repositories
                 .CountAsync(a => a.IsActive, cancellationToken);
 
         public IQueryable<SportActivity> Query()
-            => _dbSet.AsNoTracking();
+            => _dbSet
+            .AsNoTracking()
+            .Include(a => a.Category);
     }
 }
