@@ -19,27 +19,33 @@ namespace Infrastructure.Weather
 
         public async Task<WeatherForecastDto> GetAsync(double lat, double lon, DateTime startUtc, DateTime endUtc, CancellationToken cancellationToken)
         {
-            var url = $"{_options.BaseUrl}/forecast?lat={lat}&lon={lon}&units=metric&appid={_options.ApiKey}";
+            // OpenWeather kräver lat/lon med punkt som decimalavskiljare, oavsett kultur därför fick jag tvinga den till det då "," är standard i sv-SE
+            //Detta löste inte problemet så vi letar vidare.
+            var latStr = lat.ToString(System.Globalization.CultureInfo.InvariantCulture);
+            var lonStr = lon.ToString(System.Globalization.CultureInfo.InvariantCulture);
+
+            var url = $"{_options.BaseUrl}/onecall?lat={latStr}&lon={lonStr}&units=metric&appid={_options.ApiKey}";
+            //var url = $"{_options.BaseUrl}/onecall?lat={lat}&lon={lon}&units=metric&appid={_options.ApiKey}";
+
             var ow = await _http.GetFromJsonAsync<OwForecast>(url, cancellationToken)
                      ?? throw new InvalidOperationException("Weather provider returned no data");
 
-            var slices = ow.list
-                .Where(x => x.dt_txt != null)
+            var slices = ow.hourly
                 .Select(x => new
                 {
-                    t = DateTime.SpecifyKind(DateTime.Parse(x.dt_txt!, System.Globalization.CultureInfo.InvariantCulture), DateTimeKind.Utc),
+                    t = DateTimeOffset.FromUnixTimeSeconds(x.dt).UtcDateTime,
                     x
                 })
                 .Where(x => x.t >= startUtc && x.t <= endUtc)
                 .Select(x => new WeatherSliceDto
                 {
                     TimeUtc = x.t,
-                    TemperatureC = x.x.main.temp,
-                    WindSpeedMs = x.x.wind.speed,
-                    rainVolumeMm = x.x.rain?.GetValueOrDefault("3h") ?? 0.0,
+                    TemperatureC = x.x.temp,
+                    WindSpeedMs = x.x.wind_speed,
+                    rainVolumeMm = x.x.rain?.OneHour ?? 0.0,
                     ConditionIconUrl = x.x.weather.FirstOrDefault()?.icon ?? "",
                     ConditionText = x.x.weather.FirstOrDefault()?.description ?? "",
-                    Source = "openweather"
+                    Source = "openweather3.0"
                 })
                 .ToList();
 
@@ -54,17 +60,31 @@ namespace Infrastructure.Weather
         }
 
         // Minimala modeller för leverantörens JSON
-        private sealed class OwForecast { public List<Item> list { get; set; } = new(); }
-        private sealed class Item
+        private sealed class OwForecast
         {
-            public string? dt_txt { get; set; }
-            public Main main { get; set; } = new();
-            public Wind wind { get; set; } = new();
-            public List<W> weather { get; set; } = new();
-            public Dictionary<string, double>? rain { get; set; }
+            public List<HourlyItem> hourly { get; set; } = new();
         }
-        private sealed class Main { public double temp { get; set; } }
-        private sealed class Wind { public double speed { get; set; } }
-        private sealed class W { public string icon { get; set; } = ""; public string description { get; set; } = ""; }
+
+        // Representerar ett timvis prognos-objekt
+        private sealed class HourlyItem
+        {
+            public long dt { get; set; } // Unix-tid (kräver konvertering)
+            public double temp { get; set; }
+            public double wind_speed { get; set; }
+            public List<W> weather { get; set; } = new();
+            public RainData? rain { get; set; }
+        }
+
+        private sealed class RainData
+        {
+            [System.Text.Json.Serialization.JsonPropertyName("1h")]
+            public double? OneHour { get; set; }
+        }
+
+        private sealed class W
+        {
+            public string icon { get; set; } = "";
+            public string description { get; set; } = "";
+        }
     }
 }
