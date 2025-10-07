@@ -165,7 +165,22 @@ namespace Api
                 });
             });
 
+            //Cors configuration
+            var allowedOrigins = builder.Configuration.GetSection("AllowedOrigins").Get<string[]>();
+
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowFrontend", policy =>
+                {                 
+                          policy.WithOrigins(allowedOrigins!)
+                          .AllowAnyHeader()
+                          .AllowAnyMethod();
+                });
+            });
+
             var app = builder.Build();
+
+            app.UseCors("AllowFrontend");
 
             //Seeding roles and users 
             using (var scope = app.Services.CreateScope())
