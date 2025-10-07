@@ -6,6 +6,9 @@ public interface IActivityOccurrenceRepository : IGenericRepository<ActivityOccu
 {
     // används av StatisticsService för beläggning
     Task<IReadOnlyList<OccurrenceUtilItem>> GetUtilizationItemsAsync(DateTime fromUtc, DateTime toUtc, CancellationToken ct);
+   
+    // New method for weather integration in ActivityOccurence, eager loaded place & activity.
+    Task<IReadOnlyList<ActivityOccurrence>> GetOccurrencesBetweenDatesWithPlaceAndActivityAsync(DateTime fromDate, DateTime toDate, CancellationToken ct);
 }
 
 public class OccurrenceUtilItem

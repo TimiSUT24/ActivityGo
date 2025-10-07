@@ -3,6 +3,9 @@ using Domain.Interfaces;
 using Domain.Models;
 using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Infrastructure.Repositories;
 
@@ -24,4 +27,17 @@ public sealed class ActivityOccurrenceRepository : GenericRepository<ActivityOcc
             })
             .ToListAsync(ct);
     }
+    // Eager loading Place & Activity
+    public async Task<IReadOnlyList<ActivityOccurrence>> GetOccurrencesBetweenDatesWithPlaceAndActivityAsync(DateTime fromDate, DateTime toDate, CancellationToken ct)
+    {
+        return await _db.ActivityOccurrences
+            .Include(ao => ao.Place)
+            .Include(ao => ao.Activity)
+            .Where(ao => ao.StartUtc >= fromDate && ao.StartUtc < toDate)
+            .Where(ao => ao.Place.IsActive && ao.Activity.IsActive)
+            .OrderBy(ao => ao.StartUtc)
+            .AsNoTracking()
+            .ToListAsync(ct);
+    }
+
 }

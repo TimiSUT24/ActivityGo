@@ -1,4 +1,5 @@
-﻿using Application.ActivityOccurrence.DTO.Request;
+﻿using Application.ActivityOccurrence.DTO;
+using Application.ActivityOccurrence.DTO.Request;
 using Application.ActivityOccurrence.DTO.Response;
 using Application.ActivityOccurrence.Interface;
 using Microsoft.AspNetCore.Authorization;
@@ -81,5 +82,19 @@ namespace Api.Controllers.ActivityOccurrence
             return Ok();
         }
 
+        [HttpGet("with-weather")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult<IEnumerable<ActivityOccurrenceWeatherDto>>> GetOccurrencesWithWeather(
+            [FromQuery] DateTime? fromDate,
+            [FromQuery] DateTime? toDate, 
+            CancellationToken ct = default)
+        {
+            // Default to today and one week ahead if not provided
+            var start = fromDate ?? DateTime.UtcNow;
+            var end = toDate ?? start.AddDays(7);
+
+            var occurrences = await _activityOccurrenceService.GetOccurrencesWithWeatherAsync(start, end, ct);
+            return Ok(occurrences);
+        }
     }
 }

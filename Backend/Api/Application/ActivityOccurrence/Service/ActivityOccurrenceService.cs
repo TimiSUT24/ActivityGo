@@ -1,13 +1,13 @@
 ﻿using Application.ActivityOccurrence.DTO.Request;
 using Application.ActivityOccurrence.DTO.Response;
 using Application.ActivityOccurrence.Interface;
+using Application.Weather.DTO;
+using Application.Weather.Interface;
 using AutoMapper;
+using Domain.Enums;
 using Domain.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Application.Weather.DTO;
+using Application.ActivityOccurrence.DTO;
 
 namespace Application.ActivityOccurrence.Service
 {
@@ -15,11 +15,13 @@ namespace Application.ActivityOccurrence.Service
     {
         private readonly IUnitOfWork _uow;
         private readonly IMapper _mapper;
+        private readonly IWeatherService _weatherService;
 
-        public ActivityOccurrenceService(IUnitOfWork uow, IMapper mapper)
+        public ActivityOccurrenceService(IUnitOfWork uow, IMapper mapper, IWeatherService weatherService)
         {
             _uow = uow;
             _mapper = mapper;
+            _weatherService = weatherService;
         }
 
         public async Task<ActivityOccurrenceDto> AddAsync(CreateActivityOccurenceDto dto, CancellationToken ct)
@@ -40,11 +42,11 @@ namespace Application.ActivityOccurrence.Service
         public async Task<ActivityOccurrenceDto?> GetByIdAsync(Guid id, CancellationToken ct)
         {
             var entity = await _uow.Occurrences.GetByIdAsync(id, ct);
-            
-            if(entity == null)
+
+            if (entity == null)
             {
                 return null;
-            }            
+            }
             return _mapper.Map<ActivityOccurrenceDto>(entity);
         }
 
@@ -75,6 +77,62 @@ namespace Application.ActivityOccurrence.Service
             _uow.Occurrences.Delete(entity);
             await _uow.SaveChangesAsync(ct);
             return true;
+        }
+
+        /*=============ActivityOccurrence + Weather=============*/
+
+        public async Task<IReadOnlyList<ActivityOccurrenceWeatherDto>> GetOccurrencesWithWeatherAsync(
+            DateTime fromDate, DateTime toDate, CancellationToken ct)
+        {
+            var repo = (IActivityOccurrenceRepository)_uow.Occurrences;
+            var occurences = await repo.GetOccurrencesBetweenDatesWithPlaceAndActivityAsync(fromDate, toDate, ct);
+
+            var dtos = _mapper.Map<IReadOnlyList<ActivityOccurrenceWeatherDto>>(occurences);
+
+            var enrichmentTasks = new List<Task>();
+
+            foreach (var dto in dtos.Where(d => d.Environment == EnvironmentType.Outdoor))
+            {
+                var domainEntity = occurences.First(o => o.Id == dto.Id);
+
+                if (domainEntity.Place.Latitude.HasValue && domainEntity.Place.Longitude.HasValue)
+                {
+                    enrichmentTasks.Add(
+                        EnrichWithWeatherAsync(dto, domainEntity, ct));
+                }
+            }
+            await Task.WhenAll(enrichmentTasks);
+
+            return dtos;
+        }
+
+        private async Task EnrichWithWeatherAsync(
+            ActivityOccurrenceWeatherDto dto, Domain.Models.ActivityOccurrence domain, CancellationToken ct)
+        {
+            double lat = domain.Place.Latitude!.Value;
+            double lon = domain.Place.Longitude!.Value;
+            DateTime start = domain.StartUtc;
+
+            try
+            {
+                // Uses the cached weather service to get the forecast
+                var forecast = await _weatherService.GetAsync(lat, lon, start, domain.EndUtc, ct);
+
+                // Sets the weather forecast to the slice closest to the start time of the activity
+                var relevantSlice = forecast.Slices
+                    .OrderBy(s => Math.Abs((s.TimeUtc - start).TotalMinutes))
+                    .FirstOrDefault();
+
+                if (relevantSlice != null)
+                {
+                    dto.WeatherForecast = _mapper.Map<ActivityWeatherForecastDto>(relevantSlice);
+                }
+            }
+            catch (Exception)
+            {
+                // If something goes wrong, we dont provide weather data
+                dto.WeatherForecast = null;
+            }
         }
     }
 }

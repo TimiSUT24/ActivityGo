@@ -5,9 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Application.Weather.Interface
+namespace Application.Weather.Interfaces
 {
-    public interface IWeatherService
+    public interface IWeatherClient
     {
         Task<WeatherForecastDto> GetAsync(
             double lat, double lon, DateTime startUtc, DateTime endUtc, CancellationToken cancellationToken);
