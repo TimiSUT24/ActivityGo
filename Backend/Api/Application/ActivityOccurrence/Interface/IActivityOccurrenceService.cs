@@ -1,6 +1,7 @@
 ﻿using Application.ActivityOccurrence.DTO;
 using Application.ActivityOccurrence.DTO.Request;
 using Application.ActivityOccurrence.DTO.Response;
+using Domain.Enums;
 using System;
 using System.Threading;
 

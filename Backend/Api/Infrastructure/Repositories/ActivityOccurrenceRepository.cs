@@ -15,6 +15,47 @@ public sealed class ActivityOccurrenceRepository : GenericRepository<ActivityOcc
 
     public ActivityOccurrenceRepository(AppDbContext db) : base(db) => _db = db;
 
+    // Method to improve query for alternative filters
+    public async Task<IReadOnlyList<ActivityOccurrence>> GetBetweenDatesFilteredAsync(
+        DateTime fromDate, DateTime toDate,
+        Guid? categoryId, Guid? activityId, Guid? placeId,
+        EnvironmentType? environment, bool? onlyAvailable,
+        CancellationToken ct)
+    {
+        var q = _db.ActivityOccurrences
+            .AsNoTracking()
+            .Include(o => o.Place)
+            .Include(o => o.Activity)
+            .Where(o => o.StartUtc >= fromDate && o.StartUtc < toDate)
+            .Where(o => o.Place.IsActive && o.Activity.IsActive);
+
+        if (categoryId.HasValue)
+            q = q.Where(o => o.Activity.CategoryId == categoryId.Value);
+
+        if (activityId.HasValue)
+            q = q.Where(o => o.ActivityId == activityId.Value);
+
+        if (placeId.HasValue)
+            q = q.Where(o => o.PlaceId == placeId.Value);
+
+        if (environment.HasValue)
+            q = q.Where(o => o.Place.Environment == environment.Value);
+
+        if (onlyAvailable == true)
+        {
+            q = q.Where(o =>
+                _db.Bookings.Count(b => b.ActivityOccurrenceId == o.Id && b.Status == BookingStatus.Booked)
+                < o.EffectiveCapacity);
+        }
+
+        return await q
+            .OrderBy(o => o.StartUtc)
+            .ToListAsync(ct);
+    }
+
+
+
+
     public async Task<IReadOnlyList<OccurrenceUtilItem>> GetUtilizationItemsAsync(DateTime fromUtc, DateTime toUtc, CancellationToken ct)
     {
         return await _db.ActivityOccurrences.AsNoTracking()
