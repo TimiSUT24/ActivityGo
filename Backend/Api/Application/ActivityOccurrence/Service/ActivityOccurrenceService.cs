@@ -7,6 +7,7 @@ using AutoMapper;
 using Domain.Enums;
 using Domain.Interfaces;
 using Application.Weather.DTO;
+using Application.ActivityOccurrence.DTO;
 
 namespace Application.ActivityOccurrence.Service
 {
@@ -80,12 +81,13 @@ namespace Application.ActivityOccurrence.Service
 
         /*=============ActivityOccurrence + Weather=============*/
 
-        public async Task<IReadOnlyList<ActivityOccurrenceWeather>> GetOccurrencesWithWeatherAsync(
+        public async Task<IReadOnlyList<ActivityOccurrenceWeatherDto>> GetOccurrencesWithWeatherAsync(
             DateTime fromDate, DateTime toDate, CancellationToken ct)
         {
-            var occurences = await _uow.GetOccurenceBetweenDatesWithPlaceAndActivityAsync(fromDate, toDate, ct);
+            var repo = (IActivityOccurrenceRepository)_uow.Occurrences;
+            var occurences = await repo.GetOccurrencesBetweenDatesWithPlaceAndActivityAsync(fromDate, toDate, ct);
 
-            var dtos = _mapper.Map<IReadOnlyList<ActivityOccurrenceWeather>>(occurences);
+            var dtos = _mapper.Map<IReadOnlyList<ActivityOccurrenceWeatherDto>>(occurences);
 
             var enrichmentTasks = new List<Task>();
 

@@ -1,10 +1,7 @@
-﻿using AutoMapper;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
+﻿using Application.ActivityOccurrence.DTO;
+using Application.Weather.DTO;
+using AutoMapper;
+using Domain.Models;
 namespace Application.Weather.Mapper
 {
     public class WeatherProfile : Profile
@@ -12,7 +9,7 @@ namespace Application.Weather.Mapper
         public WeatherProfile()
         {
                 // Mapping if ActivityOccurrence -> ActivityOccurrenceWeatherDto is needed
-                CreateMap<ActivityOccurrence, ActivityOccurrenceWeatherDto>()
+                CreateMap<Domain.Models.ActivityOccurrence, ActivityOccurrenceWeatherDto>()
                 // Mapping eager loaded navigations for Activity & Place
                 .ForMember(dest => dest.ActivityName, opt => opt.MapFrom(src => src.Activity.Name))
                 .ForMember(dest => dest.PlaceName, opt => opt.MapFrom(src => src.Place.Name))
