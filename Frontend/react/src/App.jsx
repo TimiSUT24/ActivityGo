@@ -1,8 +1,8 @@
 import { Routes, Route, Link } from "react-router-dom";
-import LoginForm from "/Components/LoginForm";
+import LoginForm from "./components/LoginForm"; 
 
 function Home() {
-  return <h1>Välkommen</h1>;
+  return <h1 style={{ padding: 16 }}>Välkommen</h1>;
 }
 
 export default function App() {
@@ -12,7 +12,6 @@ export default function App() {
         <Link to="/">Hem</Link>
         <Link to="/login">Logga in</Link>
       </nav>
-
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<LoginForm />} />

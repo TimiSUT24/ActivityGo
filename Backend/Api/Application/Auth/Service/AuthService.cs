@@ -44,6 +44,7 @@ namespace Application.Auth.Service
             var (access, refresh) = await _tokens.IssueTokensAsync(user, GetIp());
             return new AuthResult(access)
             {
+                AccessToken = access,
                 RefreshToken = refresh,
                 Email = user.Email,
                 UserId = user.Id
