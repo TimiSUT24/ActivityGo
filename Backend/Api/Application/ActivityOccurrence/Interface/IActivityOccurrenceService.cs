@@ -1,11 +1,6 @@
 ﻿using Application.ActivityOccurrence.DTO.Request;
 using Application.ActivityOccurrence.DTO.Response;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
+using Application.ActivityOccurrence.DTO;
 
 namespace Application.ActivityOccurrence.Interface
 {

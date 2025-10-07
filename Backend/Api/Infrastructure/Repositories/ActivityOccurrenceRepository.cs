@@ -30,7 +30,7 @@ public sealed class ActivityOccurrenceRepository : GenericRepository<ActivityOcc
     // Eager loading Place & Activity
     public async Task<IReadOnlyList<ActivityOccurrence>> GetOccurrencesBetweenDatesWithPlaceAndActivityAsync(DateTime fromDate, DateTime toDate, CancellationToken ct)
     {
-        return await _db.ActivityOccurence
+        return await _db.ActivityOccurrences
             .Include(ao => ao.Place)
             .Include(ao => ao.Activity)
             .Where(ao => ao.StartUtc >= fromDate && ao.StartUtc < toDate)
