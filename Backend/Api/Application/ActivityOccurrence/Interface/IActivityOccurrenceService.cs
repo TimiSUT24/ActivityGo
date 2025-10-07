@@ -1,6 +1,8 @@
-﻿using Application.ActivityOccurrence.DTO.Request;
+﻿using Application.ActivityOccurrence.DTO;
+using Application.ActivityOccurrence.DTO.Request;
 using Application.ActivityOccurrence.DTO.Response;
-using Application.ActivityOccurrence.DTO;
+using System;
+using System.Threading;
 
 namespace Application.ActivityOccurrence.Interface
 {
@@ -12,8 +14,15 @@ namespace Application.ActivityOccurrence.Interface
         Task<bool> UpdateAsync(UpdateActivityOccurenceDto dto, CancellationToken ct);
         Task<bool> DeleteAsync(Guid id, CancellationToken ct);
 
-        // New method to get occurrences with weather data
+        // Get occurrences with weather data with optional filters.
         Task<IReadOnlyList<ActivityOccurrenceWeatherDto>> GetOccurrencesWithWeatherAsync(
-            DateTime fromDate, DateTime toDate, CancellationToken ct);
+            DateTime? fromDate, 
+            DateTime? toDate,
+            Guid? categoryId, 
+            Guid? activityId, 
+            Guid? placeId,
+            EnvironmentType? environment, 
+            bool? onlyAvailable,
+            CancellationToken ct);
     }
 }
