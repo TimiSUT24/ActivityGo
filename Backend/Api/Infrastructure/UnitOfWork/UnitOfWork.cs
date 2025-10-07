@@ -8,24 +8,29 @@ public sealed class UnitOfWork : IUnitOfWork
     private readonly AppDbContext _db;
 
     // Exponera repos här när ni skapat dem (via DI):
-    // public IActivityRepository Activities { get; }
+    public IActivityRepository Activities { get; }
     // public IPlaceRepository Places { get; }
-    // public IBookingRepository Bookings { get; }
-    // public IUserRepository Users { get; }
-
+     public IBookingRepository Bookings { get; }
+    public IPlaceRepository Places { get; }
+    public IUserRepository Users { get; }
+    public IActivityOccurrenceRepository Occurrences { get; }
+    // ==============================
     public UnitOfWork(
         AppDbContext db
-        // , IActivityRepository activities
-        // , IPlaceRepository places
-        // , IBookingRepository bookings
-        // , IUserRepository users
+        , IActivityRepository activities
+         , IBookingRepository bookings
+        , IPlaceRepository places
+        , IUserRepository users
+        , IActivityOccurrenceRepository occurrences
     )
     {
         _db = db;
-        // Activities = activities;
-        // Places = places;
-        // Bookings = bookings;
-        // Users = users;
+        Activities = activities;
+        Bookings = bookings;
+        Places = places;
+        Users = users;
+        Occurrences = occurrences;
+
     }
 
     public Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)

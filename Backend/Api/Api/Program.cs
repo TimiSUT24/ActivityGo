@@ -17,26 +17,30 @@ using Application.Statistics.Interface;
 using Application.Statistics.Mapper;
 using Application.Statistics.Service;
 using Application.Weather.Interface;
+using Application.Weather.Interfaces;
 using Application.Weather.Mapper;
 using Application.Weather.Service;
 using Domain.Interfaces;                // IUnitOfWork
 using Domain.Models;                   // Din User : IdentityUser
+using FluentValidation;
+using FluentValidation.AspNetCore;
+using Infrastructure.Auth;             // <-- TokenService s
 using Infrastructure.Data.Seeding;
 using Infrastructure.Persistence;      // Din AppDbContext
 using Infrastructure.Repositories;
 using Infrastructure.UnitOfWork;       // Din UnitOfWork
-using Infrastructure.Auth;             // <-- TokenService s
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using System.Threading.Tasks;
+using Infrastructure.Weather;
 
 // === JWT usings ===
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
-using System.Text;
-
 // === Swagger usings ===
 using Microsoft.OpenApi.Models;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace Api
 {
@@ -55,13 +59,20 @@ namespace Api
             builder.Services.AddScoped<IStatisticsService, StatisticsService>();
             builder.Services.AddScoped<IWeatherService, WeatherService>();
             builder.Services.AddScoped<ITokenService, TokenService>();
-
+            //Fake Weather client for testing and development without API key
+            builder.Services.AddSingleton<IWeatherClient, FakeWeatherClient>();
             //AutoMapper
             builder.Services.AddAutoMapper(cfg =>
             {
                 // optional: additional configuration here
-            }, typeof(ActivityProfile), typeof(ActivityOccurrenceProfile), typeof(AuthProfile),
-               typeof(BookingProfile), typeof(PlaceProfile), typeof(StatisticsProfile), typeof(WeatherProfile));
+            },
+            typeof(ActivityProfile), 
+            typeof(ActivityOccurrenceProfile), 
+            typeof(AuthProfile),
+               typeof(BookingProfile), 
+               typeof(PlaceProfile), 
+               typeof(StatisticsProfile), 
+               typeof(WeatherProfile));
 
             // ===  Connection string + DbContext (SQL Server) ===
             builder.Services.AddDbContext<AppDbContext>(opts =>
@@ -69,6 +80,29 @@ namespace Api
                     builder.Configuration.GetConnectionString("DefaultConnection")
                 )
             );
+
+            // === Weather cache + options ===
+            builder.Services.AddMemoryCache();
+
+            builder.Services.Configure<OpenWeatherOptions>(
+                builder.Configuration.GetSection("OpenWeather"));
+
+            // Välj klient: Fake i dev utan nyckel, annars riktig HTTP-klient
+            var wxKey = builder.Configuration["OpenWeather:ApiKey"];
+            if (builder.Environment.IsDevelopment() && string.IsNullOrWhiteSpace(wxKey))
+            {
+                // Utv utan nyckel = fake
+                builder.Services.AddSingleton<IWeatherClient, FakeWeatherClient>();
+            }
+            else
+            {
+                builder.Services.AddHttpClient<IWeatherClient, OpenWeatherClient>(c =>
+                {
+                    c.Timeout = TimeSpan.FromSeconds(8);
+                });
+            }
+
+
 
             // ===  Lägg till TimeProvider så Identity inte kraschar vid design-time ===
             builder.Services.AddSingleton<TimeProvider>(TimeProvider.System);
@@ -91,7 +125,16 @@ namespace Api
             // ===  Unit of Work + Repositorys ===
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
             builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+            builder.Services.AddScoped<IActivityRepository, ActivityRepository>();
+            builder.Services.AddScoped<IBookingRepository, BookingRepository>();
+            builder.Services.AddScoped<IPlaceRepository, PlaceRepository>();
+            builder.Services.AddScoped<IUserRepository, UserRepository>();
+            builder.Services.AddScoped<IActivityOccurrenceRepository, ActivityOccurrenceRepository>();
 
+
+            // ===  Validation ===   // Glöm inte att man bara behöver registrera detta en gång då den läser av alla Validators i Application.
+            builder.Services.AddValidatorsFromAssembly(typeof(Application.Activity.Validator.ActivityCreateValidator).Assembly);
+            builder.Services.AddFluentValidationAutoValidation();
             // ===  JWT Authentication ===
             var jwt = builder.Configuration.GetSection("Jwt");
             var signingKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwt["Key"]!));
@@ -149,7 +192,22 @@ namespace Api
                 });
             });
 
+            //Cors configuration
+            var allowedOrigins = builder.Configuration.GetSection("AllowedOrigins").Get<string[]>();
+
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowFrontend", policy =>
+                {                 
+                          policy.WithOrigins(allowedOrigins!)
+                          .AllowAnyHeader()
+                          .AllowAnyMethod();
+                });
+            });
+
             var app = builder.Build();
+
+            app.UseCors("AllowFrontend");
 
             //Seeding roles and users 
             using (var scope = app.Services.CreateScope())
@@ -160,10 +218,11 @@ namespace Api
 
                 await UserSeed.SeedUsersAndRolesAsync(userManager, roleManager);
                 await ActivitySeed.SeedAsync(services.GetRequiredService<AppDbContext>());
+
             }
 
-                // ===  Swagger vid utveckling ===
-                if (app.Environment.IsDevelopment())
+            // ===  Swagger vid utveckling ===
+            if (app.Environment.IsDevelopment())
                 {
                     app.UseSwagger();
                     app.UseSwaggerUI();

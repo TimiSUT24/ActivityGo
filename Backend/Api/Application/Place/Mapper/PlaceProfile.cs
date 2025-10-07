@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using Application.Place.DTO;
+using AutoMapper;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,7 +12,9 @@ namespace Application.Place.Mapper
     {
         public PlaceProfile()
         {
-
+            CreateMap<Domain.Models.Place, PlaceReadDto>();
+            CreateMap<PlaceCreateDto, Domain.Models.Place>();
+            CreateMap<PlaceUpdateDto, Domain.Models.Place>();
         }
     }
 }
