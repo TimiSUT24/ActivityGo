@@ -1,4 +1,5 @@
-﻿using Application.ActivityOccurrence.DTO.Request;
+﻿using Application.ActivityOccurrence.DTO;
+using Application.ActivityOccurrence.DTO.Request;
 using Application.ActivityOccurrence.DTO.Response;
 using Application.ActivityOccurrence.Interface;
 using Application.Weather.DTO;
@@ -6,8 +7,8 @@ using Application.Weather.Interface;
 using AutoMapper;
 using Domain.Enums;
 using Domain.Interfaces;
-using Application.Weather.DTO;
-using Application.ActivityOccurrence.DTO;
+using System;
+using System.Threading;
 
 namespace Application.ActivityOccurrence.Service
 {
@@ -82,14 +83,27 @@ namespace Application.ActivityOccurrence.Service
         /*=============ActivityOccurrence + Weather=============*/
 
         public async Task<IReadOnlyList<ActivityOccurrenceWeatherDto>> GetOccurrencesWithWeatherAsync(
-            DateTime fromDate, DateTime toDate, CancellationToken ct)
+            DateTime? fromDate, 
+            DateTime? toDate,
+            Guid? categoryId, 
+            Guid? activityId, 
+            Guid? placeId,
+            EnvironmentType? environment, 
+            bool? onlyAvailable,
+            CancellationToken ct)
         {
+            // Default to today and one week ahead if not provided
+            var start = fromDate ?? DateTime.UtcNow;
+            var end = toDate ?? start.AddDays(7);
+
             var repo = (IActivityOccurrenceRepository)_uow.Occurrences;
-            var occurences = await repo.GetOccurrencesBetweenDatesWithPlaceAndActivityAsync(fromDate, toDate, ct);
+           
+            var occurences = await repo.GetBetweenDatesFilteredAsync(
+            start, end, categoryId, activityId, placeId, environment, onlyAvailable, ct);
 
             var dtos = _mapper.Map<IReadOnlyList<ActivityOccurrenceWeatherDto>>(occurences);
 
-            var enrichmentTasks = new List<Task>();
+            var enrichmentTasks = new List<Task>(dtos.Count);
 
             foreach (var dto in dtos.Where(d => d.Environment == EnvironmentType.Outdoor))
             {
@@ -101,7 +115,14 @@ namespace Application.ActivityOccurrence.Service
                         EnrichWithWeatherAsync(dto, domainEntity, ct));
                 }
             }
-            await Task.WhenAll(enrichmentTasks);
+            try
+            {
+                await Task.WhenAll(enrichmentTasks);
+            }
+            catch (OperationCanceledException) 
+            {
+                throw;
+            }
 
             return dtos;
         }
@@ -128,7 +149,8 @@ namespace Application.ActivityOccurrence.Service
                     dto.WeatherForecast = _mapper.Map<ActivityWeatherForecastDto>(relevantSlice);
                 }
             }
-            catch (Exception)
+            catch (OperationCanceledException) { throw; }
+            catch
             {
                 // If something goes wrong, we dont provide weather data
                 dto.WeatherForecast = null;
