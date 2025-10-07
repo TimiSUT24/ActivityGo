@@ -5,7 +5,7 @@ export default function RegisterPage(){
 
 
     return (
-        <div className ="register-page">
+        <div className ="register-page">               
             <div className ="register-wrapper">
                 <div className = "register-header">
                 <h2 className = "register-title">Create an Account</h2>

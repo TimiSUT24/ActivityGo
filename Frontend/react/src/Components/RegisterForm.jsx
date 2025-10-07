@@ -27,7 +27,7 @@ export default function RegisterForm (){
 
     try{
 
-        await axios.post(`${import.meta.env.VITE_API_URL}/api/Auth/register`,formData);
+        await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/Auth/register`,formData);
         
         setMessage("Registration successful!")
         }
@@ -50,7 +50,7 @@ export default function RegisterForm (){
                 />
 
                 <input 
-                type="text" 
+                type="password" 
                 name = "password"
                 placeholder = "password"
                 value = {formData.password}
@@ -76,7 +76,7 @@ export default function RegisterForm (){
                 className = "register-input"
                 />
 
-                <button type = "submit">Register</button>
+                <button type = "submit" className="register-button">Register</button>
 
                 {message && <p>{message}</p>}
             </form>
