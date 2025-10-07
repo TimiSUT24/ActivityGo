@@ -17,6 +17,7 @@ using Application.Statistics.Interface;
 using Application.Statistics.Mapper;
 using Application.Statistics.Service;
 using Application.Weather.Interface;
+using Application.Weather.Interfaces;
 using Application.Weather.Mapper;
 using Application.Weather.Service;
 using Domain.Interfaces;                // IUnitOfWork
@@ -28,6 +29,8 @@ using Infrastructure.Data.Seeding;
 using Infrastructure.Persistence;      // Din AppDbContext
 using Infrastructure.Repositories;
 using Infrastructure.UnitOfWork;       // Din UnitOfWork
+using Infrastructure.Weather;
+
 // === JWT usings ===
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
@@ -56,7 +59,8 @@ namespace Api
             builder.Services.AddScoped<IStatisticsService, StatisticsService>();
             builder.Services.AddScoped<IWeatherService, WeatherService>();
             builder.Services.AddScoped<ITokenService, TokenService>();
-
+            //Fake Weather client for testing and development without API key
+            builder.Services.AddSingleton<IWeatherClient, FakeWeatherClient>();
             //AutoMapper
             builder.Services.AddAutoMapper(cfg =>
             {
@@ -76,6 +80,29 @@ namespace Api
                     builder.Configuration.GetConnectionString("DefaultConnection")
                 )
             );
+
+            // === Weather cache + options ===
+            builder.Services.AddMemoryCache();
+
+            builder.Services.Configure<OpenWeatherOptions>(
+                builder.Configuration.GetSection("OpenWeather"));
+
+            // Välj klient: Fake i dev utan nyckel, annars riktig HTTP-klient
+            var wxKey = builder.Configuration["OpenWeather:ApiKey"];
+            if (builder.Environment.IsDevelopment() && string.IsNullOrWhiteSpace(wxKey))
+            {
+                // Utv utan nyckel = fake
+                builder.Services.AddSingleton<IWeatherClient, FakeWeatherClient>();
+            }
+            else
+            {
+                builder.Services.AddHttpClient<IWeatherClient, OpenWeatherClient>(c =>
+                {
+                    c.Timeout = TimeSpan.FromSeconds(8);
+                });
+            }
+
+
 
             // ===  Lägg till TimeProvider så Identity inte kraschar vid design-time ===
             builder.Services.AddSingleton<TimeProvider>(TimeProvider.System);
