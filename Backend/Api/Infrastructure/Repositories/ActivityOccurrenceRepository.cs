@@ -26,6 +26,7 @@ public sealed class ActivityOccurrenceRepository : GenericRepository<ActivityOcc
             .AsNoTracking()
             .Include(o => o.Place)
             .Include(o => o.Activity)
+            .ThenInclude(a => a.Category)
             .Where(o => o.StartUtc >= fromDate && o.StartUtc < toDate)
             .Where(o => o.Place.IsActive && o.Activity.IsActive);
 
@@ -53,7 +54,6 @@ public sealed class ActivityOccurrenceRepository : GenericRepository<ActivityOcc
 
     }
 
-
     public async Task<IReadOnlyList<OccurrenceUtilItem>> GetUtilizationItemsAsync(DateTime fromUtc, DateTime toUtc, CancellationToken ct)
     {
         return await _db.ActivityOccurrences.AsNoTracking()
@@ -66,17 +66,4 @@ public sealed class ActivityOccurrenceRepository : GenericRepository<ActivityOcc
             })
             .ToListAsync(ct);
     }
-    // Eager loading Place & Activity
-    public async Task<IReadOnlyList<ActivityOccurrence>> GetOccurrencesBetweenDatesWithPlaceAndActivityAsync(DateTime fromDate, DateTime toDate, CancellationToken ct)
-    {
-        return await _db.ActivityOccurrences
-            .Include(ao => ao.Place)
-            .Include(ao => ao.Activity)
-            .Where(ao => ao.StartUtc >= fromDate && ao.StartUtc < toDate)
-            .Where(ao => ao.Place.IsActive && ao.Activity.IsActive)
-            .OrderBy(ao => ao.StartUtc)
-            .AsNoTracking()
-            .ToListAsync(ct);
-    }
-
 }
