@@ -43,6 +43,7 @@
     <Folder Include="Booking\DTO\" />
     <Folder Include="Booking\Validator\" />
     <Folder Include="Statistics\Validator\" />
+    <Folder Include="Weather\Validator\" />
   </ItemGroup>
 
   <ItemGroup>

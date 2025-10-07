@@ -3,6 +3,9 @@ using Domain.Interfaces;
 using Domain.Models;
 using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Infrastructure.Repositories;
 
@@ -24,4 +27,10 @@ public sealed class ActivityOccurrenceRepository : GenericRepository<ActivityOcc
             })
             .ToListAsync(ct);
     }
+
+    Task<IReadOnlyList<ActivityOccurrence>> GetOccurrencesBetweenDatesWithPlaceAndActivityAsync(DateTime fromDate, DateTime toDate, CancellationToken ct)
+    {
+
+    }
+
 }

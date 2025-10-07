@@ -5,8 +5,10 @@ using AutoMapper;
 using Domain.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.Eventing.Reader;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Application.ActivityOccurrence.Service
@@ -15,11 +17,13 @@ namespace Application.ActivityOccurrence.Service
     {
         private readonly IUnitOfWork _uow;
         private readonly IMapper _mapper;
+        private readonly IWeatherService _weatherService;
 
-        public ActivityOccurrenceService(IUnitOfWork uow, IMapper mapper)
+        public ActivityOccurrenceService(IUnitOfWork uow, IMapper mapper, IWeatherService weatherService)
         {
             _uow = uow;
             _mapper = mapper;
+            _weatherService = weatherService;
         }
 
         public async Task<ActivityOccurrenceDto> AddAsync(CreateActivityOccurenceDto dto, CancellationToken ct)
@@ -75,6 +79,14 @@ namespace Application.ActivityOccurrence.Service
             _uow.Occurrences.Delete(entity);
             await _uow.SaveChangesAsync(ct);
             return true;
+        }
+
+        /*=============ActivityOccurrence + Weather=============*/
+
+        public async Task<IReadOnlyList<ActivityOccurrenceWeatherDto>> GetOccurrencesWithWeatherAsync(
+            DateTime fromDate, DateTime toDate, CancellationToken ct)
+        {
+
         }
     }
 }
