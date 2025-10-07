@@ -20,11 +20,13 @@ namespace Application.ActivityOccurrence.DTO
         int ActivityDurationMinutes,
 
         string PlaceName,
-        EnvironmentType Environment,
-
+        EnvironmentType Environment
+    )
+    {
         // Weather details
-        ActivityWeatherForecastDto? WeatherForecast
-    );
+        // Nullable, as not all occurrences will have weather data
+        public ActivityWeatherForecastDto? WeatherForecast { get; set; }
+    }
 
     
 }
