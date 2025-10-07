@@ -24,9 +24,9 @@ public sealed class ActivityOccurrenceRepository : GenericRepository<ActivityOcc
     {
         var q = _db.ActivityOccurrences
             .AsNoTracking()
-            .Include(o => o.Place)
             .Include(o => o.Activity)
             .ThenInclude(a => a.Category)
+            .Include(o => o.Place)
             .Where(o => o.StartUtc >= fromDate && o.StartUtc < toDate)
             .Where(o => o.Place.IsActive && o.Activity.IsActive);
 
