@@ -11,8 +11,8 @@ namespace Application.ActivityOccurrence.DTO.Request
     {
         // Filter parameters
         // Filter by date range
-        public DateTime FromDate { get; init; }
-        public DateTime ToDate { get; init; }
+        public DateTime? FromDate { get; init; }
+        public DateTime? ToDate { get; init; }
 
         // Optional filters
         public Guid? CategoryId { get; init; }

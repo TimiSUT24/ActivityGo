@@ -92,37 +92,25 @@ namespace Application.ActivityOccurrence.Service
             bool? onlyAvailable,
             CancellationToken ct)
         {
-            // Default to today and one week ahead if not provided
-            var start = fromDate ?? DateTime.UtcNow;
-            var end = toDate ?? start.AddDays(7);
+            var (start, end) = Normalize(fromDate, toDate);
 
             var repo = (IActivityOccurrenceRepository)_uow.Occurrences;
-           
-            var occurences = await repo.GetBetweenDatesFilteredAsync(
-            start, end, categoryId, activityId, placeId, environment, onlyAvailable, ct);
+            var occurrences = await repo.GetBetweenDatesFilteredAsync(
+                start, end, categoryId, activityId, placeId, environment, onlyAvailable, ct);
 
-            var dtos = _mapper.Map<IReadOnlyList<ActivityOccurrenceWeatherDto>>(occurences);
+            var dtos = _mapper.Map<IReadOnlyList<ActivityOccurrenceWeatherDto>>(occurrences);
 
-            var enrichmentTasks = new List<Task>(dtos.Count);
-
+            var tasks = new List<Task>(dtos.Count);
             foreach (var dto in dtos.Where(d => d.Environment == EnvironmentType.Outdoor))
             {
-                var domainEntity = occurences.First(o => o.Id == dto.Id);
+                var domain = occurrences.First(o => o.Id == dto.Id);
+                if (domain.Place.Latitude.HasValue && domain.Place.Longitude.HasValue)
+                    tasks.Add(EnrichWithWeatherAsync(dto, domain, ct));
+            }
 
-                if (domainEntity.Place.Latitude.HasValue && domainEntity.Place.Longitude.HasValue)
-                {
-                    enrichmentTasks.Add(
-                        EnrichWithWeatherAsync(dto, domainEntity, ct));
-                }
-            }
-            try
-            {
-                await Task.WhenAll(enrichmentTasks);
-            }
-            catch (OperationCanceledException) 
-            {
-                throw;
-            }
+            try { await Task.WhenAll(tasks); }
+            catch (OperationCanceledException) { throw; }
+            catch { /* ignorera enrichment-fel */ }
 
             return dtos;
         }
@@ -155,6 +143,42 @@ namespace Application.ActivityOccurrence.Service
                 // If something goes wrong, we dont provide weather data
                 dto.WeatherForecast = null;
             }
+        }
+
+        /*============= Hjälpare: datum-normalisering =============*/
+        private static (DateTime start, DateTime end) Normalize(DateTime? from, DateTime? to)
+        {   // Normalizes "from" and "to" to UTC, with these rules:
+            DateTime ToUtcAssumeLocal(DateTime dt) =>
+                dt.Kind switch
+                {
+                    DateTimeKind.Utc => dt,
+                    DateTimeKind.Local => dt.ToUniversalTime(),
+                    _ => DateTime.SpecifyKind(dt, DateTimeKind.Local).ToUniversalTime()
+                };
+
+            var start = from.HasValue
+                ? ToUtcAssumeLocal(from.Value.TimeOfDay == TimeSpan.Zero
+                    ? from.Value.Date // dygnsstart
+                    : from.Value)
+                : DateTime.UtcNow.AddDays(-7);
+
+            DateTime end;
+            if (to.HasValue)
+            {
+                var t = to.Value;
+                end = ToUtcAssumeLocal(t);
+                if (t.TimeOfDay == TimeSpan.Zero)
+                    end = ToUtcAssumeLocal(t.Date).AddDays(1);
+            }
+            else
+            {
+                // If no "to" is given, we default to one day after "from"
+                end = from.HasValue && from.Value.TimeOfDay == TimeSpan.Zero
+                    ? ToUtcAssumeLocal(from.Value.Date).AddDays(1)
+                    : start.AddDays(1);
+            }
+
+            return (start, end);
         }
     }
 }

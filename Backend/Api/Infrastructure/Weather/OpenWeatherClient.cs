@@ -36,7 +36,6 @@ namespace Infrastructure.Weather
                     t = DateTimeOffset.FromUnixTimeSeconds(x.dt).UtcDateTime,
                     x
                 })
-                .Where(x => x.t >= startUtc && x.t <= endUtc)
                 .Select(x => new WeatherSliceDto
                 {
                     TimeUtc = x.t,

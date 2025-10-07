@@ -7,22 +7,24 @@ using System.Threading.Tasks;
 
 namespace Application.ActivityOccurrence.DTO
 {
-    public sealed class ActivityOccurrenceWeatherDto
-    {
-        public Guid Id { get; set; }
-        public DateTime StartUtc { get; set; }
-        public DateTime EndUtc { get; set; }
-        public int EffectiveCapacity { get; set; }
-
+    public sealed record ActivityOccurrenceWeatherDto
+    (
+        Guid Id,
+        DateTime StartUtc,
+        DateTime EndUtc,
+        int EffectiveCapacity,
 
         // Activity and Place details for context
-        public string ActivityName { get; set; } = string.Empty;
-        public string PlaceName { get; set; } = string.Empty;
-        public EnvironmentType Environment { get; set; }
+        string? CategoryName,
+        string ActivityName,
+        int ActivityDurationMinutes,
+
+        string PlaceName,
+        EnvironmentType Environment,
 
         // Weather details
-        public ActivityWeatherForecastDto? WeatherForecast { get; set; }
-    }
+        ActivityWeatherForecastDto? WeatherForecast
+    );
 
     
 }

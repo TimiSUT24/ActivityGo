@@ -45,15 +45,13 @@ public sealed class ActivityOccurrenceRepository : GenericRepository<ActivityOcc
         {
             q = q.Where(o =>
                 _db.Bookings.Count(b => b.ActivityOccurrenceId == o.Id && b.Status == BookingStatus.Booked)
-                < o.EffectiveCapacity);
+                < (o.CapacityOverride.HasValue ? o.CapacityOverride.Value : o.Place.Capacity));
         }
 
-        return await q
-            .OrderBy(o => o.StartUtc)
-            .ToListAsync(ct);
+
+        return await q.OrderBy(o => o.StartUtc).ToListAsync(ct);
+
     }
-
-
 
 
     public async Task<IReadOnlyList<OccurrenceUtilItem>> GetUtilizationItemsAsync(DateTime fromUtc, DateTime toUtc, CancellationToken ct)
