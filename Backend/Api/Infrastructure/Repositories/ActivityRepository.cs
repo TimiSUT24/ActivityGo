@@ -23,7 +23,11 @@ namespace Infrastructure.Repositories
 
         public async Task<IReadOnlyList<SportActivity>> GetActiveAsync(CancellationToken cancellationToken = default)
         {
-            return await _dbSet.Where(a => a.IsActive).ToListAsync(cancellationToken);
+            return await _dbSet
+                .AsNoTracking()
+                .Include(a => a.Category)
+                .Where(a => a.IsActive)
+                .ToListAsync(cancellationToken);
         }
 
         public Task<int> CountActiveAsync(CancellationToken cancellationToken = default)
