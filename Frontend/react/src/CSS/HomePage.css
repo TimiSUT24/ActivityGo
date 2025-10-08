@@ -1,8 +1,48 @@
 .home-body{
     background-image: url("/IMG/HomePageBack.png");
-    
+    background-repeat: no-repeat;
+    background-position: center;
 }
 
 .mario-island{
+    display: flex;
+    justify-content: center;
+    margin-top:20px;
+}
 
+.activity-category{
+    margin-top:40px;
+    display:flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap:120px;
+}
+
+.category-img{
+    display:flex;
+}
+
+.activity-list{
+    width:500px;
+    height:430px;
+    display:grid;
+    grid-template-areas: 
+    "card card "
+    "card card ";
+    align-items: center;
+    justify-items: center;
+    justify-self: center; 
+}
+
+.activity-card{
+    background-color: black;
+    height:170px;
+    width:200px;
+    background-image: url("/public/IMG/bricktile.png");
+    border-radius: 10px;
+    -webkit-border-radius: 10px;
+    -moz-border-radius: 10px;
+    -ms-border-radius: 10px;
+    -o-border-radius: 10px;
 }

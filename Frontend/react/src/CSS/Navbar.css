@@ -3,7 +3,7 @@
     width: 100%;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     transition: all 0.3s ease;
-    justify-self: center;   
+    justify-self: center;  
 }
 
 .navbar-container{
@@ -17,8 +17,12 @@
 .nav-links{
     display: flex;
     gap: 24px;
+    font-family: 'Press Start 2P', cursive, system-ui;
 }
 .nav-link{
+    display:flex;
+    align-items: center;
+    gap:10px;
     padding: 8px 16px;
     border-radius: 6px;
     text-decoration: none;
@@ -34,12 +38,16 @@
 
 .home-navbar #nav1{
     background-color: red;
+    color:white;
 }
+
 
 .home-navbar #nav2{
     background-color: yellow;
+    color:red;
 }
 
 .home-navbar #nav3{
     background-color: green;
+    color:white;
 }
