@@ -1,10 +1,8 @@
 import { Routes, Route, Link } from "react-router-dom";
 import LoginForm from "./Components/LoginForm";
 import RegisterPage from "./Pages/RegisterPage";
+import HomePage from "./Pages/HomePage";
 
-function Home() {
-  return <h1 style={{ padding: 16 }}>Välkommen</h1>;
-}
 
 export default function App() {
   return (
@@ -15,7 +13,7 @@ export default function App() {
         <Link to="/register">Register</Link>
       </nav>
       <Routes>
-        <Route path="/" element={<Home />} />
+        <Route path="/" element={<HomePage />} />
         <Route path="/login" element={<LoginForm />} />
         <Route path="/register" element={<RegisterPage />}></Route>
       </Routes>
