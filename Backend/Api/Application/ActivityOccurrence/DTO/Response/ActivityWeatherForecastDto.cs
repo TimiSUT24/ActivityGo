@@ -6,14 +6,14 @@ using System.Threading.Tasks;
 
 namespace Application.ActivityOccurrence.DTO
 {
-    public class ActivityWeatherForecastDto
-    {
+    public sealed record ActivityWeatherForecastDto
+    (
         // General forecast info
-        public DateTime TimeUtc { get; init; } // Time of the forecast (nearest to activity start)
-        public double TemperatureC { get; init; }
-        public double WindSpeedMs { get; init; }
-        public string ConditionText { get; init; } = string.Empty;
-        public string ConditionIconUrl { get; init; } = string.Empty;
-        public double RainVolumeMm { get; init; }
-    }
+        DateTime TimeUtc, // Time of the forecast (nearest to activity start)
+        double TemperatureC,
+        double WindSpeedMs,
+        string ConditionText,
+        string ConditionIconUrl,
+        double RainVolumeMm
+    );
 }

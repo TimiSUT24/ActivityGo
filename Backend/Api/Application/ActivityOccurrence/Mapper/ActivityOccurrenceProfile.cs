@@ -1,11 +1,8 @@
-﻿using Application.ActivityOccurrence.DTO.Request;
+﻿using Application.ActivityOccurrence.DTO;
+using Application.ActivityOccurrence.DTO.Request;
 using Application.ActivityOccurrence.DTO.Response;
 using AutoMapper;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace Application.ActivityOccurrence.Mapper
 {
@@ -18,6 +15,15 @@ namespace Application.ActivityOccurrence.Mapper
 
             CreateMap<CreateActivityOccurenceDto, Domain.Models.ActivityOccurrence>();
             CreateMap<UpdateActivityOccurenceDto, Domain.Models.ActivityOccurrence>();
+
+            CreateMap<Domain.Models.ActivityOccurrence, ActivityOccurrenceWeatherDto>()
+                .ForMember(d => d.EffectiveCapacity, o => o.MapFrom(s => s.CapacityOverride ?? s.Place.Capacity))
+                .ForMember(d => d.ActivityName, o => o.MapFrom(s => s.Activity.Name))
+                .ForMember(d => d.PlaceName, o => o.MapFrom(s => s.Place.Name))
+                .ForMember(d => d.Environment, o => o.MapFrom(s => s.Place.Environment))
+                .ForMember(d => d.CategoryName, o => o.MapFrom(s => s.Activity.Category != null ? s.Activity.Category.Name : null))
+                .ForMember(d => d.DurationMinutes, o => o.MapFrom(
+                    s => (int)(s.EndUtc - s.StartUtc).TotalMinutes));
         }
     }
 }
