@@ -20,7 +20,7 @@ body{
         4px 100%, 4px calc(100% - 4px), 0 calc(100% - 4px)
     );
     width:300px;
-    height:290px;
+    height:320px;
     justify-self: center;
 }
 
@@ -83,4 +83,8 @@ body{
     font-family: 'Press Start 2P', cursive, system-ui;
     margin-top:20px;
     cursor:pointer;
+}
+
+.register-message{
+    color:white;
 }

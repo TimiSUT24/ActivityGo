@@ -29,11 +29,16 @@ export default function RegisterForm (){
 
         await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/Auth/register`,formData);
         
-        setMessage("Registration successful!")
+        setMessage("Welcome to Mario Kingdom")
         }
         catch(error)
         {
-            setMessage(error.response?.data || "Registration failed")
+            if (error.response?.status === 409){
+                setMessage("A user with this email already exists")
+            }         
+            else {
+                setMessage("Registration failed. Please try again.");
+            }
         }
     }
 
@@ -78,7 +83,7 @@ export default function RegisterForm (){
 
                 <button type = "submit" className="register-button">Register</button>
 
-                {message && <p>{message}</p>}
+                {message && <p className ="register-message">{message}</p>}
             </form>
         </div>
     )
