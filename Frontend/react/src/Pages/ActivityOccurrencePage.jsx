@@ -48,7 +48,7 @@ export default function ActivityOccurrencePage() {
           </select>
         </label>
 
-        <button type="submit" className="apply-button">
+        <button type="submit" className="occurrence-button">
           Apply Filters
         </button>
       </form>
