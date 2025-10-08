@@ -9,12 +9,18 @@ export default function NavBar(){
         location.pathname === "/login" ? "login-navbar" : 
         location.pathname === "/register" ? "register-navbar" : "default-navbar";
     return (
-        <div>
-        <nav className ={`nav-bar ${pageClass}`}style={{ display: "flex", gap: 12, padding: 12 }}>
-        <NavLink to="/" className ="nav-link"><img src="./IMG/icons8-coin-100.png" alt="" height={20} />Hem</NavLink>
-        <NavLink to="/login" className ="nav-link">Logga in</NavLink>
-        <NavLink to="/register" className ="nav-link">Register</NavLink>
+        <nav className ={`nav-bar ${pageClass}`}style={{padding: 12 }}>
+            <div className="navbar-container">
+                <div className="nav-img">
+                    <img src="./IMG/icons8-coin-100.png" alt="" />
+                </div>
+                <div className="nav-links">
+                <NavLink to="/" className ="nav-link" id="nav1">Hem</NavLink>
+                <NavLink to="/login" className ="nav-link" id="nav2">Logga in</NavLink>
+                <NavLink to="/register" className ="nav-link" id="nav3">Register</NavLink>
+                </div>   
+            </div>
+               
         </nav>
-        </div>
     )
 }
