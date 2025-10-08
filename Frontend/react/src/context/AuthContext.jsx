@@ -1,24 +1,25 @@
-// src/context/AuthContext.jsx
 import { createContext, useContext, useEffect, useState } from "react";
-import api, { setAccessToken } from "../lib/api";
+import api, { setAccessToken } from "../lib/api"; // din axios-instans
 
-const TOKEN_KEY = "ag_access_token";
-const AuthContext = createContext(null);
+const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [ready, setReady] = useState(false);
+  const TOKEN_KEY = "ag_access_token";
 
+  // Ladda ev. token vid uppstart och hämta /auth/me
   useEffect(() => {
     const t = localStorage.getItem(TOKEN_KEY);
-    if (t) setAccessToken(t);
+    if (!t) { setReady(true); return; }
+    setAccessToken(t);
     (async () => {
       try {
         const { data } = await api.get("/api/auth/me");
         setUser(data);
       } catch {
-        setAccessToken(null);
         localStorage.removeItem(TOKEN_KEY);
+        setAccessToken(null);
         setUser(null);
       } finally {
         setReady(true);
@@ -26,21 +27,29 @@ export function AuthProvider({ children }) {
     })();
   }, []);
 
-  const login = async (email, password) => {
+  // Viktigt: login sätter både token OCH user direkt
+  async function login(email, password) {
     const { data } = await api.post("/api/auth/login", { email, password });
     const token = data?.accessToken || data?.token;
-    if (!token) throw new Error("No access token");
-    setAccessToken(token);
+    if (!token) throw new Error("No access token returned");
     localStorage.setItem(TOKEN_KEY, token);
-    setUser(data.user ?? null);
-  };
+    setAccessToken(token);
 
-  const logout = async () => {
-    try { await api.post("/api/auth/logout"); } catch {}
-    setAccessToken(null);
+    // sätt user direkt från svaret om det finns…
+    if (data?.user) {
+      setUser(data.user);
+    } else {
+      // …annars hämta /me direkt efter
+      const me = await api.get("/api/auth/me").then(r => r.data).catch(() => null);
+      setUser(me);
+    }
+  }
+
+  function logout() {
     localStorage.removeItem(TOKEN_KEY);
+    setAccessToken(null);
     setUser(null);
-  };
+  }
 
   return (
     <AuthContext.Provider value={{ user, ready, login, logout }}>
@@ -50,7 +59,5 @@ export function AuthProvider({ children }) {
 }
 
 export function useAuth() {
-  const ctx = useContext(AuthContext);
-  if (!ctx) throw new Error("useAuth must be used within AuthProvider");
-  return ctx;
+  return useContext(AuthContext);
 }
