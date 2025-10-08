@@ -1,0 +1,10 @@
+.home-navbar{
+    background-color: rgb(226, 106, 106);
+    flex-direction: row;
+    justify-content: center;
+}
+
+.nav-link{
+    display:flex;
+}
+
