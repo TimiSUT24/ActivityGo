@@ -1,4 +1,5 @@
-﻿using Application.ActivityOccurrence.DTO.Request;
+﻿using Application.ActivityOccurrence.DTO;
+using Application.ActivityOccurrence.DTO.Request;
 using Application.ActivityOccurrence.DTO.Response;
 using Application.ActivityOccurrence.Interface;
 using Application.Weather.DTO;
@@ -6,8 +7,8 @@ using Application.Weather.Interface;
 using AutoMapper;
 using Domain.Enums;
 using Domain.Interfaces;
-using Application.Weather.DTO;
-using Application.ActivityOccurrence.DTO;
+using System;
+using System.Threading;
 
 namespace Application.ActivityOccurrence.Service
 {
@@ -82,26 +83,34 @@ namespace Application.ActivityOccurrence.Service
         /*=============ActivityOccurrence + Weather=============*/
 
         public async Task<IReadOnlyList<ActivityOccurrenceWeatherDto>> GetOccurrencesWithWeatherAsync(
-            DateTime fromDate, DateTime toDate, CancellationToken ct)
+            DateTime? fromDate, 
+            DateTime? toDate,
+            Guid? categoryId, 
+            Guid? activityId, 
+            Guid? placeId,
+            EnvironmentType? environment, 
+            bool? onlyAvailable,
+            CancellationToken ct)
         {
+            var (start, end) = Normalize(fromDate, toDate);
+
             var repo = (IActivityOccurrenceRepository)_uow.Occurrences;
-            var occurences = await repo.GetOccurrencesBetweenDatesWithPlaceAndActivityAsync(fromDate, toDate, ct);
+            var occurrences = await repo.GetBetweenDatesFilteredAsync(
+                start, end, categoryId, activityId, placeId, environment, onlyAvailable, ct);
 
-            var dtos = _mapper.Map<IReadOnlyList<ActivityOccurrenceWeatherDto>>(occurences);
+            var dtos = _mapper.Map<IReadOnlyList<ActivityOccurrenceWeatherDto>>(occurrences);
 
-            var enrichmentTasks = new List<Task>();
-
+            var tasks = new List<Task>(dtos.Count);
             foreach (var dto in dtos.Where(d => d.Environment == EnvironmentType.Outdoor))
             {
-                var domainEntity = occurences.First(o => o.Id == dto.Id);
-
-                if (domainEntity.Place.Latitude.HasValue && domainEntity.Place.Longitude.HasValue)
-                {
-                    enrichmentTasks.Add(
-                        EnrichWithWeatherAsync(dto, domainEntity, ct));
-                }
+                var domain = occurrences.First(o => o.Id == dto.Id);
+                if (domain.Place.Latitude.HasValue && domain.Place.Longitude.HasValue)
+                    tasks.Add(EnrichWithWeatherAsync(dto, domain, ct));
             }
-            await Task.WhenAll(enrichmentTasks);
+
+            try { await Task.WhenAll(tasks); }
+            catch (OperationCanceledException) { throw; }
+            catch { /* ignorera enrichment-fel */ }
 
             return dtos;
         }
@@ -128,11 +137,48 @@ namespace Application.ActivityOccurrence.Service
                     dto.WeatherForecast = _mapper.Map<ActivityWeatherForecastDto>(relevantSlice);
                 }
             }
-            catch (Exception)
+            catch (OperationCanceledException) { throw; }
+            catch
             {
                 // If something goes wrong, we dont provide weather data
                 dto.WeatherForecast = null;
             }
+        }
+
+        /*============= Hjälpare: datum-normalisering =============*/
+        private static (DateTime start, DateTime end) Normalize(DateTime? from, DateTime? to)
+        {   // Normalizes "from" and "to" to UTC, with these rules:
+            DateTime ToUtcAssumeLocal(DateTime dt) =>
+                dt.Kind switch
+                {
+                    DateTimeKind.Utc => dt,
+                    DateTimeKind.Local => dt.ToUniversalTime(),
+                    _ => DateTime.SpecifyKind(dt, DateTimeKind.Local).ToUniversalTime()
+                };
+
+            var start = from.HasValue
+                ? ToUtcAssumeLocal(from.Value.TimeOfDay == TimeSpan.Zero
+                    ? from.Value.Date // dygnsstart
+                    : from.Value)
+                : DateTime.UtcNow.AddDays(-7);
+
+            DateTime end;
+            if (to.HasValue)
+            {
+                var t = to.Value;
+                end = ToUtcAssumeLocal(t);
+                if (t.TimeOfDay == TimeSpan.Zero)
+                    end = ToUtcAssumeLocal(t.Date).AddDays(1);
+            }
+            else
+            {
+                // If no "to" is given, we default to one day after "from"
+                end = from.HasValue && from.Value.TimeOfDay == TimeSpan.Zero
+                    ? ToUtcAssumeLocal(from.Value.Date).AddDays(1)
+                    : start.AddDays(1);
+            }
+
+            return (start, end);
         }
     }
 }

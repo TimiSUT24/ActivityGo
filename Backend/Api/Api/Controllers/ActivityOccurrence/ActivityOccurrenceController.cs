@@ -85,16 +85,19 @@ namespace Api.Controllers.ActivityOccurrence
         [HttpGet("with-weather")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult<IEnumerable<ActivityOccurrenceWeatherDto>>> GetOccurrencesWithWeather(
-            [FromQuery] DateTime? fromDate,
-            [FromQuery] DateTime? toDate, 
+            [FromQuery] OccurencyQuery q, 
             CancellationToken ct = default)
         {
-            // Default to today and one week ahead if not provided
-            var start = fromDate ?? DateTime.UtcNow;
-            var end = toDate ?? start.AddDays(7);
 
-            var occurrences = await _activityOccurrenceService.GetOccurrencesWithWeatherAsync(start, end, ct);
-            return Ok(occurrences);
+            var result = await _activityOccurrenceService.GetOccurrencesWithWeatherAsync(
+               q.FromDate, 
+                 q.ToDate,
+              q.CategoryId, 
+              q.ActivityId, 
+                q.PlaceId,
+             q.Environment, 
+           q.OnlyAvailable, ct);
+            return Ok(result);
         }
     }
 }
