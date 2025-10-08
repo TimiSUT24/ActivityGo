@@ -7,7 +7,7 @@ import HomePage from "./Pages/HomePage";
 export default function App() {
   return (
     <>
-      <nav style={{ display: "flex", gap: 12, padding: 12 }}>
+      <nav className ="nav-bar"style={{ display: "flex", gap: 12, padding: 12 }}>
         <Link to="/">Hem</Link>
         <Link to="/login">Logga in</Link>
         <Link to="/register">Register</Link>
