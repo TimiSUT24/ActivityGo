@@ -1,9 +1,13 @@
 /*Default navbar css*/
-.nav-bar{
-    width: 100%;
+.nav-bar{  
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     transition: all 0.3s ease;
     justify-self: center;  
+    position:sticky;
+    top:0;
+    width:1400px;
+    background-image: url("/IMG/navbar-background.png");
+    height:57px;
 }
 
 .navbar-container{
@@ -12,7 +16,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    gap:20px;
+    gap:20px;   
 }
 
 .nav-links{
@@ -39,7 +43,6 @@
 
 /*HomePage css for navbar*/
 .home-navbar{
-    background-color: rgb(165, 66, 26);
 }
 
 .home-navbar #nav1{

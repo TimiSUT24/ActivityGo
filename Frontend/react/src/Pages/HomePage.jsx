@@ -4,13 +4,13 @@ import '../CSS/HomePage.css';
 export default function HomePage(){
 
     return(
-        <body className="home-body">
+        <div className="home-content">
             <div className="mario-island">   
                 <img src="/IMG/marioisland.png" alt="" className="mario-island"/>        
             </div>
             <div className ="activity-category">
                 <img src="/IMG/Greencircle.png" alt="" className="category-img" width={100}/>
-                <img src="/IMG/workingmushroom.png" alt="" className="category-img" width={100}/>
+                <img src="/IMG/mushroomcircle.png" alt="" className="category-img" width={100}/>
                 <img src="/IMG/bluecircle.png" alt="" className="category-img" width={100}/>
             </div>
 
@@ -44,9 +44,7 @@ export default function HomePage(){
                     </div>
                       <button className="activity-card-btn" id="activity-btn4">Boka här</button>
                 </div>
-
-
             </div>
-        </body>      
+        </div>      
     )
 }

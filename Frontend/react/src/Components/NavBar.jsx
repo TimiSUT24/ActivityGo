@@ -1,8 +1,25 @@
 import {NavLink, useLocation} from 'react-router-dom';
+import {useEffect} from 'react';
 import '../CSS/Navbar.css';
 
 export default function NavBar(){
     const location = useLocation();
+
+    useEffect(() => {
+    const bodyClassMap = {
+        "/": "home-body",
+        "/login": "login-body",
+        "/register": "register-body",
+    };
+
+    const newClass = bodyClassMap[location.pathname] || "default-body";
+
+    document.body.classList.remove("home-body", "login-body", "register-body", "default-body");
+
+    document.body.classList.add(newClass);
+
+    return () => document.body.classList.remove(newClass);
+    }, [location]);
 
     const pageClass = 
         location.pathname === "/" ? "home-navbar" :
@@ -23,15 +40,15 @@ export default function NavBar(){
                 <NavLink to="/" className ="nav-link" id="nav2">
                 {location.pathname === '/' && ( 
                 <img src="/IMG/icons8-pixel-star-48.png" alt="" height={20} width={20}/>
-                )}Browse Activities</NavLink>
+                )}Sök Aktivitet</NavLink>
 
                 <NavLink to="/" className ="nav-link" id="nav3">
                 {location.pathname === '/' && ( 
                 <img src="/IMG/bookinicon.png" alt="" height={20} width={20}/>
-                )}My Bookings</NavLink>
+                )}Mina Bokningar</NavLink>
 
                 <NavLink to="/login" className ="nav-link" id="nav4">Logga in</NavLink>
-                <NavLink to="/register" className ="nav-link" id="nav5">Register</NavLink>
+                <NavLink to="/register" className ="nav-link" id="nav5">Registrera</NavLink>
                 </div>   
             </div>              
         </nav>

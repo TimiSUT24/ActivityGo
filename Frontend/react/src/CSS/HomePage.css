@@ -2,6 +2,11 @@
     background-image: url("/IMG/HomePageBack.png");
     background-repeat: no-repeat;
     background-position: center;
+    background-size: cover;   
+    background-attachment: fixed; 
+    margin:0 auto;
+    overflow-x: hidden;
+    justify-self: center;
 }
 
 .mario-island{
@@ -36,7 +41,6 @@
 }
 
 .activity-card{
-    background-color: black;
     height:190px;
     width:200px;
     background-image: url("/IMG/bricktile.png");
