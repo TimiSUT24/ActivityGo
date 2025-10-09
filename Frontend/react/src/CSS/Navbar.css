@@ -12,6 +12,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    gap:20px;
 }
 
 .nav-links{
@@ -29,6 +30,11 @@
     font-weight: 500;
     transition: all 0.2s ease;
     position: relative;
+}
+
+.nav-img{
+    display:flex;
+    gap:10px;
 }
 
 /*HomePage css for navbar*/

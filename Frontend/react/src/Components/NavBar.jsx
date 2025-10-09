@@ -11,8 +11,8 @@ export default function NavBar(){
     return (
         <nav className ={`nav-bar ${pageClass}`}style={{padding: 12 }}>
             <div className="navbar-container">
-                <div className="nav-img">
-                    <img src="./IMG/icons8-coin-100.png" alt="" />
+                <div className="nav-img">   
+                    <img src="/IMG/Activigotitle.png" alt="" />                 
                 </div>
                 <div className="nav-links">                 
                 <NavLink to="/" className ="nav-link" id="nav1">
@@ -20,13 +20,20 @@ export default function NavBar(){
                 <img src="/IMG/Mario-Mushroom-Step-10.webp" alt="" height={20} width={20}/>
                 )}  Hem</NavLink>  
 
-                <NavLink to="/" className ="nav-link" id="nav2">Browse Activities</NavLink>
-                <NavLink to="/" className ="nav-link" id="nav3">My Bookings</NavLink>
+                <NavLink to="/" className ="nav-link" id="nav2">
+                {location.pathname === '/' && ( 
+                <img src="/IMG/icons8-pixel-star-48.png" alt="" height={20} width={20}/>
+                )}Browse Activities</NavLink>
+
+                <NavLink to="/" className ="nav-link" id="nav3">
+                {location.pathname === '/' && ( 
+                <img src="/IMG/bookinicon.png" alt="" height={20} width={20}/>
+                )}My Bookings</NavLink>
+
                 <NavLink to="/login" className ="nav-link" id="nav4">Logga in</NavLink>
                 <NavLink to="/register" className ="nav-link" id="nav5">Register</NavLink>
                 </div>   
-            </div>
-               
+            </div>              
         </nav>
     )
 }

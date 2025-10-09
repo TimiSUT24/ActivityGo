@@ -11,7 +11,7 @@
 }
 
 .activity-category{
-    margin-top:40px;
+    margin-top:15px;
     display:flex;
     flex-direction: row;
     justify-content: center;
@@ -37,12 +37,49 @@
 
 .activity-card{
     background-color: black;
-    height:170px;
+    height:190px;
     width:200px;
-    background-image: url("/public/IMG/bricktile.png");
+    background-image: url("/IMG/bricktile.png");
     border-radius: 10px;
     -webkit-border-radius: 10px;
     -moz-border-radius: 10px;
     -ms-border-radius: 10px;
     -o-border-radius: 10px;
+    align-items: center;
+    justify-content:center;
+    display:flex;
+    flex-direction: column;
+}
+
+.activity-img{
+    display:flex;
+    align-items: center;
+    border-radius: 10px;
+    -webkit-border-radius: 10px;
+    -moz-border-radius: 10px;
+    -ms-border-radius: 10px;
+    -o-border-radius: 10px;
+}
+
+.activity-card-btn{
+    border-radius: 10px;
+    -webkit-border-radius: 10px;
+    -moz-border-radius: 10px;
+    -ms-border-radius: 10px;
+    -o-border-radius: 10px;
+    border-style: none;
+    margin-top:5px;
+    width:150px;
+    cursor: pointer;
+    background-color: red;
+    color:white;
+    font-family:'Press Start 2P', cursive, system-ui;
+}
+
+#activity-btn4{
+    background-color: green;
+}
+
+#activity-btn2{
+    background-color: rgb(0, 140, 255);
 }
