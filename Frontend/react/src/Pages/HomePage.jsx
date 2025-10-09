@@ -20,14 +20,14 @@ export default function HomePage(){
                         <img src="/IMG/HomePage/mariotennis.png" alt="" width={170} height={140} className="activity-img" />
                     </div>
                     
-                    <button className="activity-card-btn" id="activity-btn1">Boka här</button>
+                    <button className="activity-card-btn" id="activity-btn1">Boka nu</button>
                 </div>
 
                 <div className="activity-card"id="card2">
                     <div>
                         <img src="/IMG/HomePage/toadTraining.png" alt=""  width={170} height={140} className="activity-img"/>
                     </div>
-                      <button className="activity-card-btn" id="activity-btn2">Boka här</button>
+                      <button className="activity-card-btn" id="activity-btn2">Boka nu</button>
                 </div>
                 
 
@@ -35,14 +35,14 @@ export default function HomePage(){
                     <div>
                         <img src="/IMG/HomePage/Marioyoga.png" alt=""  width={170} height={140} className="activity-img"/>
                     </div>
-                      <button className="activity-card-btn" id="activity-btn3">Boka här</button>
+                      <button className="activity-card-btn" id="activity-btn3">Boka nu</button>
                 </div>
 
                 <div className="activity-card" id="card4">
                        <div>
                         <img src="/IMG/HomePage/luigiclimbing.png" alt=""  width={170} height={140} className="activity-img"/>
                     </div>
-                      <button className="activity-card-btn" id="activity-btn4">Boka här</button>
+                      <button className="activity-card-btn" id="activity-btn4">Boka nu</button>
                 </div>
             </div>
         </div>      
