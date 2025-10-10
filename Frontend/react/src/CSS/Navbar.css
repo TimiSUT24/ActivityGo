@@ -5,7 +5,7 @@
     justify-self: center;  
     position:sticky;
     top:0;
-    width:1400px;
+    width:100vw;
     background-image: url("/IMG/HomePage/navbar-background.png");
     height:57px;
 }
@@ -41,44 +41,44 @@
     gap:10px;
 }
 
-/*HomePage css for navbar*/
-.home-navbar{
-}
-
-.home-navbar #nav1{
+#nav1{
     background-color: red;
     color:white;
 }
 
-
-.home-navbar #nav2{
+#nav2{
     background-color: yellow;
     color:red;
 }
 
-.home-navbar #nav3{
+#nav3{
     background-color: green;
     color:white;
 }
 
-.home-navbar #nav4{
+#nav4{
     color:snow;
 }
 
 
-.home-navbar #nav5{
+#nav5{
     color:moccasin;
+}
+
+#nav6{
+    background-color: green;
+    color:white;
 }
 
 
 @media screen and (max-width: 1400px){
     .nav-bar{
-        width:880px;
+        width:1000px;
         font-size: 10px;
     }
 }
 
-@media screen and (max-width:900px){
+@media screen and (max-width:800px){
     .nav-bar{
         width:700px;
         font-size:7px;
