@@ -29,7 +29,7 @@ export default function NavBar(){
         <nav className ={`nav-bar ${pageClass}`}style={{padding: 12 }}>
             <div className="navbar-container">
                 <div className="nav-img">   
-                    <img src="/IMG/Activigotitle.png" alt="" />                 
+                    <img src="/IMG/Activigotitle.png" alt="" className="activigo-title"/>                 
                 </div>
                 <div className="nav-links">                 
                 <NavLink to="/" className ="nav-link" id="nav1">

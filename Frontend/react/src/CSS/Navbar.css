@@ -69,3 +69,30 @@
 .home-navbar #nav5{
     color:moccasin;
 }
+
+
+@media screen and (max-width: 1400px){
+    .nav-bar{
+        width:880px;
+        font-size: 10px;
+    }
+}
+
+@media screen and (max-width:900px){
+    .nav-bar{
+        width:700px;
+        font-size:7px;
+    }
+    .activigo-title{
+       width:70px;
+    }
+
+    .nav-link{
+        width:80px;
+    }
+
+    .nav-links{
+        gap:13px;
+    }
+ 
+}
