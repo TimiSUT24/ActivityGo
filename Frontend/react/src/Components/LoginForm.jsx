@@ -1,11 +1,17 @@
 import { useEffect, useRef, useState } from "react";
 import { useAuth } from "../context/AuthContext";
+import { useLocation, useNavigate } from "react-router-dom";
 
 export default function LoginForm() {
   const { login } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const from = location.state?.from?.pathname || "/user";
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const [coins, setCoins] = useState([]);
   const [marioJump, setMarioJump] = useState(false);
   const marioTimerRef = useRef(null);
@@ -249,10 +255,11 @@ export default function LoginForm() {
     },
   };
 
-  const handleSubmit = async (e) => {
+
+  async function handleSubmit(e) {
     e.preventDefault();
     setError("");
-
+    setLoading(true);
     try {
       if (marioTimerRef.current) {
         window.clearTimeout(marioTimerRef.current);
@@ -260,18 +267,31 @@ export default function LoginForm() {
       }
 
       await login(email, password);
+
+      navigate(from, { replace: true }); // -> /user (eller vart man försökte gå)
+    } catch (err) {
+      // Försök läsa meddelande från backend, fall back till generiskt
+      const msg =
+        err?.response?.data?.message ||
+        err?.message ||
+        "Felaktig e-post eller lösenord";
+      setError(msg);
+    } finally {
+      setLoading(false);
+
       setMarioJump(true);
       marioTimerRef.current = window.setTimeout(() => {
         setMarioJump(false);
         marioTimerRef.current = null;
       }, 1100);
       // Optional redirect goes here.
-    } catch (err) {
+    } try{}catch (err) {
       console.error("Login failed:", err);
       setError("Felaktig e-post eller lösenord");
       setMarioJump(false);
+
     }
-  };
+  }
 
   const handleCoinSpawn = (e) => {
     if (e.target.closest("button")) {
@@ -357,127 +377,135 @@ export default function LoginForm() {
   );
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      style={styles.form}
-      onClick={handleCoinSpawn}
-    >
-      {marioJump && (
-        <div
-          style={{
-            ...styles.marioWrap,
-            animation: "marioJump 1.1s ease-out forwards",
-          }}
-        >
-          <div style={styles.marioHat}>
-            <div style={styles.marioEmblem}>M</div>
-          </div>
-          <div style={styles.marioFace}>
-            <div style={{ ...styles.marioEye, left: 18 }} />
-            <div style={{ ...styles.marioEye, right: 18 }} />
-            <div style={styles.marioMoustache} />
-            <div style={styles.marioNose} />
-          </div>
-          <div style={styles.marioBody}>
-            <div style={{ ...styles.marioStrap, left: 8 }} />
-            <div style={{ ...styles.marioStrap, right: 8 }} />
-            <div style={styles.marioButtons}>
-              <span style={styles.marioButton} />
-              <span style={styles.marioButton} />
-            </div>
-          </div>
-        </div>
-      )}
-      {coins.map((coin) => (
-        <span
-          key={coin.id}
-          style={{
-            ...styles.coin,
-            left: coin.x - 14,
-            top: coin.y - 14,
-            animation: "coinPop 0.6s ease-out forwards",
-          }}
-        >
-          C
-        </span>
-      ))}
-      <span style={styles.badge}>1-Up Login</span>
-      <h2 style={styles.title}>Logga in</h2>
+  <form onSubmit={handleSubmit} style={styles.form} onClick={handleCoinSpawn}>
+    {/* Header */}
+    <h2 style={{ textAlign: "center", marginBottom: 20 }}>Logga in</h2>
 
-      {error && <p style={styles.error}>{error}</p>}
+    {error && <p style={styles.error}>{error}</p>}
 
-      <div style={styles.field}>
-        <label htmlFor="email" style={styles.label}>
-          E-post
-        </label>
-        <input
-          id="email"
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          autoComplete="email"
-          required
-          placeholder="mario@nintendo.se"
-          style={styles.input}
-          onFocus={(e) => {
-            e.target.style.transform = "translateY(-2px)";
-            e.target.style.boxShadow =
-              "inset 0 4px 0 rgba(0,0,0,0.3), 0 8px 12px rgba(0,0,0,0.35)";
-          }}
-          onBlur={(e) => {
-            e.target.style.transform = "translateY(0)";
-            e.target.style.boxShadow = "inset 0 4px 0 rgba(0,0,0,0.3)";
-          }}
-        />
-        <span style={styles.helper}>
-          Toad tips: glöm inte att Princess Peach gillar ordentliga e-postadresser!
-        </span>
-      </div>
-
-      <div style={styles.field}>
-        <label htmlFor="password" style={styles.label}>
-          Lösenord
-        </label>
-        <input
-          id="password"
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          autoComplete="current-password"
-          required
-          placeholder="*****"
-          style={styles.input}
-          onFocus={(e) => {
-            e.target.style.transform = "translateY(-2px)";
-            e.target.style.boxShadow =
-              "inset 0 4px 0 rgba(0,0,0,0.3), 0 8px 12px rgba(0,0,0,0.35)";
-          }}
-          onBlur={(e) => {
-            e.target.style.transform = "translateY(0)";
-            e.target.style.boxShadow = "inset 0 4px 0 rgba(0,0,0,0.3)";
-          }}
-        />
-        <span style={styles.helper}>Luigi säger: minst 8 tecken</span>
-      </div>
-
-      <button
-        type="submit"
-        style={styles.button}
-        onMouseOver={(e) => {
-          e.target.style.backgroundColor = "#9af0a3";
-          e.target.style.transform = "translateY(-3px)";
-          e.target.style.boxShadow =
-            "0 9px 0 #0b5c33, 0 16px 22px rgba(0,0,0,0.5), inset 0 -4px 0 rgba(0,0,0,0.2)";
-        }}
-        onMouseOut={(e) => {
-          e.target.style.backgroundColor = "#7fe18a";
-          e.target.style.transform = "translateY(0)";
-          e.target.style.boxShadow =
-            "0 6px 0 #0b5c33, 0 12px 18px rgba(0,0,0,0.45), inset 0 -4px 0 rgba(0,0,0,0.2)";
+    {/* Mario Animation */}
+    {marioJump && (
+      <div
+        style={{
+          ...styles.marioWrap,
+          animation: "marioJump 1.1s ease-out forwards",
         }}
       >
-        Logga in
-      </button>
-    </form>
-  );
+        <div style={styles.marioHat}>
+          <div style={styles.marioEmblem}>M</div>
+        </div>
+        <div style={styles.marioFace}>
+          <div style={{ ...styles.marioEye, left: 18 }} />
+          <div style={{ ...styles.marioEye, right: 18 }} />
+          <div style={styles.marioMoustache} />
+          <div style={styles.marioNose} />
+        </div>
+        <div style={styles.marioBody}>
+          <div style={{ ...styles.marioStrap, left: 8 }} />
+          <div style={{ ...styles.marioStrap, right: 8 }} />
+          <div style={styles.marioButtons}>
+            <span style={styles.marioButton} />
+            <span style={styles.marioButton} />
+          </div>
+        </div>
+      </div>
+    )}
+
+    {/* Coins */}
+    {coins.map((coin) => (
+      <span
+        key={coin.id}
+        style={{
+          ...styles.coin,
+          left: coin.x - 14,
+          top: coin.y - 14,
+          animation: "coinPop 0.6s ease-out forwards",
+        }}
+      >
+        C
+      </span>
+    ))}
+
+    <span style={styles.badge}>1-Up Login</span>
+
+    {/* Email Field */}
+    <div style={styles.field}>
+      <label htmlFor="email" style={styles.label}>
+        E-post
+      </label>
+      <input
+        id="email"
+        type="email"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+        autoComplete="email"
+        required
+        disabled={loading}
+        placeholder="mario@nintendo.se"
+        style={styles.input}
+        onFocus={(e) => {
+          e.target.style.transform = "translateY(-2px)";
+          e.target.style.boxShadow =
+            "inset 0 4px 0 rgba(0,0,0,0.3), 0 8px 12px rgba(0,0,0,0.35)";
+        }}
+        onBlur={(e) => {
+          e.target.style.transform = "translateY(0)";
+          e.target.style.boxShadow = "inset 0 4px 0 rgba(0,0,0,0.3)";
+        }}
+      />
+      <span style={styles.helper}>
+        Toad tips: glöm inte att Princess Peach gillar ordentliga e-postadresser!
+      </span>
+    </div>
+
+    {/* Password Field */}
+    <div style={styles.field}>
+      <label htmlFor="password" style={styles.label}>
+        Lösenord
+      </label>
+      <input
+        id="password"
+        type="password"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+        autoComplete="current-password"
+        required
+        disabled={loading}
+        placeholder="*****"
+        style={styles.input}
+        onFocus={(e) => {
+          e.target.style.transform = "translateY(-2px)";
+          e.target.style.boxShadow =
+            "inset 0 4px 0 rgba(0,0,0,0.3), 0 8px 12px rgba(0,0,0,0.35)";
+        }}
+        onBlur={(e) => {
+          e.target.style.transform = "translateY(0)";
+          e.target.style.boxShadow = "inset 0 4px 0 rgba(0,0,0,0.3)";
+        }}
+      />
+      <span style={styles.helper}>Luigi säger: minst 8 tecken</span>
+    </div>
+
+    {/* Submit Button */}
+    <button
+      type="submit"
+      disabled={loading}
+      style={styles.button}
+      onMouseOver={(e) => {
+        e.target.style.backgroundColor = "#9af0a3";
+        e.target.style.transform = "translateY(-3px)";
+        e.target.style.boxShadow =
+          "0 9px 0 #0b5c33, 0 16px 22px rgba(0,0,0,0.5), inset 0 -4px 0 rgba(0,0,0,0.2)";
+      }}
+      onMouseOut={(e) => {
+        e.target.style.backgroundColor = "#7fe18a";
+        e.target.style.transform = "translateY(0)";
+        e.target.style.boxShadow =
+          "0 6px 0 #0b5c33, 0 12px 18px rgba(0,0,0,0.45), inset 0 -4px 0 rgba(0,0,0,0.2)";
+      }}
+    >
+      {loading ? "Loggar in…" : "Logga in"}
+    </button>
+  </form>
+);
 }
