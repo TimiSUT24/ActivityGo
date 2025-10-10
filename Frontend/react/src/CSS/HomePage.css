@@ -1,0 +1,89 @@
+.home-body{
+    background-image: url("/IMG/HomePageBack.png");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;   
+    background-attachment: fixed; 
+    margin:0 auto;
+    overflow-x: hidden;
+    justify-self: center;
+}
+
+.mario-island{
+    display: flex;
+    justify-content: center;
+    margin-top:20px;
+}
+
+.activity-category{
+    margin-top:15px;
+    display:flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap:120px;
+}
+
+.category-img{
+    display:flex;
+}
+
+.activity-list{
+    width:500px;
+    height:430px;
+    display:grid;
+    grid-template-areas: 
+    "card card "
+    "card card ";
+    align-items: center;
+    justify-items: center;
+    justify-self: center; 
+}
+
+.activity-card{
+    height:190px;
+    width:200px;
+    background-image: url("/IMG/HomePage/bricktile.png");
+    border-radius: 10px;
+    -webkit-border-radius: 10px;
+    -moz-border-radius: 10px;
+    -ms-border-radius: 10px;
+    -o-border-radius: 10px;
+    align-items: center;
+    justify-content:center;
+    display:flex;
+    flex-direction: column;
+}
+
+.activity-img{
+    display:flex;
+    align-items: center;
+    border-radius: 10px;
+    -webkit-border-radius: 10px;
+    -moz-border-radius: 10px;
+    -ms-border-radius: 10px;
+    -o-border-radius: 10px;
+}
+
+.activity-card-btn{
+    border-radius: 10px;
+    -webkit-border-radius: 10px;
+    -moz-border-radius: 10px;
+    -ms-border-radius: 10px;
+    -o-border-radius: 10px;
+    border-style: none;
+    margin-top:5px;
+    width:150px;
+    cursor: pointer;
+    background-color: red;
+    color:white;
+    font-family:'Press Start 2P', cursive, system-ui;
+}
+
+#activity-btn4{
+    background-color: green;
+}
+
+#activity-btn2{
+    background-color: rgb(0, 140, 255);
+}
