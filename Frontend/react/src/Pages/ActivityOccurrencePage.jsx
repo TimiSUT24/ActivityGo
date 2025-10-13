@@ -1,18 +1,60 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import occurrenceService from "../Services/occurrenceService.js";
+import OccurrenceCard from "../Components/OccurrenceCard.jsx";
 import "../CSS/Occurrences.css";
 
 export default function ActivityOccurrencePage() {
-  // State för att lagra aktivitetens filter
   const today = new Date().toISOString().slice(0, 10);
-  const in7 = new Date(Date.now() + 7 * 864000000).toISOString().slice(0, 10); // 7 dagar framåt
+  const in7 = new Date(Date.now() + 7 * 86400000).toISOString().slice(0, 10);
 
   const [dateFrom, setDateFrom] = useState(today);
   const [dateTo, setDateTo] = useState(in7);
-  const [environment, setEnvironment] = useState(""); // Tomt som standard
+  const [environment, setEnvironment] = useState("");
+
+  const [items, setItems] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [err, setErr] = useState("");
+
+  const fetchOccurrences = async () => {
+    setLoading(true);
+    setErr("");
+    try {
+      const data = await occurrenceService.list({
+        dateFrom,
+        dateTo,
+        environment: environment === "" ? undefined : Number(environment),
+      });
+      console.log(
+        "[occurrences] rows",
+        Array.isArray(data) ? data.length : data
+      );
+      setItems(Array.isArray(data) ? data : []);
+    } catch (e) {
+      console.error("[occurrence] fetch error", e);
+      setErr(
+        e?.response?.data?.message ||
+          e?.message ||
+          "Failed to fetch occurrences"
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchOccurrences();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const onApply = (e) => {
     e.preventDefault();
-    // logik för filtrering kommer här
+    fetchOccurrences();
+  };
+
+  // placeholder tills bokningsflödet kopplas
+  const handleBook = (id) => {
+    // TODO: koppla POST /api/bookings
+    alert(`Book occurrence: ${id}`);
   };
 
   return (
@@ -28,6 +70,7 @@ export default function ActivityOccurrencePage() {
             onChange={(e) => setDateFrom(e.target.value)}
           />
         </label>
+
         <label className="occurence-field">
           <span>To Date:</span>
           <input
@@ -36,6 +79,7 @@ export default function ActivityOccurrencePage() {
             onChange={(e) => setDateTo(e.target.value)}
           />
         </label>
+
         <label className="occurence-field">
           <span>Environment:</span>
           <select
@@ -49,14 +93,23 @@ export default function ActivityOccurrencePage() {
         </label>
 
         <button type="submit" className="occurrence-button">
-          Apply Filters
+          Let's a go!
         </button>
       </form>
 
-      <div className="occurrence-meta">Shows 0 results</div>
+      {loading && <div className="occurrence-status">Loading...</div>}
+      {err && <div className="occurrence-status error">{err}</div>}
+
+      <div className="occurrence-meta">Shows {items.length} results</div>
+
       <div className="occurence-grid">
-        {/* Här kommer de filtrerade aktiviteterna att visas */}
-        <div className="occurence-empty">No occurrences found</div>
+        {items.length === 0 && !loading && !err && (
+          <div className="occurence-empty">No occurrences found.</div>
+        )}
+
+        {items.map((x) => (
+          <OccurrenceCard key={x.id} item={x} onBook={handleBook} />
+        ))}
       </div>
     </div>
   );

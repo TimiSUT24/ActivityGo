@@ -1,37 +1,203 @@
+/* Sida */
 .occurrence-page {
   max-width: 1100px;
   margin: 24px auto;
   padding: 16px;
 }
-
 .occurrence-title {
   font-size: 1.8rem;
   margin-bottom: 12px;
 }
 
-.occurrence-filters {
+/* Filter (observera stavningen occurence-* som i din JSX) */
+.occurence-filters {
   display: grid;
   grid-template-columns: repeat(4, minmax(160px, 1fr));
   gap: 12px;
   align-items: end;
   margin-bottom: 16px;
 }
+.occurence-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 0.9rem;
+}
+.occurence-field input,
+.occurence-field select {
+  padding: 10px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  background: #fff;
+}
+.occurrence-button {
+  padding: 10px 14px;
+  border: none;
+  border-radius: 8px;
+  background: #4f46e5;
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+}
+.occurrence-button:disabled {
+  background: #9ca3af;
+  cursor: not-allowed;
+}
 
-.occurrence-field {
+/* Status + meta */
+.occurrence-status {
+  margin: 8px 0;
+  color: #374151;
+}
+.occurrence-status.error {
+  color: #b91c1c;
+}
+.occurrence-meta {
+  font-size: 0.9rem;
+  color: #6b7280;
+  margin: 8px 0;
+}
+
+/* Grid + tomvy */
+.occurence-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 12px;
+}
+.occurence-empty {
+  border: 1px dashed #d1d5db;
+  border-radius: 10px;
+  padding: 24px;
+  text-align: center;
+  color: #6b7280;
+}
+
+/* Kort */
+.occurrence-card {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.occurrence-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+.occurrence-card-title {
+  font-weight: 600;
+  margin: 0;
+}
+.occurrence-card-place {
+  margin: 2px 0 0;
+  font-size: 0.9rem;
+  color: #6b7280;
+}
+
+.occurrence-badge {
+  font-size: 0.75rem;
+  padding: 4px 10px;
+  border-radius: 999px;
+}
+.occurrence-badge-indoor {
+  background: #e0e7ff;
+  color: #3730a3;
+}
+.occurrence-badge-outdoor {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.occurrence-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.95rem;
+  color: #111827;
+}
+.occurrence-weather {
+  font-size: 0.85rem;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 8px;
+}
+
+/* Responsiv */
+@media (max-width: 768px) {
+  .occurence-filters {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* Modal overlay och container */
+.occurrence-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+}
+
+.occurrence-modal {
+  width: 100%;
+  max-width: 420px;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+/* Header */
+.occurrence-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.occurrence-modal-close {
+  border: none;
+  background: transparent;
+  font-size: 20px;
+  cursor: pointer;
+  line-height: 1;
+}
+
+/* Body */
+.occurrence-modal-body {
+  padding: 16px;
+}
+
+.occurrence-modal-field {
   display: flex;
   flex-direction: column;
   gap: 6px;
   font-size: 0.9rem;
 }
 
-.occurrence-field input,
-.occurrence-field select {
+.occurrence-modal-field input {
   padding: 10px;
   border: 1px solid #d1d5db;
   border-radius: 8px;
   background: #fff;
 }
 
+/* Footer */
+.occurrence-modal-footer {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  padding: 12px 16px;
+  border-top: 1px solid #e5e7eb;
+}
+
+/* Knappar */
 .occurrence-button {
   padding: 10px 14px;
   border: none;
@@ -42,29 +208,16 @@
   cursor: pointer;
 }
 
-.occurrence-meta {
-  font-size: 0.9rem;
-  color: #6b7280;
-  margin-bottom: 8px;
+.occurrence-button:disabled {
+  background: #9ca3af;
+  cursor: not-allowed;
 }
 
-.occurrence-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 12px;
-}
-
-.occurrence-empty {
-  border: 1px dashed #d1d5db;
-  border-radius: 10px;
-  padding: 24px;
-  text-align: center;
-  color: #6b7280;
-}
-
-/* Responsiv */
-@media (max-width: 768px) {
-  .occurrence-filters {
-    grid-template-columns: 1fr 1fr;
-  }
+.occurrence-button-ghost {
+  padding: 10px 14px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #fff;
+  color: #111827;
+  cursor: pointer;
 }
