@@ -18,7 +18,7 @@ namespace Infrastructure.Weather
                 TimeUtc = startUtc.AddHours(i),
                 TemperatureC = Math.Round(12 + 5 * Math.Sin(i / 3.0), 1),
                 WindSpeedMs = 3 + (i % 4),
-                rainVolumeMm = i % 5 == 0 ? 0.4 : 0,
+                RainVolumeMm = i % 5 == 0 ? 0.4 : 0,
                 ConditionIconUrl = "04d",
                 ConditionText = "partly cloudy",
                 Source = "fake"

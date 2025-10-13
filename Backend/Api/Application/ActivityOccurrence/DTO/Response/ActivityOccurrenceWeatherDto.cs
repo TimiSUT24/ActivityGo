@@ -7,21 +7,22 @@ using System.Threading.Tasks;
 
 namespace Application.ActivityOccurrence.DTO
 {
-    public sealed class ActivityOccurrenceWeatherDto
+    public sealed record class ActivityOccurrenceWeatherDto
     {
-        public Guid Id { get; set; }
-        public DateTime StartUtc { get; set; }
-        public DateTime EndUtc { get; set; }
-        public int EffectiveCapacity { get; set; }
+        public Guid Id { get; init; }
+        public DateTime StartUtc { get; init; }
+        public DateTime EndUtc { get; init; }
+        public int EffectiveCapacity { get; init; }
+        public string ActivityName { get; init; } = string.Empty;
+        public string PlaceName { get; init; } = string.Empty;
+        public EnvironmentType Environment { get; init; }
+        public string? CategoryName { get; init; }
+        public int DurationMinutes { get; init; }
 
-
-        // Activity and Place details for context
-        public string ActivityName { get; set; } = string.Empty;
-        public string PlaceName { get; set; } = string.Empty;
-        public EnvironmentType Environment { get; set; }
-
-        // Weather details
+        // Enrichment efter mapping
         public ActivityWeatherForecastDto? WeatherForecast { get; set; }
+
+        public ActivityOccurrenceWeatherDto() { }
     }
 
     

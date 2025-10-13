@@ -1,0 +1,103 @@
+/*Default navbar css*/
+.nav-bar {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  justify-self: center;
+  position: sticky;
+  top: 0;
+  width: 100vw;
+  z-index: 1000;
+  background-image: url("/IMG/HomePage/navbar-background.png");
+  height: 57px;
+}
+
+.navbar-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+}
+
+.nav-links {
+  display: flex;
+  gap: 24px;
+  font-family: "Press Start 2P", cursive, system-ui;
+}
+.nav-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 16px;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.nav-img {
+  display: flex;
+  gap: 10px;
+}
+
+#nav1 {
+  background-color: red;
+  color: white;
+}
+
+#nav2 {
+  background-color: yellow;
+  color: red;
+}
+
+#nav3 {
+  background-color: green;
+  color: white;
+}
+
+#nav4 {
+  color: snow;
+}
+
+#nav5 {
+  color: moccasin;
+}
+
+#nav6 {
+  background-color: green;
+  color: white;
+}
+
+#nav-admin{
+    color: white;
+    background-color: purple;
+}
+
+
+@media screen and (max-width: 1400px){
+    .nav-bar{
+        width:1000px;
+        font-size: 10px;
+    }
+
+}
+
+@media screen and (max-width: 800px) {
+  .nav-bar {
+    width: 700px;
+    font-size: 7px;
+  }
+  .activigo-title {
+    width: 70px;
+  }
+
+  .nav-link {
+    width: 80px;
+  }
+
+  .nav-links {
+    gap: 13px;
+  }
+}

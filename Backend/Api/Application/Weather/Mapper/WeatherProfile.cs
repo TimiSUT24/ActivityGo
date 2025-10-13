@@ -20,7 +20,7 @@ namespace Application.Weather.Mapper
 
                 // Mapping if WeatherSliceDto -> ActivityWeatherForecastDto is needed for a hourly slice
                 CreateMap<WeatherSliceDto, ActivityWeatherForecastDto>()
-                .ForMember(dest => dest.RainVolumeMm, opt => opt.MapFrom(src => src.rainVolumeMm));
+                .ForMember(dest => dest.RainVolumeMm, opt => opt.MapFrom(src => src.RainVolumeMm));
         }
     }
 }

@@ -36,13 +36,12 @@ namespace Infrastructure.Weather
                     t = DateTimeOffset.FromUnixTimeSeconds(x.dt).UtcDateTime,
                     x
                 })
-                .Where(x => x.t >= startUtc && x.t <= endUtc)
                 .Select(x => new WeatherSliceDto
                 {
                     TimeUtc = x.t,
                     TemperatureC = x.x.temp,
                     WindSpeedMs = x.x.wind_speed,
-                    rainVolumeMm = x.x.rain?.OneHour ?? 0.0,
+                    RainVolumeMm = x.x.rain?.OneHour ?? 0.0,
                     ConditionIconUrl = x.x.weather.FirstOrDefault()?.icon ?? "",
                     ConditionText = x.x.weather.FirstOrDefault()?.description ?? "",
                     Source = "openweather3.0"

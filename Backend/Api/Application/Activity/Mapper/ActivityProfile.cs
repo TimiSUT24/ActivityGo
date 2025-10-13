@@ -30,6 +30,11 @@ namespace Application.Activity.Mapper
                 .ForMember(d => d.CategoryId, o => o.Ignore())
                 .ForMember(d => d.CreatedAtUtc, o => o.Ignore())
                 .ForMember(d => d.UpdatedAtUtc, o => o.Ignore());
+
+            // Entity to DTO for list
+            CreateMap<SportActivity, ActivityResponse>()
+                .ForMember(d => d.CategoryName,
+                o => o.MapFrom(s => s.Category != null ? s.Category.Name : null));
         }
     }
 }
