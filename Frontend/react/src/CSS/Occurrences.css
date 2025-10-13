@@ -1,50 +1,30 @@
+body.activity-occurrences-body {
+  background-image: url("/IMG/HomePageBack.png");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+  background-attachment: fixed;
+  margin: 0 auto;
+  overflow-x: hidden;
+  justify-self: center;
+}
+
 /* Sida */
 .occurrence-page {
-  max-width: 1100px;
   margin: 24px auto;
   padding: 16px;
+  max-width: 1100px;
+  overflow-x: hidden;
+  justify-self: center;
 }
 .occurrence-title {
+  text-align: center;
+  font-family: "Press Start 2P", cursive, system-ui;
   font-size: 1.8rem;
   margin-bottom: 12px;
 }
 
-/* Filter (observera stavningen occurence-* som i din JSX) */
-.occurence-filters {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(160px, 1fr));
-  gap: 12px;
-  align-items: end;
-  margin-bottom: 16px;
-}
-.occurence-field {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  font-size: 0.9rem;
-}
-.occurence-field input,
-.occurence-field select {
-  padding: 10px;
-  border: 1px solid #d1d5db;
-  border-radius: 8px;
-  background: #fff;
-}
-.occurrence-button {
-  padding: 10px 14px;
-  border: none;
-  border-radius: 8px;
-  background: #4f46e5;
-  color: #fff;
-  font-weight: 600;
-  cursor: pointer;
-}
-.occurrence-button:disabled {
-  background: #9ca3af;
-  cursor: not-allowed;
-}
-
-/* Status + meta */
+/* ---- GRID + STATUS ---- */
 .occurrence-status {
   margin: 8px 0;
   color: #374151;
@@ -58,7 +38,6 @@
   margin: 8px 0;
 }
 
-/* Grid + tomvy */
 .occurence-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -72,10 +51,9 @@
   color: #6b7280;
 }
 
-/* Kort */
+/* ---- KORT ---- */
 .occurrence-card {
   background: #fff;
-  border: 1px solid #e5e7eb;
   border-radius: 12px;
   padding: 14px;
   display: flex;
@@ -125,14 +103,219 @@
   padding: 8px;
 }
 
-/* Responsiv */
-@media (max-width: 768px) {
-  .occurence-filters {
-    grid-template-columns: 1fr 1fr;
-  }
+/* ---- FILTERS: layout (behåller dina klassnamn) ---- */
+.occurence-filters {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(160px, 1fr));
+  gap: 12px;
+  align-items: end;
+  margin-bottom: 16px;
+}
+.occurence-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 0.9rem;
+}
+.occurence-field input,
+.occurence-field select {
+  padding: 10px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  background: #fff;
 }
 
-/* Modal overlay och container */
+/* ---- FILTERS: Mario-stil i samma wrapper ---- */
+.occurence-filters.brick-filters {
+  padding: 14px;
+  background: rgba(255, 255, 255, 0.88);
+}
+.occurence-filters.brick-filters .occurence-field label {
+  font-family: "Press Start 2P", cursive, system-ui;
+  font-size: 0.7rem;
+  color: #0b3a86;
+  text-shadow: 1px 1px rgba(0, 0, 0, 0.15);
+}
+.occurence-filters.brick-filters .occurence-field input,
+.occurence-filters.brick-filters .occurence-field select {
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 3px solid #ffd166; /* gul kant */
+  background: #14213d; /* mörk bakgrund */
+  color: #fff;
+  font-size: 0.9rem;
+  box-shadow: inset 0 4px 0 rgba(0, 0, 0, 0.25);
+  outline: none;
+}
+.occurence-filters.brick-filters .occurence-field input:focus,
+.occurence-filters.brick-filters .occurence-field select:focus {
+  box-shadow: inset 0 4px 0 rgba(0, 0, 0, 0.25), 0 0 0 3px #1f3fff;
+}
+
+/* knappar i filtersektionen (behåller dina klasser) */
+.occurence-filters.brick-filters .occurrence-button,
+.occurence-filters.brick-filters .occurrence-button-ghost {
+  font-family: "Press Start 2P", cursive, system-ui;
+  text-transform: uppercase;
+  padding: 12px 14px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: transform 0.12s ease, box-shadow 0.12s ease, filter 0.12s ease;
+}
+.occurence-filters.brick-filters .occurrence-button {
+  border: 4px solid #0b5c33;
+  background: #7fe18a;
+  color: #064b2d;
+  box-shadow: 0 6px 0 #0b5c33, 0 12px 18px rgba(0, 0, 0, 0.25);
+}
+.occurence-filters.brick-filters .occurrence-button:hover {
+  transform: translateY(-2px);
+  filter: saturate(1.08);
+  box-shadow: 0 9px 0 #0b5c33, 0 16px 24px rgba(0, 0, 0, 0.3);
+}
+.occurence-filters.brick-filters .occurrence-button-ghost {
+  border: 3px solid #e5e7eb;
+  background: #fff;
+  color: #111827;
+  box-shadow: 0 6px 0 #9aa2aa, 0 12px 18px rgba(0, 0, 0, 0.2);
+}
+.occurence-filters.brick-filters .occurrence-button-ghost:hover {
+  transform: translateY(-2px);
+}
+
+/* ---- GEMENSAM BRICK-RAM till filter + kort ---- */
+.brick-frame {
+  border: 28px solid transparent; /* krävs för border-image */
+  border-radius: 12px;
+  border-image: url("/IMG/HomePage/bricktile.png") 28 round;
+}
+.occurence-filters.brick-frame {
+  background: rgba(255, 255, 255, 0.88);
+}
+.occurrence-card.brick-frame {
+  background: #fff;
+}
+
+/* ---- Mario-typografi i korten (din tidigare stil) ---- */
+.mario-title {
+  font-family: "Press Start 2P", cursive, system-ui;
+  font-size: 0.95rem;
+  color: #ffcc00;
+  text-shadow: 3px 3px #d32f2f, 4px 4px #000;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+}
+.mario-sub {
+  margin: 2px 0 0;
+  font-size: 0.78rem;
+  color: #14325f;
+  text-shadow: 1px 1px rgba(0, 0, 0, 0.2);
+}
+.mario-icon {
+  image-rendering: pixelated;
+}
+.mario-card {
+  padding: 16px;
+}
+.mario-card__header {
+  align-items: center;
+}
+.mario-card__titlewrap {
+  display: flex;
+  flex-direction: column;
+}
+.mario-badge {
+  font-family: "Press Start 2P", cursive;
+  font-size: 0.62rem;
+  padding: 6px 10px;
+  border-radius: 999px;
+  box-shadow: 0 3px 0 rgba(0, 0, 0, 0.25);
+  border: 3px solid #0b5c33;
+}
+.mario-badge--out {
+  background: #d1fae5;
+  color: #065f46;
+}
+.mario-badge--in {
+  background: #e0e7ff;
+  color: #3730a3;
+  border-color: #233196;
+}
+.mario-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 0;
+  font-size: 0.92rem;
+  color: #0d2447;
+}
+.mario-label {
+  font-family: "Press Start 2P", cursive;
+  font-size: 0.68rem;
+  color: #0b3a86;
+}
+
+.mario-value {
+  font-family: "Press Start 2P", cursive;
+  font-size: 0.75rem;
+}
+
+.mario-value--ok {
+  color: #065f46;
+  font-weight: 700;
+}
+.mario-value--danger {
+  color: #8b1c1c;
+  font-weight: 700;
+}
+.mario-weather {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  border: 3px solid #ff271f;
+  background: #f0f6ff;
+  padding: 8px 10px;
+  border-radius: 10px;
+  font-family: "Press Start 2P", cursive;
+  font-size: 0.7rem;
+  box-shadow: 0 4px 0 rgba(0, 0, 0, 0.15);
+}
+
+/* ---- M-BUTTONS för korten ---- */
+.m-btn {
+  font-family: "Press Start 2P", cursive;
+  text-transform: uppercase;
+  padding: 12px 14px;
+  border-radius: 10px;
+  cursor: pointer;
+  width: 100%;
+  border: 4px solid #0b5c33;
+  box-shadow: 0 6px 0 #0b5c33, 0 12px 18px rgba(0, 0, 0, 0.25);
+  transition: transform 0.12s ease, box-shadow 0.12s ease, filter 0.12s ease;
+}
+.m-btn--primary {
+  background: #7fe18a;
+  color: #064b2d;
+}
+.m-btn--primary:hover {
+  transform: translateY(-2px);
+  filter: saturate(1.1);
+  box-shadow: 0 9px 0 #0b5c33, 0 16px 24px rgba(0, 0, 0, 0.3);
+}
+.m-btn--disabled {
+  background: #9ca3af;
+  color: #fff;
+  border-color: #6b7280;
+  box-shadow: none;
+  cursor: not-allowed;
+}
+.mario-book {
+  margin-top: 10px;
+}
+
+/* Modal (oförändrad) */
 .occurrence-modal-overlay {
   position: fixed;
   inset: 0;
@@ -142,7 +325,6 @@
   justify-content: center;
   z-index: 50;
 }
-
 .occurrence-modal {
   width: 100%;
   max-width: 420px;
@@ -151,8 +333,6 @@
   border-radius: 12px;
   overflow: hidden;
 }
-
-/* Header */
 .occurrence-modal-header {
   display: flex;
   align-items: center;
@@ -160,7 +340,6 @@
   padding: 12px 16px;
   border-bottom: 1px solid #e5e7eb;
 }
-
 .occurrence-modal-close {
   border: none;
   background: transparent;
@@ -168,27 +347,21 @@
   cursor: pointer;
   line-height: 1;
 }
-
-/* Body */
 .occurrence-modal-body {
   padding: 16px;
 }
-
 .occurrence-modal-field {
   display: flex;
   flex-direction: column;
   gap: 6px;
   font-size: 0.9rem;
 }
-
 .occurrence-modal-field input {
   padding: 10px;
   border: 1px solid #d1d5db;
   border-radius: 8px;
   background: #fff;
 }
-
-/* Footer */
 .occurrence-modal-footer {
   display: flex;
   gap: 8px;
@@ -197,27 +370,65 @@
   border-top: 1px solid #e5e7eb;
 }
 
-/* Knappar */
-.occurrence-button {
-  padding: 10px 14px;
-  border: none;
-  border-radius: 8px;
-  background: #4f46e5;
-  color: #fff;
-  font-weight: 600;
-  cursor: pointer;
+/* Responsiv */
+@media (max-width: 768px) {
+  .occurence-filters {
+    grid-template-columns: 1fr 1fr;
+  }
+  .occurence-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
-.occurrence-button:disabled {
-  background: #9ca3af;
-  cursor: not-allowed;
-}
-
-.occurrence-button-ghost {
-  padding: 10px 14px;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
+/* ===== BookingModal: Mario-stil ===== */
+.occurrence-modal.brick-frame {
   background: #fff;
-  color: #111827;
-  cursor: pointer;
+}
+
+.mario-modal__header {
+  background: linear-gradient(180deg, #ffcf33 0%, #ffb300 100%);
+  border-bottom: 3px solid #d99700;
+  padding: 10px 16px;
+}
+
+.mario-modal__title {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: "Press Start 2P", cursive;
+  font-size: 0.95rem;
+  color: #4a2c00;
+  text-shadow: 1px 1px rgba(0, 0, 0, 0.2);
+}
+
+.mario-modal__close {
+  width: 34px;
+  height: 34px;
+  line-height: 30px;
+  text-align: center;
+  border-radius: 10px;
+  border: 3px solid #8b1c1c;
+  background: #d62828;
+  color: #fff;
+  font-weight: 700;
+  box-shadow: 0 4px 0 rgba(0, 0, 0, 0.2);
+  transition: transform 0.1s ease;
+}
+.mario-modal__close:hover {
+  transform: translateY(-2px);
+}
+
+.occurrence-modal-body .m-input {
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 3px solid #ffd166;
+  background: #14213d;
+  color: #fff;
+  font-size: 0.95rem;
+  box-shadow: inset 0 4px 0 rgba(0, 0, 0, 0.25);
+  outline: none;
+}
+.occurrence-modal-body .m-input:focus {
+  box-shadow: inset 0 4px 0 rgba(0, 0, 0, 0.25), 0 0 0 3px #1f3fff;
 }

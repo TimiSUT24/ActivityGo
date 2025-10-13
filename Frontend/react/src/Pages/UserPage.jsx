@@ -14,18 +14,28 @@ export default function UserPage() {
 
   // game state
   const [score, setScore] = useState(0);
-  const [coins, setCoins] = useState(() => Array.from({ length: 6 }, spawnCoin));
+  const [coins, setCoins] = useState(() =>
+    Array.from({ length: 6 }, spawnCoin)
+  );
 
   // audio (small pling)
   const coinAudio = useMemo(
-    () => new Audio("data:audio/wav;base64,UklGRoQAAABXQVZFZm10IBAAAAABAAEAESsAACJWAAACABYAAAEsAAACABYAAABbAAAASAAAAGZmZmZmZmY="),
+    () =>
+      new Audio(
+        "data:audio/wav;base64,UklGRoQAAABXQVZFZm10IBAAAAABAAEAESsAACJWAAACABYAAAEsAAACABYAAABbAAAASAAAAGZmZmZmZmY="
+      ),
     []
   );
 
   const collectCoin = (id) => {
-    setCoins((prev) => prev.map((c) => (c.id === id ? { ...c, collected: true } : c)));
+    setCoins((prev) =>
+      prev.map((c) => (c.id === id ? { ...c, collected: true } : c))
+    );
     setScore((s) => s + 1);
-    try { coinAudio.currentTime = 0; coinAudio.play().catch(() => {}); } catch {}
+    try {
+      coinAudio.currentTime = 0;
+      coinAudio.play().catch(() => {});
+    } catch {}
     setTimeout(() => {
       setCoins((prev) => prev.map((c) => (c.id === id ? spawnCoin() : c)));
     }, 350);
@@ -63,7 +73,13 @@ export default function UserPage() {
 
       {/* Coins */}
       {coins.map((c) => (
-        <Coin key={c.id} x={c.x} y={c.y} collected={c.collected} onClick={() => !c.collected && collectCoin(c.id)} />
+        <Coin
+          key={c.id}
+          x={c.x}
+          y={c.y}
+          collected={c.collected}
+          onClick={() => !c.collected && collectCoin(c.id)}
+        />
       ))}
 
       {/* Content */}

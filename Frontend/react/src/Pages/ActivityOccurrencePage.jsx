@@ -1,116 +1,267 @@
-import { useEffect, useState } from "react";
-import occurrenceService from "../Services/occurrenceService.js";
-import OccurrenceCard from "../Components/OccurrenceCard.jsx";
+import { useEffect, useMemo, useState } from "react";
+import api from "../lib/api";
+import OccurrenceCard from "../Components/OccurrenceCard";
+import BookingModal from "../Components/BookingModal";
 import "../CSS/Occurrences.css";
 
 export default function ActivityOccurrencePage() {
-  const today = new Date().toISOString().slice(0, 10);
-  const in7 = new Date(Date.now() + 7 * 86400000).toISOString().slice(0, 10);
+  const [categories, setCategories] = useState([]);
+  const [activities, setActivities] = useState([]);
+  const [places, setPlaces] = useState([]);
 
-  const [dateFrom, setDateFrom] = useState(today);
-  const [dateTo, setDateTo] = useState(in7);
-  const [environment, setEnvironment] = useState("");
-
-  const [items, setItems] = useState([]);
+  const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState("");
 
-  const fetchOccurrences = async () => {
+  const [filters, setFilters] = useState({
+    startDate: "",
+    endDate: "",
+    categoryId: "",
+    activityId: "",
+    placeId: "",
+    environment: "", // "" | "0" | "1"
+    onlyAvailable: false,
+  });
+
+  const [modalOpen, setModalOpen] = useState(false);
+  const [selectedId, setSelectedId] = useState(null);
+
+  // Dropdown-data
+  useEffect(() => {
+    (async () => {
+      try {
+        const [cats, pls] = await Promise.all([
+          api.get("/api/Category"),
+          api.get("/api/Place"),
+        ]);
+        setCategories(cats.data ?? []);
+        setPlaces(pls.data ?? []);
+      } catch {
+        /* ignore */
+      }
+    })();
+  }, []);
+
+  // Aktiviteter
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await api.get("/api/Activity");
+        setActivities(res.data ?? []);
+      } catch {
+        setActivities([]);
+      }
+    })();
+  }, []);
+
+  // Bygg querystring (matchar OccurencyQuery)
+  const queryString = useMemo(() => {
+    const p = new URLSearchParams();
+
+    if (filters.startDate)
+      p.set(
+        "fromDate",
+        new Date(`${filters.startDate}T00:00:00Z`).toISOString()
+      );
+    if (filters.endDate)
+      p.set("toDate", new Date(`${filters.endDate}T23:59:59Z`).toISOString());
+
+    if (filters.categoryId) p.set("categoryId", filters.categoryId);
+    if (filters.activityId) p.set("activityId", filters.activityId);
+    if (filters.placeId) p.set("placeId", filters.placeId);
+
+    if (filters.environment !== "") p.set("environment", filters.environment);
+    if (filters.onlyAvailable) p.set("onlyAvailable", "true");
+
+    return p.toString();
+  }, [filters]);
+
+  async function fetchOccurrences() {
     setLoading(true);
     setErr("");
     try {
-      const data = await occurrenceService.list({
-        dateFrom,
-        dateTo,
-        environment: environment === "" ? undefined : Number(environment),
-      });
-      console.log(
-        "[occurrences] rows",
-        Array.isArray(data) ? data.length : data
-      );
-      setItems(Array.isArray(data) ? data : []);
-    } catch (e) {
-      console.error("[occurrence] fetch error", e);
-      setErr(
-        e?.response?.data?.message ||
-          e?.message ||
-          "Failed to fetch occurrences"
-      );
+      const url = `/api/ActivityOccurrence/with-weather${
+        queryString ? `?${queryString}` : ""
+      }`;
+      const res = await api.get(url);
+      const payload = res?.data;
+      const items = Array.isArray(payload) ? payload : payload?.items ?? [];
+      setData(items);
+    } catch {
+      setErr("Kunde inte hämta tillfällen");
+      setData([]);
     } finally {
       setLoading(false);
     }
-  };
+  }
 
   useEffect(() => {
     fetchOccurrences();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const onApply = (e) => {
-    e.preventDefault();
-    fetchOccurrences();
+  const onChange = (k) => (e) => {
+    const v = e.target.type === "checkbox" ? e.target.checked : e.target.value;
+    setFilters((f) => ({ ...f, [k]: v }));
   };
 
-  // placeholder tills bokningsflödet kopplas
+  const resetFilters = () =>
+    setFilters({
+      startDate: "",
+      endDate: "",
+      categoryId: "",
+      activityId: "",
+      placeId: "",
+      environment: "",
+      onlyAvailable: false,
+    });
+
+  // Booking-modal
   const handleBook = (id) => {
-    // TODO: koppla POST /api/bookings
-    alert(`Book occurrence: ${id}`);
+    setSelectedId(id);
+    setModalOpen(true);
+  };
+  const handleClose = () => {
+    setModalOpen(false);
+    setSelectedId(null);
+  };
+  const handleConfirm = async (people) => {
+    try {
+      // TODO: POST bokning
+      // await api.post("/api/Booking", { occurrenceId: selectedId, numberOfPeople: people });
+    } finally {
+      handleClose();
+    }
   };
 
   return (
     <div className="occurrence-page">
-      <h1 className="occurrence-title">Activity Occurrences</h1>
+      <h1 className="occurrence-title mario-page-title">
+        <img
+          src="/IMG/icons8-pixel-star-48.png"
+          alt=""
+          width={22}
+          height={22}
+          className="m-icon"
+        />
+        Sök aktivitetstillfällen
+      </h1>
 
-      <form className="occurence-filters" onSubmit={onApply}>
-        <label className="occurence-field">
-          <span>From Date:</span>
+      <section className="occurence-filters brick-frame brick-filters">
+        <div className="occurence-field">
+          <label>Från datum</label>
           <input
             type="date"
-            value={dateFrom}
-            onChange={(e) => setDateFrom(e.target.value)}
+            value={filters.startDate}
+            onChange={onChange("startDate")}
           />
-        </label>
+        </div>
 
-        <label className="occurence-field">
-          <span>To Date:</span>
+        <div className="occurence-field">
+          <label>Till datum</label>
           <input
             type="date"
-            value={dateTo}
-            onChange={(e) => setDateTo(e.target.value)}
+            value={filters.endDate}
+            onChange={onChange("endDate")}
           />
-        </label>
+        </div>
 
-        <label className="occurence-field">
-          <span>Environment:</span>
-          <select
-            value={environment}
-            onChange={(e) => setEnvironment(e.target.value)}
-          >
-            <option value="">All</option>
-            <option value="0">Indoor</option>
-            <option value="1">Outdoor</option>
+        <div className="occurence-field">
+          <label>Kategori</label>
+          <select value={filters.categoryId} onChange={onChange("categoryId")}>
+            <option value="">Alla</option>
+            {categories.map((c) => (
+              <option key={c.id} value={c.id}>
+                {c.name}
+              </option>
+            ))}
           </select>
-        </label>
+        </div>
 
-        <button type="submit" className="occurrence-button">
-          Let's a go!
-        </button>
-      </form>
+        <div className="occurence-field">
+          <label>Aktivitet</label>
+          <select value={filters.activityId} onChange={onChange("activityId")}>
+            <option value="">Alla</option>
+            {activities.map((a) => (
+              <option key={a.id} value={a.id}>
+                {a.name}
+              </option>
+            ))}
+          </select>
+        </div>
 
-      {loading && <div className="occurrence-status">Loading...</div>}
+        <div className="occurence-field">
+          <label>Plats</label>
+          <select value={filters.placeId} onChange={onChange("placeId")}>
+            <option value="">Alla</option>
+            {places.map((p) => (
+              <option key={p.id} value={p.id}>
+                {p.name}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className="occurence-field">
+          <label>Inne/Ute</label>
+          <select
+            value={filters.environment}
+            onChange={onChange("environment")}
+          >
+            <option value="">Båda</option>
+            <option value="0">Inomhus</option>
+            <option value="1">Utomhus</option>
+          </select>
+        </div>
+
+        <div className="occurence-field">
+          <label>Endast lediga</label>
+          <input
+            type="checkbox"
+            checked={filters.onlyAvailable}
+            onChange={onChange("onlyAvailable")}
+          />
+        </div>
+
+        <div className="occurence-field" style={{ alignSelf: "end" }}>
+          <button className="occurrence-button" onClick={fetchOccurrences}>
+            Sök
+          </button>
+        </div>
+        <div className="occurence-field" style={{ alignSelf: "end" }}>
+          <button className="occurrence-button-ghost" onClick={resetFilters}>
+            Rensa
+          </button>
+        </div>
+      </section>
+
       {err && <div className="occurrence-status error">{err}</div>}
+      {loading && <div className="occurrence-status">Laddar…</div>}
 
-      <div className="occurrence-meta">Shows {items.length} results</div>
+      {!loading && (
+        <>
+          <div className="occurrence-meta">Antal: {data.length}</div>
+          <div className="occurence-grid">
+            {data.length === 0 ? (
+              <div className="occurence-empty">Inga träffar</div>
+            ) : (
+              data.map((it) => (
+                <OccurrenceCard
+                  key={it.id}
+                  item={it}
+                  onBook={(id) => handleBook(id)}
+                />
+              ))
+            )}
+          </div>
 
-      <div className="occurence-grid">
-        {items.length === 0 && !loading && !err && (
-          <div className="occurence-empty">No occurrences found.</div>
-        )}
-
-        {items.map((x) => (
-          <OccurrenceCard key={x.id} item={x} onBook={handleBook} />
-        ))}
-      </div>
+          <BookingModal
+            open={modalOpen}
+            onClose={handleClose}
+            onConfirm={handleConfirm}
+          />
+        </>
+      )}
     </div>
   );
 }

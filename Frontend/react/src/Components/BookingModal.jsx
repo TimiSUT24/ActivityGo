@@ -5,28 +5,40 @@ export default function BookingModal({ open, onClose, onConfirm }) {
   if (!open) return null;
 
   return (
-    <div className="occurrence-modal-overlay">
-      <div className="occurrence-modal">
-        <div className="occurrence-modal-header">
-          <h3>Book Activity</h3>
+    <div className="occurrence-modal-overlay" role="dialog" aria-modal="true">
+      <div className="occurrence-modal brick-frame">
+        <div className="occurrence-modal-header mario-modal__header">
+          <h3 className="mario-modal__title">
+            <img
+              src="/IMG/Mario-Mushroom-Step-10.webp"
+              alt=""
+              width={18}
+              height={18}
+              className="mario-icon"
+            />
+            Boka aktivitet
+          </h3>
           <button
             type="button"
-            className="occurrence-modal-close"
+            className="occurrence-modal-close mario-modal__close"
+            aria-label="Stäng"
             onClick={onClose}
-            aria-label="Close"
           >
-            x
+            ×
           </button>
         </div>
 
         <div className="occurrence-modal-body">
           <label className="occurrence-modal-field">
-            <span>Number of People:</span>
+            <span className="mario-label">Antal personer</span>
             <input
+              className="m-input"
               type="number"
               min={1}
               value={people}
-              onChange={(e) => setPeople(parseInt(e.target.value || "1", 10))}
+              onChange={(e) =>
+                setPeople(Math.max(1, parseInt(e.target.value || "1", 10)))
+              }
             />
           </label>
         </div>
@@ -34,17 +46,17 @@ export default function BookingModal({ open, onClose, onConfirm }) {
         <div className="occurrence-modal-footer">
           <button
             type="button"
-            className="occurrence-button-ghost"
+            className="m-btn m-btn--ghost"
             onClick={onClose}
           >
-            Cancel
+            Avbryt
           </button>
           <button
             type="button"
-            className="occurrence-button"
+            className="m-btn m-btn--primary"
             onClick={() => onConfirm(people)}
           >
-            Confirm
+            Bekräfta
           </button>
         </div>
       </div>
