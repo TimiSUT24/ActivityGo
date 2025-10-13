@@ -143,7 +143,7 @@ export default function ActivityOccurrencePage() {
     try {
       // TODO: POST bokning
       await api.post("/api/Booking", {
-        occurrenceId: selectedId,
+        ActivityOccurrenceId: selectedId,
         numberOfPeople: people,
       });
     } finally {
