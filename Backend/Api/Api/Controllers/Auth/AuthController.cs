@@ -28,8 +28,9 @@ namespace Api.Controllers.Auth
             {
                 HttpOnly = true,
                 Secure = true,
-                SameSite = SameSiteMode.Strict,
-                Expires = DateTimeOffset.UtcNow.AddDays(14) // matcha Jwt:RefreshDays
+                SameSite = SameSiteMode.None,
+                Expires = DateTimeOffset.UtcNow.AddDays(14), // matcha Jwt:RefreshDays
+                Path = "/"
             });
         }
 
