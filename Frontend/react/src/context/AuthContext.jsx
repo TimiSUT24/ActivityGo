@@ -45,7 +45,8 @@ export function AuthProvider({ children }) {
     }
   }
 
-  function logout() {
+  async function logout() {
+    await api.post("/api/auth/logout");
     localStorage.removeItem(TOKEN_KEY);
     setAccessToken(null);
     setUser(null);

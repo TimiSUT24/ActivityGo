@@ -34,7 +34,16 @@ namespace Api.Controllers.Auth
             });
         }
 
-        private void ClearRefreshCookie() => Response.Cookies.Delete("refreshToken");
+        private void ClearRefreshCookie()
+        {
+            Response.Cookies.Delete("refreshToken", new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.None,
+                Path = "/"
+            });
+        }
 
         // === Register (skapar user + valfri default-roll) ===
         [HttpPost("register")]
