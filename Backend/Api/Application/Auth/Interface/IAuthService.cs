@@ -10,7 +10,6 @@ namespace Application.Auth.Interface
     public interface IAuthService
     {
         Task<AuthResult> LoginAsync(LoginDto dto, CancellationToken cancellationToken);
-        Task<AuthResult> RefreshAsync(string refreshToken, CancellationToken ct);
         Task LogoutAsync(string userId, CancellationToken ct);
         Task<AuthResult> RegisterAsync(RegisterDto dto, CancellationToken ct);
 

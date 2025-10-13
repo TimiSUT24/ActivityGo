@@ -18,20 +18,17 @@ namespace Application.Auth.Service
         private readonly SignInManager<User> _signIn;
         private readonly ITokenService _tokens;
         private readonly IHttpContextAccessor? _http;
-        private readonly IMapper _mapper;
 
         public AuthService(
             UserManager<User> users,
             SignInManager<User> signIn,
             ITokenService tokens,
-            IMapper mapper,
             IHttpContextAccessor? http = null)
         {
             _users = users;
             _signIn = signIn;
             _tokens = tokens;
             _http = http;
-            _mapper = mapper;
         }
 
       
@@ -57,18 +54,6 @@ namespace Application.Auth.Service
                 Email = user.Email,
                 UserId = user.Id
             };
-        }
-
-        public async Task<AuthResult> RefreshAsync(string refreshToken, CancellationToken ct)
-        {
-            if (string.IsNullOrWhiteSpace(refreshToken))
-                throw new ArgumentException("Missing refresh token.", nameof(refreshToken));
-
-            var (newAccess, newRefresh) = await _tokens.RefreshAsync(refreshToken, GetIp());
-            return new AuthResult(
-                AccessToken: newAccess,
-                RefreshToken: newRefresh
-            );
         }
 
         public async Task LogoutAsync(string userId, CancellationToken ct)
