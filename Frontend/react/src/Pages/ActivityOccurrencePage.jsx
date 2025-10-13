@@ -235,33 +235,52 @@ export default function ActivityOccurrencePage() {
         </div>
       </section>
 
-      {err && <div className="occurrence-status error">{err}</div>}
+      {err && (
+        <div className="mario-alert mario-alert--error">
+          <img
+            src="/IMG/Mario-Mushroom-Step-10.webp"
+            alt=""
+            width={18}
+            height={18}
+            className="mario-icon"
+          />
+          <span>{err}</span>
+        </div>
+      )}
+
       {loading && <div className="occurrence-status">Laddar…</div>}
 
-      {!loading && (
-        <>
-          <div className="occurrence-meta">Antal: {data.length}</div>
-          <div className="occurence-grid">
-            {data.length === 0 ? (
-              <div className="occurence-empty">Inga träffar</div>
-            ) : (
-              data.map((it) => (
-                <OccurrenceCard
-                  key={it.id}
-                  item={it}
-                  onBook={(id) => handleBook(id)}
-                />
-              ))
-            )}
-          </div>
-
-          <BookingModal
-            open={modalOpen}
-            onClose={handleClose}
-            onConfirm={handleConfirm}
+      {!loading && !err && data.length > 0 && (
+        <div className="occurrence-meta mario-meta">
+          <img
+            src="/IMG/Mario-Mushroom-Step-10.webp"
+            alt=""
+            width={16}
+            height={16}
+            className="mario-icon"
           />
-        </>
+          <span>Antal:</span>
+          <strong>{data.length}</strong>
+        </div>
       )}
+
+      {!loading && !err && (
+        <div className="occurence-grid">
+          {data.length > 0 &&
+            data.map((it) => (
+              <OccurrenceCard
+                key={it.id}
+                item={it}
+                onBook={(id) => handleBook(id)}
+              />
+            ))}
+        </div>
+      )}
+      <BookingModal
+        open={modalOpen}
+        onClose={handleClose}
+        onConfirm={handleConfirm}
+      />
     </div>
   );
 }

@@ -432,3 +432,39 @@ body.activity-occurrences-body {
 .occurrence-modal-body .m-input:focus {
   box-shadow: inset 0 4px 0 rgba(0, 0, 0, 0.25), 0 0 0 3px #1f3fff;
 }
+
+.mario-meta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: "Press Start 2P", cursive, system-ui;
+  font-size: 0.78rem;
+  color: #14325f;
+  background: rgba(255, 255, 255, 0.9);
+  border: 3px solid #ffd166;
+  border-radius: 10px;
+  padding: 8px 12px;
+  box-shadow: 0 3px 0 rgba(0, 0, 0, 0.15);
+}
+.mario-meta strong {
+  color: #064b2d;
+}
+
+.mario-alert {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  margin: 8px 0;
+  border-radius: 12px;
+  background: #fff;
+  font-family: "Press Start 2P", cursive, system-ui;
+  font-size: 0.78rem;
+}
+.mario-alert--error {
+  justify-content: center;
+  text-align: center;
+  border: 3px solid #8b1c1c;
+  background: #ffe5e5;
+  color: #8b1c1c;
+}
