@@ -38,14 +38,12 @@ namespace Application.Auth.Service
             _http?.HttpContext?.Connection?.RemoteIpAddress?.ToString();
 
         public async Task<AuthResult> LoginAsync(LoginDto dto, CancellationToken ct)
-        {
-            var map = _mapper.Map<LoginDto>(dto);
-
-            var user = await _users.FindByEmailAsync(map.Email);
+        {        
+            var user = await _users.FindByEmailAsync(dto.Email);
             if (user is null)
                 throw new UnauthorizedAccessException("Invalid email or password.");
 
-            var check = await _signIn.CheckPasswordSignInAsync(user, map.Password, lockoutOnFailure: false);
+            var check = await _signIn.CheckPasswordSignInAsync(user, dto.Password, lockoutOnFailure: false);
             if (!check.Succeeded)
                 throw new UnauthorizedAccessException("Invalid email or password.");
 
@@ -82,7 +80,8 @@ namespace Application.Auth.Service
 
         // Valfritt – om du vill samla även register här
         public async Task<AuthResult> RegisterAsync(RegisterDto dto, CancellationToken ct)
-        {
+        {          
+
             var existing = await _users.FindByEmailAsync(dto.Email);
             if (existing is not null)
                 throw new InvalidOperationException("User with this email already exists.");

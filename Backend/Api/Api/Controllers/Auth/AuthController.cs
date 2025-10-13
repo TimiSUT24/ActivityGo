@@ -44,31 +44,8 @@ namespace Api.Controllers.Auth
         [AllowAnonymous] // Tillåter anonyma användare att komma åt denna endpoint
         public async Task<ActionResult<AuthResult>> Register([FromBody] RegisterDto dto, CancellationToken ct)
         {
-            // Finns användaren redan?
-            var existingUser = await _users.FindByEmailAsync(dto.Email);
-            if (existingUser is not null)
-                return Conflict(new { message = "User with this email already exists." });
-
-            var user = new User
-            {
-                Email = dto.Email,
-                Firstname = dto.Firstname,
-                Lastname = dto.Lastname,
-                UserName = dto.Email,
-                EmailConfirmed = true // dev: slipp mailflöde
-            };
-
-            var create = await _users.CreateAsync(user, dto.Password);
-            if (!create.Succeeded)
-                return BadRequest(create.Errors);
-
-            // Tilldela standardroll (seeda rollen 'User' vid uppstart)
-            await _users.AddToRoleAsync(user, "User");
-
-            // Skapa access + refresh, sätt cookie och returnera AuthResult (access token)
-            var (access, refresh) = await _tokenService.IssueTokensAsync(user, HttpContext.Connection.RemoteIpAddress?.ToString());
-            SetRefreshCookie(refresh);
-            return Ok(new AuthResult(access));
+            var register = await _authService.RegisterAsync(dto, ct);
+            return CreatedAtAction(nameof(Register), new { id = register.Email }, register);
         }
 
         // === Login (returnerar JWT-token + sätter refresh-cookie) ===
@@ -77,7 +54,6 @@ namespace Api.Controllers.Auth
         public async Task<ActionResult<AuthResult>> Login([FromBody] LoginDto dto, CancellationToken ct)
         {
             var login = await _authService.LoginAsync(dto, ct);
-
             return Ok(login);
         }
 
