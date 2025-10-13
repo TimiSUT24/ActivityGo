@@ -84,13 +84,10 @@ namespace Api.Controllers.Auth
         // === Logout (revokerar alla refresh-tokens för användaren) ===
         [HttpPost("logout")]
         [Authorize]
-        public async Task<IActionResult> Logout()
+        public async Task<IActionResult> Logout(CancellationToken ct)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? User.FindFirst("sub")?.Value;
-            if (string.IsNullOrWhiteSpace(userId)) return Unauthorized();
-
-            await _tokenService.RevokeAllAsync(userId, HttpContext.Connection.RemoteIpAddress?.ToString());
-            ClearRefreshCookie();
+            await _authService.LogoutAsync(userId, ct);
             return NoContent();
         }
 

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 using Application.Auth.DTO;
@@ -72,8 +73,16 @@ namespace Application.Auth.Service
 
         public async Task LogoutAsync(string userId, CancellationToken ct)
         {
-            if (string.IsNullOrWhiteSpace(userId))
-                return;
+            if (string.IsNullOrEmpty(userId))
+            {
+                throw new ArgumentException("User ID cannot be null or empty.", nameof(userId));
+            }
+
+            var user = await _users.FindByIdAsync(userId);
+            if(user == null)
+            {
+                throw new InvalidOperationException("User not found.");
+            }
 
             await _tokens.RevokeAllAsync(userId, GetIp());
         }
