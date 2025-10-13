@@ -28,10 +28,11 @@ export default function NavBar() {
       "/": "home-body",
       "/login": "login-body",
       "/register": "register-body",
+      "/activity-occurrences": "activity-occurrences-body",
       "/admin": "admin-body",
     };
     const newClass = bodyClassMap[location.pathname] || "default-body";
-    document.body.classList.remove("home-body", "login-body", "register-body", "admin-body", "default-body");
+    document.body.classList.remove("home-body", "login-body", "register-body", "admin-body", "activity-occurrences-body", "default-body");
     document.body.classList.add(newClass);
     return () => document.body.classList.remove(newClass);
   }, [location]);
@@ -41,6 +42,7 @@ export default function NavBar() {
     location.pathname === "/login" ? "login-navbar" :
     location.pathname === "/user" ? "user-navbar" :
     location.pathname === "/register" ? "register-navbar" :
+    location.pathname === "/activity-occurrences" ? "activity-occurrences-navbar" :
     location.pathname === "/admin" ? "admin-navbar" :
     "default-navbar";
 
@@ -51,7 +53,7 @@ export default function NavBar() {
       return (
         <>
           <NavLink to="/" className="nav-link" id="nav1">Hem</NavLink>
-          <NavLink to="/" className="nav-link" id="nav2">Sök Aktivitet</NavLink>
+          <NavLink to="/activity-occurrences" className="nav-link" id="nav2">Sök Aktivitet</NavLink>
           <NavLink to="/user" className="nav-link" id="nav6">Mina Sidor</NavLink>
           <NavLink to="/admin" className="nav-link" id="nav-admin">Admin</NavLink>
         </>
@@ -63,7 +65,7 @@ export default function NavBar() {
       return (
         <>
           <NavLink to="/" className="nav-link" id="nav1">Hem</NavLink>
-          <NavLink to="/" className="nav-link" id="nav2">Sök Aktivitet</NavLink>
+          <NavLink to="/activity-occurrences" className="nav-link" id="nav2">Sök Aktivitet</NavLink>
           <NavLink to="/me/bookings" className="nav-link" id="nav3">Mina Bokningar</NavLink>
           <NavLink to="/user" className="nav-link" id="nav6">Mina Sidor</NavLink>
         </>
@@ -74,7 +76,7 @@ export default function NavBar() {
     return (
       <>
         <NavLink to="/" className="nav-link" id="nav1">Hem</NavLink>
-        <NavLink to="/" className="nav-link" id="nav2">Sök Aktivitet</NavLink>
+        <NavLink to="/activity-occurrences" className="nav-link" id="nav2">Sök Aktivitet</NavLink>
         <NavLink to="/login" className="nav-link" id="nav4">Logga in</NavLink>
         <NavLink to="/register" className="nav-link" id="nav5">Registrera</NavLink>
       </>
