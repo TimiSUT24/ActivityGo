@@ -71,6 +71,8 @@ body.activity-occurrences-body {
 }
 .occurrence-card-place {
   margin: 2px 0 0;
+  margin-top: 0.5rem;
+  font-family: "Press Start 2P", cursive, system-ui;
   font-size: 0.9rem;
   color: #6b7280;
 }
@@ -283,6 +285,12 @@ body.activity-occurrences-body {
   box-shadow: 0 4px 0 rgba(0, 0, 0, 0.15);
 }
 
+.mario-weather .wx {
+  font-size: 2em;
+  line-height: 1;
+  margin-right: 4px;
+}
+
 /* ---- M-BUTTONS för korten ---- */
 .m-btn {
   font-family: "Press Start 2P", cursive;
@@ -467,4 +475,65 @@ body.activity-occurrences-body {
   border: 3px solid #8b1c1c;
   background: #ffe5e5;
   color: #8b1c1c;
+}
+
+/*------Checkbox------*/
+
+.occurence-filters.brick-filters .m-check {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: "Press Start 2P", cursive, system-ui;
+  font-size: 0.78rem;
+  color: #0b3a86;
+}
+.occurence-filters.brick-filters .m-check input {
+  appearance: none;
+  width: 22px;
+  height: 22px;
+  cursor: pointer;
+  border: 3px solid #ffd166;
+  border-radius: 6px;
+  background: #14213d;
+  box-shadow: inset 0 4px 0 rgba(0, 0, 0, 0.25), 0 3px 0 rgba(0, 0, 0, 0.2);
+  position: relative;
+  transition: transform 0.08s ease, filter 0.08s ease;
+}
+.occurence-filters.brick-filters .m-check input:hover {
+  transform: translateY(-1px);
+}
+.occurence-filters.brick-filters .m-check input:focus-visible {
+  outline: 3px solid #1f3fff;
+  outline-offset: 2px;
+}
+.occurence-filters.brick-filters .m-check input:checked {
+  background: #7fe18a;
+  border-color: #0b5c33;
+}
+.occurence-filters.brick-filters .m-check input:checked::after {
+  content: "✓";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -60%);
+  font-weight: 700;
+  font-size: 16px;
+  color: #064b2d;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.3);
+}
+.occurence-filters.brick-filters .m-check span {
+  user-select: none;
+}
+
+.occurence-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr)); /* exakt 2 kolumner */
+  gap: 12px;
+}
+
+/* 1 kolumn på smalare skärmar */
+@media (max-width: 900px) {
+  .occurence-grid {
+    grid-template-columns: 1fr;
+  }
 }

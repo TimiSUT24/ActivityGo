@@ -27,30 +27,42 @@ export default function ActivityOccurrencePage() {
   const [selectedId, setSelectedId] = useState(null);
 
   // Dropdown-data
-  useEffect(() => {
-    (async () => {
-      try {
-        const [cats, pls] = await Promise.all([
-          api.get("/api/Category"),
-          api.get("/api/Place"),
-        ]);
-        setCategories(cats.data ?? []);
-        setPlaces(pls.data ?? []);
-      } catch {
-        /* ignore */
-      }
-    })();
-  }, []);
 
-  // Aktiviteter
   useEffect(() => {
     (async () => {
-      try {
-        const res = await api.get("/api/Activity");
-        setActivities(res.data ?? []);
-      } catch {
-        setActivities([]);
-      }
+      const tryGet = async (paths) => {
+        for (const p of paths) {
+          try {
+            const r = await api.get(p);
+            console.log(
+              "OK:",
+              p,
+              Array.isArray(r?.data) ? r.data.length : r?.data
+            );
+            return r?.data;
+          } catch (e) {
+            console.warn("GET fail:", p, e?.response?.status, e?.message);
+          }
+        }
+        return null;
+      };
+      const toArray = (x) => (Array.isArray(x) ? x : x?.items ?? []);
+
+      const catsRaw = await tryGet(["/api/Category"]);
+      const plsRaw = await tryGet(["/api/Place"]);
+      const actsRaw = await tryGet(["/api/Activity"]);
+
+      const cats = toArray(catsRaw);
+      const pls = toArray(plsRaw);
+      const acts = toArray(actsRaw);
+
+      setCategories(cats);
+      setPlaces(pls);
+      setActivities(acts);
+
+      console.log("CATEGORIES sample:", cats[0]);
+      console.log("PLACES sample:", pls[0]); // ska inte vara undefined
+      console.log("ACTIVITIES sample:", acts[0]);
     })();
   }, []);
 
@@ -83,9 +95,11 @@ export default function ActivityOccurrencePage() {
       const url = `/api/ActivityOccurrence/with-weather${
         queryString ? `?${queryString}` : ""
       }`;
+      console.log("GET:", url); // DEBUG
       const res = await api.get(url);
       const payload = res?.data;
       const items = Array.isArray(payload) ? payload : payload?.items ?? [];
+      console.log("RESULT count:", items.length); // DEBUG
       setData(items);
     } catch {
       setErr("Kunde inte hämta tillfällen");
@@ -128,12 +142,25 @@ export default function ActivityOccurrencePage() {
   const handleConfirm = async (people) => {
     try {
       // TODO: POST bokning
-      // await api.post("/api/Booking", { occurrenceId: selectedId, numberOfPeople: people });
+      await api.post("/api/Booking", {
+        occurrenceId: selectedId,
+        numberOfPeople: people,
+      });
     } finally {
       handleClose();
     }
   };
 
+  /*=======LOGGAR OCH DYLIKT FÖR FELSÖKNING======*/
+  useEffect(() => {
+    console.log("state placeId:", filters.placeId);
+  }, [filters.placeId]);
+
+  useEffect(() => {
+    console.log("queryString:", queryString);
+  }, [queryString]);
+
+  /*===========================================*/
   return (
     <div className="occurrence-page">
       <h1 className="occurrence-title mario-page-title">
@@ -215,12 +242,14 @@ export default function ActivityOccurrencePage() {
         </div>
 
         <div className="occurence-field">
-          <label>Endast lediga</label>
-          <input
-            type="checkbox"
-            checked={filters.onlyAvailable}
-            onChange={onChange("onlyAvailable")}
-          />
+          <label className="m-check">
+            <input
+              type="checkbox"
+              checked={filters.onlyAvailable}
+              onChange={onChange("onlyAvailable")}
+            />
+            <span>Endast lediga</span>
+          </label>
         </div>
 
         <div className="occurence-field" style={{ alignSelf: "end" }}>

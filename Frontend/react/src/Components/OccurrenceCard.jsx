@@ -39,7 +39,6 @@ export default function OccurrenceCard({ item, onBook }) {
             />
             {title}
           </h3>
-          <p className="occurrence-card-place mario-sub">{place}</p>
         </div>
 
         <span
@@ -50,6 +49,13 @@ export default function OccurrenceCard({ item, onBook }) {
           {isOutdoor ? "UTOMHUS" : "INOMHUS"}
         </span>
       </header>
+
+      <div className="mario-row">
+        <span className="mario-label">Var:</span>
+        <span className="mario-value one-line" title={place}>
+          {place}
+        </span>
+      </div>
 
       <div className="mario-row">
         <span className="mario-label">Tid:</span>
@@ -80,9 +86,17 @@ export default function OccurrenceCard({ item, onBook }) {
 
       {isOutdoor && item.weatherForecast && (
         <div className="occurrence-weather mario-weather">
-          <span>🌡 {item.weatherForecast.temperatureC}°C</span>
-          <span>💨 {item.weatherForecast.windSpeedMs} m/s</span>
-          <span>☔ {item.weatherForecast.rainVolumeMm} mm</span>
+          <span>
+            <span className="wx">🌡</span> {item.weatherForecast.temperatureC}°C
+          </span>
+          <span>
+            <span className="wx">💨</span> {item.weatherForecast.windSpeedMs}{" "}
+            m/s
+          </span>
+          <span>
+            <span className="wx">☔</span> {item.weatherForecast.rainVolumeMm}{" "}
+            mm
+          </span>
         </div>
       )}
 
