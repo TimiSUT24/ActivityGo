@@ -47,7 +47,7 @@ export default function NavBar(){
                 
                 {location.pathname === '/user' && ( 
                 <>
-                    <NavLink to="/user" className ="nav-link" id="nav3"><img src="/IMG/bookinicon.png" alt="" height={20} width={20}/>Mina Bokningar</NavLink>                  
+                    <NavLink to="/me/bookings" className ="nav-link" id="nav3"><img src="/IMG/bookinicon.png" alt="" height={20} width={20}/>Mina Bokningar</NavLink>                  
                 </>
                 )}
 
