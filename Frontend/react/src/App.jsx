@@ -5,7 +5,9 @@ import HomePage from "./Pages/HomePage";
 import NavBar from "./Components/NavBar";
 import UserPage from "./Pages/UserPage";
 import RequireAuth from "./Components/RequireAuth";
-import MyBookings from "./Pages/MyBookings"; // fixat till stor bokstav i "Pages"
+import MyBookings from "./Pages/MyBookings";
+import RequireAdmin from "./Components/RequireAdmin";
+import AdminPage from "./Pages/AdminPage";
 
 export default function App() {
   return (
@@ -31,6 +33,14 @@ export default function App() {
             <RequireAuth>
               <MyBookings />
             </RequireAuth>
+          }
+        />
+        <Route
+          path="/admin"
+          element={
+            <RequireAdmin>
+              <AdminPage />
+            </RequireAdmin>
           }
         />
       </Routes>

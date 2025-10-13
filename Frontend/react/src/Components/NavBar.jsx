@@ -1,66 +1,96 @@
-import {NavLink, useLocation} from 'react-router-dom';
-import {useEffect} from 'react';
+import { NavLink, useLocation } from 'react-router-dom';
+import { useEffect } from 'react';
 import '../CSS/Navbar.css';
+import { useAuth } from '../context/AuthContext'; // du har redan denna i ditt projekt
 
-export default function NavBar(){
-    const location = useLocation();
+export default function NavBar() {
+  const location = useLocation();
+  const { user } = useAuth(); // t.ex. { email, role } eller { roles: [] }
 
-    useEffect(() => {
+  // ✅ Kolla roll
+  const isAdmin =
+    !!user &&
+    (
+      (Array.isArray(user.roles) && user.roles.includes('Admin')) ||
+      user.role === 'Admin'
+    );
+
+  const isUser =
+    !!user &&
+    (
+      (Array.isArray(user.roles) && user.roles.includes('User')) ||
+      user.role === 'User'
+    );
+
+  // Body class logik (samma som innan)
+  useEffect(() => {
     const bodyClassMap = {
-        "/": "home-body",
-        "/login": "login-body",
-        "/register": "register-body",
+      "/": "home-body",
+      "/login": "login-body",
+      "/register": "register-body",
+      "/admin": "admin-body",
     };
-
     const newClass = bodyClassMap[location.pathname] || "default-body";
-
-    document.body.classList.remove("home-body", "login-body", "register-body", "default-body");
-
+    document.body.classList.remove("home-body", "login-body", "register-body", "admin-body", "default-body");
     document.body.classList.add(newClass);
-
     return () => document.body.classList.remove(newClass);
-    }, [location]);
+  }, [location]);
 
-    const pageClass = 
-        location.pathname === "/" ? "home-navbar" :
-        location.pathname === "/login" ? "login-navbar" : 
-        location.pathname === "/user" ? "user-navbar" :
-        location.pathname === "/register" ? "register-navbar" : "default-navbar";
+  const pageClass =
+    location.pathname === "/" ? "home-navbar" :
+    location.pathname === "/login" ? "login-navbar" :
+    location.pathname === "/user" ? "user-navbar" :
+    location.pathname === "/register" ? "register-navbar" :
+    location.pathname === "/admin" ? "admin-navbar" :
+    "default-navbar";
+
+  // ✅ Funktion som bestämmer vilka länkar som ska visas
+  const renderLinks = () => {
+    // --- ADMIN ---
+    if (isAdmin) {
+      return (
+        <>
+          <NavLink to="/" className="nav-link" id="nav1">Hem</NavLink>
+          <NavLink to="/" className="nav-link" id="nav2">Sök Aktivitet</NavLink>
+          <NavLink to="/user" className="nav-link" id="nav6">Mina Sidor</NavLink>
+          <NavLink to="/admin" className="nav-link" id="nav-admin">Admin</NavLink>
+        </>
+      );
+    }
+
+    // --- INLOGGAD USER ---
+    if (isUser) {
+      return (
+        <>
+          <NavLink to="/" className="nav-link" id="nav1">Hem</NavLink>
+          <NavLink to="/" className="nav-link" id="nav2">Sök Aktivitet</NavLink>
+          <NavLink to="/me/bookings" className="nav-link" id="nav3">Mina Bokningar</NavLink>
+          <NavLink to="/user" className="nav-link" id="nav6">Mina Sidor</NavLink>
+        </>
+      );
+    }
+
+    // --- UTSKRIVEN / EJ INLOGGAD ---
     return (
-        <nav className ={`nav-bar ${pageClass}`}style={{padding: 12 }}>
-            <div className="navbar-container">
-                <div className="nav-img">   
-                    <img src="/IMG/Activigotitle.png" alt="" className="activigo-title"/>                 
-                </div>
-                <div className="nav-links">   
+      <>
+        <NavLink to="/" className="nav-link" id="nav1">Hem</NavLink>
+        <NavLink to="/" className="nav-link" id="nav2">Sök Aktivitet</NavLink>
+        <NavLink to="/login" className="nav-link" id="nav4">Logga in</NavLink>
+        <NavLink to="/register" className="nav-link" id="nav5">Registrera</NavLink>
+      </>
+    );
+  };
 
-                <NavLink to="/" className ="nav-link" id="nav1">
-                {(location.pathname === '/' ||  location.pathname === '/user') && ( //Show image only in homePage/user
-                <img src="/IMG/Mario-Mushroom-Step-10.webp" alt="" height={20} width={20}/>
-                )}  Hem</NavLink>  
-
-                <NavLink to="/" className ="nav-link" id="nav2">
-                {(location.pathname === '/' ||  location.pathname === '/user') && ( 
-                <img src="/IMG/icons8-pixel-star-48.png" alt="" height={20} width={20}/>
-                )}Sök Aktivitet</NavLink>
-
-                
-                {location.pathname === '/user' && ( 
-                <>
-                    <NavLink to="/me/bookings" className ="nav-link" id="nav3"><img src="/IMG/bookinicon.png" alt="" height={20} width={20}/>Mina Bokningar</NavLink>                  
-                </>
-                )}
-
-                <NavLink to="/user" className ="nav-link" id="nav6">Mina Sidor</NavLink>
-
-                {location.pathname !== "/user" &&(
-                <>
-                <NavLink to="/login" className ="nav-link" id="nav4">Logga in</NavLink> 
-                <NavLink to="/register" className ="nav-link" id="nav5">Registrera</NavLink> 
-                </>
-                )}                                                                
-                </div>   
-            </div>              
-        </nav>
-    )
+  return (
+    <nav className={`nav-bar ${pageClass}`} style={{ padding: 12 }}>
+      <div className="navbar-container">
+        <div className="nav-img">
+          <img src="/IMG/Activigotitle.png" alt="Activigo" className="activigo-title" />
+        </div>
+        <div className="nav-links">
+          {renderLinks()}
+        </div>
+      </div>
+    </nav>
+  );
 }
