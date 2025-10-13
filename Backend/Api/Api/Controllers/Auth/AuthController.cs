@@ -15,12 +15,14 @@ namespace Api.Controllers.Auth
         private readonly ITokenService _tokenService;
         private readonly UserManager<User> _users;
         private readonly SignInManager<User> _signIn;
+        private readonly IAuthService _authService;
 
-        public AuthController(ITokenService tokenService, UserManager<User> users, SignInManager<User> signIn)
+        public AuthController(ITokenService tokenService, UserManager<User> users, SignInManager<User> signIn, IAuthService authService)
         {
             _tokenService = tokenService;
             _users = users;
             _signIn = signIn;
+            _authService = authService;
         }
 
         // === Helpers för refresh-cookie ===
@@ -74,18 +76,9 @@ namespace Api.Controllers.Auth
         [AllowAnonymous]
         public async Task<ActionResult<AuthResult>> Login([FromBody] LoginDto dto, CancellationToken ct)
         {
-            var user = await _users.FindByEmailAsync(dto.Email);
-            if (user is null)
-                return Unauthorized(new { message = "Invalid email or password." });
+            var login = await _authService.LoginAsync(dto, ct);
 
-            // Viktigt: använd cookiesless variant för JWT
-            var result = await _signIn.CheckPasswordSignInAsync(user, dto.Password, lockoutOnFailure: false);
-            if (!result.Succeeded)
-                return Unauthorized(new { message = "Invalid email or password." });
-
-            var (access, refresh) = await _tokenService.IssueTokensAsync(user, HttpContext.Connection.RemoteIpAddress?.ToString());
-            SetRefreshCookie(refresh);
-            return Ok(new AuthResult(access));
+            return Ok(login);
         }
 
         // === Refresh (roterar refresh-token och ger ny access-token) ===

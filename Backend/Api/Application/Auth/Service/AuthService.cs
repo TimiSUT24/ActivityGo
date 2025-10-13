@@ -3,6 +3,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using Application.Auth.DTO;
 using Application.Auth.Interface;
+using AutoMapper;
+using Azure;
 using Domain.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -15,33 +17,40 @@ namespace Application.Auth.Service
         private readonly SignInManager<User> _signIn;
         private readonly ITokenService _tokens;
         private readonly IHttpContextAccessor? _http;
+        private readonly IMapper _mapper;
 
         public AuthService(
             UserManager<User> users,
             SignInManager<User> signIn,
             ITokenService tokens,
+            IMapper mapper,
             IHttpContextAccessor? http = null)
         {
             _users = users;
             _signIn = signIn;
             _tokens = tokens;
             _http = http;
+            _mapper = mapper;
         }
 
+      
         private string? GetIp() =>
             _http?.HttpContext?.Connection?.RemoteIpAddress?.ToString();
 
         public async Task<AuthResult> LoginAsync(LoginDto dto, CancellationToken ct)
         {
-            var user = await _users.FindByEmailAsync(dto.Email);
+            var map = _mapper.Map<LoginDto>(dto);
+
+            var user = await _users.FindByEmailAsync(map.Email);
             if (user is null)
                 throw new UnauthorizedAccessException("Invalid email or password.");
 
-            var check = await _signIn.CheckPasswordSignInAsync(user, dto.Password, lockoutOnFailure: false);
+            var check = await _signIn.CheckPasswordSignInAsync(user, map.Password, lockoutOnFailure: false);
             if (!check.Succeeded)
                 throw new UnauthorizedAccessException("Invalid email or password.");
 
             var (access, refresh) = await _tokens.IssueTokensAsync(user, GetIp());
+           
             return new AuthResult(access)
             {
                 AccessToken = access,
