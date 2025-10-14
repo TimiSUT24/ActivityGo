@@ -1,4 +1,9 @@
-﻿namespace Api.Middleware
+﻿using Api.Controllers.Admin;
+using Microsoft.AspNetCore.Mvc;
+using System.Net;
+using System.Text.Json;
+
+namespace Api.Middleware
 {
     public class GlobalExceptionMiddleware
     {
@@ -22,6 +27,55 @@
                 _logger.LogError(ex, "An unhandled exception occurred: {Message}", ex.Message);
                 await HandleExceptionAsync(context, ex);
             }
+        }
+
+        private static async Task HandleExceptionAsync(HttpContext context, Exception ex)
+        {
+            var problem = CreateProblemDetails(context, ex);
+
+            context.Response.ContentType = "application/problem+json";
+            context.Response.StatusCode = problem.Status ?? (int)HttpStatusCode.InternalServerError;
+
+            var json = JsonSerializer.Serialize(problem, new JsonSerializerOptions { WriteIndented = true});
+            await context.Response.WriteAsync(json);
+        }
+
+        private static ProblemDetails CreateProblemDetails(HttpContext context, Exception ex)
+        {
+            var problem = new ProblemDetails
+            {
+                Type = "https://tools.ietf.org/html/rfc7807",
+                Instance = context.Request.Path
+            };
+
+            switch (ex)
+            {
+                case UnauthorizedAccessException:
+                    problem.Title = "Unauthorized";
+                    problem.Status = (int)HttpStatusCode.Unauthorized;
+                    problem.Detail = ex.Message;
+                    break;
+
+                case KeyNotFoundException:
+                    problem.Title = "Not Found";
+                    problem.Status = (int)HttpStatusCode.NotFound;
+                    problem.Detail = ex.Message;
+                    break;
+
+                case ArgumentException:
+                case InvalidOperationException:
+                    problem.Title = "Bad Request";
+                    problem.Status = (int)HttpStatusCode.BadRequest;
+                    problem.Detail = ex.Message;
+                    break;         
+                default:
+                    problem.Title = "Internal Server Error";
+                    problem.Status = (int)HttpStatusCode.InternalServerError;
+                    problem.Detail = "An unexpected error occurred. Please try again later.";
+                    break;
+            }
+
+            return problem;
         }
     }
 }
