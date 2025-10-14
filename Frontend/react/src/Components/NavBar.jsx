@@ -52,8 +52,8 @@ export default function NavBar() {
     if (isAdmin) {
       return (
         <>
-          <NavLink to="/" className="nav-link" id="nav1">Hem</NavLink>
-          <NavLink to="/activity-occurrences" className="nav-link" id="nav2">Sök Aktivitet</NavLink>
+          <NavLink to="/" className="nav-link" id="nav1"><img src="/IMG/Mario-Mushroom-Step-10.webp" alt="" width={20} height={20}/>Hem</NavLink>
+          <NavLink to="/activity-occurrences" className="nav-link" id="nav2"><img src="/IMG/icons8-pixel-star-48.png" alt="" width={20} height={20}/>Sök Aktivitet</NavLink>
           <NavLink to="/user" className="nav-link" id="nav6">Mina Sidor</NavLink>
           <NavLink to="/admin" className="nav-link" id="nav-admin">Admin</NavLink>
         </>
@@ -64,9 +64,9 @@ export default function NavBar() {
     if (isUser) {
       return (
         <>
-          <NavLink to="/" className="nav-link" id="nav1">Hem</NavLink>
-          <NavLink to="/activity-occurrences" className="nav-link" id="nav2">Sök Aktivitet</NavLink>
-          <NavLink to="/me/bookings" className="nav-link" id="nav3">Mina Bokningar</NavLink>
+          <NavLink to="/" className="nav-link" id="nav1"><img src="/IMG/Mario-Mushroom-Step-10.webp" alt="" width={20} height={20}/>Hem</NavLink>
+          <NavLink to="/activity-occurrences" className="nav-link" id="nav2"><img src="/IMG/icons8-pixel-star-48.png" alt="" width={20} height={20}/>Sök Aktivitet</NavLink>
+          <NavLink to="/me/bookings" className="nav-link" id="nav3"><img src="/IMG/bookinicon.png" alt="" width={20} height={20}/>Mina Bokningar</NavLink>
           <NavLink to="/user" className="nav-link" id="nav6">Mina Sidor</NavLink>
         </>
       );
@@ -75,8 +75,8 @@ export default function NavBar() {
     // --- UTSKRIVEN / EJ INLOGGAD ---
     return (
       <>
-        <NavLink to="/" className="nav-link" id="nav1">Hem</NavLink>
-        <NavLink to="/activity-occurrences" className="nav-link" id="nav2">Sök Aktivitet</NavLink>
+        <NavLink to="/" className="nav-link" id="nav1"><img src="/IMG/Mario-Mushroom-Step-10.webp" alt="" width={20} height={20}/>Hem</NavLink>
+        <NavLink to="/activity-occurrences" className="nav-link" id="nav2"><img src="/IMG/icons8-pixel-star-48.png" alt="" width={20} height={20}/>Sök Aktivitet</NavLink>
         <NavLink to="/login" className="nav-link" id="nav4">Logga in</NavLink>
         <NavLink to="/register" className="nav-link" id="nav5">Registrera</NavLink>
       </>
