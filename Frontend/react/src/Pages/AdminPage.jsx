@@ -1,4 +1,3 @@
-// src/Pages/AdminPage.jsx
 import React, { useEffect, useMemo, useState } from "react";
 import api from "../lib/api";
 import { useAuth } from "../context/AuthContext";
@@ -996,7 +995,7 @@ export default function AdminPage() {
       { k: "overview", t: "Översikt" },
       { k: "activities", t: "Aktiviteter" },
       { k: "places", t: "Platser" },
-      { k: "categories", t: "Kategorier" }, 
+      { k: "categories", t: "Kategorier" },
       { k: "occ", t: "Tillfällen" },
     ],
     []
@@ -1004,23 +1003,35 @@ export default function AdminPage() {
   const [tab, setTab] = useState("overview");
 
   return (
-    <div style={baseStyles.wrap}>
-      <div style={baseStyles.badge}>Admin</div>
-      <h2 style={baseStyles.title}>Adminpanel</h2>
+    <div
+      style={{
+        minHeight: "100vh", // täcker hela höjden
+        backgroundImage: "url('/IMG/HomePageBack.png')", // <-- ändra till din bild
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundAttachment: "fixed", // gör att bilden sitter still vid scroll
+        padding: "40px 0",
+      }}
+    >
+      <div style={baseStyles.wrap}>
+        <div style={baseStyles.badge}>Admin</div>
+        <h2 style={baseStyles.title}>Adminpanel</h2>
 
-      <div style={baseStyles.tabs}>
-        {tabs.map((x) => (
-          <button key={x.k} style={baseStyles.tab(tab === x.k)} onClick={() => setTab(x.k)}>
-            {x.t}
-          </button>
-        ))}
+        <div style={baseStyles.tabs}>
+          {tabs.map((x) => (
+            <button key={x.k} style={baseStyles.tab(tab === x.k)} onClick={() => setTab(x.k)}>
+              {x.t}
+            </button>
+          ))}
+        </div>
+
+        {tab === "overview" && <Overview />}
+        {tab === "activities" && <Activities />}
+        {tab === "places" && <Places />}
+        {tab === "categories" && <Categories />}
+        {tab === "occ" && <Occurrences />}
       </div>
-
-      {tab === "overview" && <Overview />}
-      {tab === "activities" && <Activities />}
-      {tab === "places" && <Places />}
-      {tab === "categories" && <Categories />}
-      {tab === "occ" && <Occurrences />}
     </div>
   );
 }
+
