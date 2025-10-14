@@ -13,6 +13,8 @@ using Application.Booking.Service;
 using Application.Place.Interface;
 using Application.Place.Mapper;
 using Application.Place.Service;
+using Application.Services.Interfaces;
+using Application.Services;
 using Application.Statistics.Interface;
 using Application.Statistics.Mapper;
 using Application.Statistics.Service;
@@ -59,6 +61,7 @@ namespace Api
             builder.Services.AddScoped<IStatisticsService, StatisticsService>();
             builder.Services.AddScoped<IWeatherService, WeatherService>();
             builder.Services.AddScoped<ITokenService, TokenService>();
+            builder.Services.AddScoped<ICategoryService, CategoryService>();
             //Fake Weather client for testing and development without API key
             builder.Services.AddSingleton<IWeatherClient, FakeWeatherClient>();
             //AutoMapper
@@ -130,6 +133,7 @@ namespace Api
             builder.Services.AddScoped<IPlaceRepository, PlaceRepository>();
             builder.Services.AddScoped<IUserRepository, UserRepository>();
             builder.Services.AddScoped<IActivityOccurrenceRepository, ActivityOccurrenceRepository>();
+            builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 
 
             // ===  Validation ===   // Glöm inte att man bara behöver registrera detta en gång då den läser av alla Validators i Application.
