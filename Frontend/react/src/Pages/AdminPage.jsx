@@ -82,7 +82,7 @@ const baseStyles = {
   grid: { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 12 },
   row: { display: "flex", gap: 12 },
   input: {
-    width: "100%",
+    width: "92%",
     padding: "10px 12px",
     borderRadius: 8,
     border: "3px solid #ffd166",
@@ -90,6 +90,7 @@ const baseStyles = {
     color: "#fff",
     fontSize: 13,
     boxShadow: "inset 0 4px 0 rgba(0,0,0,0.3)",
+    marginBottom: "10px",
   },
   label: { display: "block", marginBottom: 6, fontSize: 12, textTransform: "uppercase", color: "#ffef9f" },
   small: { fontSize: 11, color: "#ffef9f" },
