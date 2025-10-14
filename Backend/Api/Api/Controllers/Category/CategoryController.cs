@@ -14,11 +14,11 @@ public sealed class CategoriesController : ControllerBase
 
     public CategoriesController(ICategoryService svc) => _svc = svc;
 
-    [HttpGet]
+    [HttpGet, AllowAnonymous]
     public async Task<ActionResult<IEnumerable<CategoryReadDto>>> GetAll(CancellationToken ct)
         => Ok(await _svc.GetAllAsync(ct));
 
-    [HttpGet("{id:guid}")]
+    [HttpGet("{id:guid}"), AllowAnonymous]
     public async Task<ActionResult<CategoryReadDto>> GetById(Guid id, CancellationToken ct)
     {
         var dto = await _svc.GetByIdAsync(id, ct);
