@@ -1,8 +1,11 @@
 ﻿using System;
+using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 using Application.Auth.DTO;
 using Application.Auth.Interface;
+using AutoMapper;
+using Azure;
 using Domain.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -28,11 +31,12 @@ namespace Application.Auth.Service
             _http = http;
         }
 
+      
         private string? GetIp() =>
             _http?.HttpContext?.Connection?.RemoteIpAddress?.ToString();
 
         public async Task<AuthResult> LoginAsync(LoginDto dto, CancellationToken ct)
-        {
+        {        
             var user = await _users.FindByEmailAsync(dto.Email);
             if (user is null)
                 throw new UnauthorizedAccessException("Invalid email or password.");
@@ -42,6 +46,7 @@ namespace Application.Auth.Service
                 throw new UnauthorizedAccessException("Invalid email or password.");
 
             var (access, refresh) = await _tokens.IssueTokensAsync(user, GetIp());
+           
             return new AuthResult(access)
             {
                 AccessToken = access,
@@ -51,29 +56,26 @@ namespace Application.Auth.Service
             };
         }
 
-        public async Task<AuthResult> RefreshAsync(string refreshToken, CancellationToken ct)
-        {
-            if (string.IsNullOrWhiteSpace(refreshToken))
-                throw new ArgumentException("Missing refresh token.", nameof(refreshToken));
-
-            var (newAccess, newRefresh) = await _tokens.RefreshAsync(refreshToken, GetIp());
-            return new AuthResult(
-                AccessToken: newAccess,
-                RefreshToken: newRefresh
-            );
-        }
-
         public async Task LogoutAsync(string userId, CancellationToken ct)
         {
-            if (string.IsNullOrWhiteSpace(userId))
-                return;
+            if (string.IsNullOrEmpty(userId))
+            {
+                throw new ArgumentException("User ID cannot be null or empty.", nameof(userId));
+            }
+
+            var user = await _users.FindByIdAsync(userId);
+            if(user == null)
+            {
+                throw new InvalidOperationException("User not found.");
+            }
 
             await _tokens.RevokeAllAsync(userId, GetIp());
         }
 
         // Valfritt – om du vill samla även register här
         public async Task<AuthResult> RegisterAsync(RegisterDto dto, CancellationToken ct)
-        {
+        {          
+
             var existing = await _users.FindByEmailAsync(dto.Email);
             if (existing is not null)
                 throw new InvalidOperationException("User with this email already exists.");

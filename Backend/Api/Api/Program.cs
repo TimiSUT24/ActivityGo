@@ -198,8 +198,9 @@ namespace Api
             builder.Services.AddCors(options =>
             {
                 options.AddPolicy("AllowFrontend", policy =>
-                {                 
-                          policy.WithOrigins(allowedOrigins!)
+                {
+                        policy.WithOrigins(allowedOrigins!)
+                          .AllowCredentials()
                           .AllowAnyHeader()
                           .AllowAnyMethod();
                 });

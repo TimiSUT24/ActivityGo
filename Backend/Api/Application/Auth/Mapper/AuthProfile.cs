@@ -11,6 +11,9 @@ namespace Application.Auth.Mapper
     {
         public AuthProfile()
         {
+                CreateMap<DTO.LoginDto, Domain.Models.User>()
+                    .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email))
+                    .ForMember(dest => dest.PasswordHash, opt => opt.Ignore());
 
         }
     }

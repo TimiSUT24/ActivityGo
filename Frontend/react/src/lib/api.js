@@ -3,7 +3,7 @@ import axios from "axios";
 // Skapa en Axios-instans för alla API-anrop
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL,
-  withCredentials: false, // krävs om du använder HttpOnly cookies för refresh
+  withCredentials: true, // krävs om du använder HttpOnly cookies för refresh
 });
 
 // Access token hålls i minnet (inte i localStorage av säkerhetsskäl)
