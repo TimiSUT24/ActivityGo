@@ -38,8 +38,6 @@
 
   <ItemGroup>
     <Folder Include="Auth\Validator\" />
-    <Folder Include="Category\Interface\" />
-    <Folder Include="Category\Service\" />
     <Folder Include="Place\DTO\" />
     <Folder Include="Place\Validator\" />
     <Folder Include="Booking\DTO\" />
