@@ -76,12 +76,12 @@ public sealed class CategoryService : ICategoryService
         return true;
     }
 
-    public async Task<bool> SoftDeactivateAsync(Guid id, CancellationToken ct = default)
+    public async Task<bool> SetActiveAsync(Guid id, bool isActive, CancellationToken ct = default)
     {
         var entity = await _uow.Categories.GetByIdAsync(id, ct);
         if (entity is null) return false;
 
-        entity.IsActive = false;
+        entity.IsActive = isActive;
         _uow.Categories.Update(entity);
         await _uow.SaveChangesAsync(ct);
         return true;

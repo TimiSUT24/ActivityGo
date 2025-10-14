@@ -622,6 +622,187 @@ function Places() {
   );
 }
 
+// ---- KATEGORIER (CRUD + aktivering/deaktivering) ----
+function Categories() {
+  const { ready } = useAuth();
+  const [items, setItems] = useState([]);
+  const [err, setErr] = useState("");
+
+  const empty = { name: "", description: "", isActive: true };
+  const [form, setForm] = useState(empty);
+  const [editing, setEditing] = useState(null);
+
+  function pickErr(e) {
+    // Plocka ut vettigt felmeddelande oavsett backend-format
+    return (
+      e?.response?.data?.detail ||
+      e?.response?.data?.message ||
+      (Array.isArray(e?.response?.data?.errors) && e.response.data.errors.map(x => x.errorMessage || x).join(", ")) ||
+      e?.message ||
+      "Något gick fel"
+    );
+  }
+
+  async function load() {
+    setErr("");
+    try {
+      const { data } = await api.get(`/api/Category`);
+      setItems(data || []);
+    } catch (e) {
+      setErr(pickErr(e));
+    }
+  }
+
+  useEffect(() => {
+    if (ready) load();
+  }, [ready]);
+
+  async function save() {
+    setErr("");
+    try {
+      if (editing) {
+        // Update – alla fält är optional i UpdateDto men vi skickar med aktuella
+        await api.put(`/api/Category/${editing.id}`, {
+          name: form.name,
+          description: form.description,
+          isActive: form.isActive,
+        });
+      } else {
+        // Create – CreateDto: name + description
+        await api.post(`/api/Category`, {
+          name: form.name,
+          description: form.description,
+        });
+      }
+      setForm(empty);
+      setEditing(null);
+      await load();
+    } catch (e) {
+      setErr(pickErr(e));
+    }
+  }
+
+  function edit(c) {
+    setEditing(c);
+    setForm({
+      name: c.name || "",
+      description: c.description || "",
+      isActive: c.isActive ?? true,
+    });
+  }
+
+  async function remove(id) {
+    if (!confirm("Ta bort kategori?")) return;
+    setErr("");
+    try {
+      await api.delete(`/api/Category/${id}`);
+      await load();
+    } catch (e) {
+      setErr(pickErr(e));
+    }
+  }
+
+  async function toggleActive(c) {
+  setErr("");
+  try {
+    await api.patch(`/api/Category/${c.id}/active/${(!c.isActive).toString()}`);
+    await load();
+  } catch (e) {
+    setErr(pickErr(e));
+  }
+}
+
+  return (
+    <div style={baseStyles.section}>
+      <h3 style={{ marginTop: 0 }}>Kategorier</h3>
+      {err && <div style={baseStyles.error}>{err}</div>}
+
+      <div style={{ ...baseStyles.section, background: "#0b1b36" }}>
+        <div style={baseStyles.row}>
+          <Field label="Namn">
+            <input
+              style={baseStyles.input}
+              value={form.name}
+              onChange={(e) => setForm({ ...form, name: e.target.value })}
+              placeholder="t.ex. Padel"
+            />
+          </Field>
+          <Field label="Aktiv?">
+            <select
+              style={baseStyles.input}
+              value={String(form.isActive)}
+              onChange={(e) => setForm({ ...form, isActive: e.target.value === "true" })}
+              disabled={!editing} // vid create styrs isActive i backend (default true)
+            >
+              <option value="true">Ja</option>
+              <option value="false">Nej</option>
+            </select>
+          </Field>
+        </div>
+        <div style={baseStyles.row}>
+          <Field label="Beskrivning">
+            <input
+              style={baseStyles.input}
+              value={form.description}
+              onChange={(e) => setForm({ ...form, description: e.target.value })}
+              placeholder="valfritt"
+            />
+          </Field>
+        </div>
+
+        <div style={{ display: "flex", gap: 10, marginTop: 10 }}>
+          <button style={baseStyles.button} onClick={save}>
+            {editing ? "Spara ändringar" : "Skapa kategori"}
+          </button>
+          {editing && (
+            <button
+              style={baseStyles.ghost}
+              onClick={() => {
+                setEditing(null);
+                setForm(empty);
+              }}
+            >
+              Avbryt
+            </button>
+          )}
+        </div>
+      </div>
+
+      <table style={baseStyles.table}>
+        <thead>
+          <tr>
+            <th style={baseStyles.th}>Namn</th>
+            <th style={baseStyles.th}>Beskrivning</th>
+            <th style={baseStyles.th}>Status</th>
+            <th style={{ ...baseStyles.th, ...baseStyles.right }}>Åtgärder</th>
+          </tr>
+        </thead>
+        <tbody>
+          {items.map((c) => (
+            <tr key={c.id}>
+              <td style={baseStyles.td}>{c.name}</td>
+              <td style={baseStyles.td}>{c.description || "-"}</td>
+              <td style={baseStyles.td}>{c.isActive ? "Aktiv" : "Inaktiv"}</td>
+              <td style={{ ...baseStyles.td, ...baseStyles.right }}>
+                <button style={baseStyles.ghost} onClick={() => edit(c)}>
+                  Redigera
+                </button>{" "}
+                <button style={baseStyles.button} onClick={() => toggleActive(c)}>
+                  {c.isActive ? "Inaktivera" : "Aktivera"}
+                </button>{" "}
+                <button style={baseStyles.danger} onClick={() => remove(c.id)}>
+                  Ta bort
+                </button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+
 // ---- TILLFÄLLEN (CRUD) ----
 function Occurrences() {
   const { ready } = useAuth();
@@ -814,6 +995,7 @@ export default function AdminPage() {
       { k: "overview", t: "Översikt" },
       { k: "activities", t: "Aktiviteter" },
       { k: "places", t: "Platser" },
+      { k: "categories", t: "Kategorier" }, 
       { k: "occ", t: "Tillfällen" },
     ],
     []
@@ -836,6 +1018,7 @@ export default function AdminPage() {
       {tab === "overview" && <Overview />}
       {tab === "activities" && <Activities />}
       {tab === "places" && <Places />}
+      {tab === "categories" && <Categories />}
       {tab === "occ" && <Occurrences />}
     </div>
   );

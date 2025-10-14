@@ -8,5 +8,5 @@ public interface ICategoryService
     Task<Guid> CreateAsync(CategoryCreateDto dto, CancellationToken ct = default);
     Task<bool> UpdateAsync(Guid id, CategoryUpdateDto dto, CancellationToken ct = default);
     Task<bool> DeleteAsync(Guid id, CancellationToken ct = default); // hårddelete
-    Task<bool> SoftDeactivateAsync(Guid id, CancellationToken ct = default); // sätter IsActive=false
+    Task<bool> SetActiveAsync(Guid id, bool isActive, CancellationToken ct = default);
 }

@@ -56,7 +56,8 @@ public sealed class CategoryController : ControllerBase
     public async Task<IActionResult> Delete(Guid id, CancellationToken ct)
         => await _svc.DeleteAsync(id, ct) ? NoContent() : NotFound();
 
-    [HttpPatch("{id:guid}/deactivate")]
-    public async Task<IActionResult> Deactivate(Guid id, CancellationToken ct)
-        => await _svc.SoftDeactivateAsync(id, ct) ? NoContent() : NotFound();
+    [HttpPatch("{id:guid}/active/{isActive:bool}")]
+    public async Task<IActionResult> SetActive(Guid id, bool isActive, CancellationToken ct)
+        => await _svc.SetActiveAsync(id, isActive, ct) ? NoContent() : NotFound();
+
 }

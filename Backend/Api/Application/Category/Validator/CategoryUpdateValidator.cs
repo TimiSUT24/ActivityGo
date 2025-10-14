@@ -10,7 +10,6 @@ public sealed class CategoryUpdateValidator : AbstractValidator<CategoryUpdateDt
         // Name – obligatoriskt, trim, längd
         RuleFor(x => x.Name)
             .NotEmpty().WithMessage("Name is required.")
-            .Must(n => n.Trim().Length == n.Length).WithMessage("Name cannot start or end with spaces.")
             .MinimumLength(2).MaximumLength(60);
 
         // Description
