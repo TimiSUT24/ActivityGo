@@ -8,11 +8,11 @@ namespace Api.Controllers;
 [ApiController]
 [Route("api/[controller]")]
 [Authorize(Roles = "Admin")] // lås CRUD till Admins
-public sealed class CategoriesController : ControllerBase
+public sealed class CategoryController : ControllerBase
 {
     private readonly ICategoryService _svc;
 
-    public CategoriesController(ICategoryService svc) => _svc = svc;
+    public CategoryController(ICategoryService svc) => _svc = svc;
 
     [HttpGet, AllowAnonymous]
     public async Task<ActionResult<IEnumerable<CategoryReadDto>>> GetAll(CancellationToken ct)
