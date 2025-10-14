@@ -59,7 +59,10 @@ namespace Api.Controllers.Auth
         // === Login (returnerar JWT-token + sätter refresh-cookie) ===
         [HttpPost("login")]
         [AllowAnonymous]
-        [ProducesResponseType(statusCode: 200)]       
+        [ProducesResponseType(statusCode: 200)]
+        [ProducesResponseType(statusCode: 401)]
+        [ProducesResponseType(statusCode: 400)]
+        [ProducesResponseType(statusCode: 500)]
         public async Task<ActionResult<AuthResult>> Login([FromBody] LoginDto dto, CancellationToken ct)
         {
             var login = await _authService.LoginAsync(dto, ct);

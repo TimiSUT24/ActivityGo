@@ -1,4 +1,5 @@
 ﻿using Api.Controllers.Admin;
+using Api.Exceptions;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 using System.Text.Json;
@@ -67,7 +68,14 @@ namespace Api.Middleware
                     problem.Title = "Bad Request";
                     problem.Status = (int)HttpStatusCode.BadRequest;
                     problem.Detail = ex.Message;
-                    break;         
+                    break;
+
+                case ConflictException:
+                    problem.Title = "Conflict";
+                    problem.Status = (int)HttpStatusCode.Conflict;
+                    problem.Detail = ex.Message;
+                    break;
+
                 default:
                     problem.Title = "Internal Server Error";
                     problem.Status = (int)HttpStatusCode.InternalServerError;
