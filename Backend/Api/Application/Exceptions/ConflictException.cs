@@ -1,4 +1,4 @@
-﻿namespace Api.Exceptions
+﻿namespace Application.Exceptions
 {
     public class ConflictException : Exception
     {

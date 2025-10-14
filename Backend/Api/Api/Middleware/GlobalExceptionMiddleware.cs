@@ -1,5 +1,5 @@
 ﻿using Api.Controllers.Admin;
-using Api.Exceptions;
+using Application.Exceptions;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 using System.Text.Json;
