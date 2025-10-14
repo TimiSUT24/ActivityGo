@@ -64,7 +64,6 @@ namespace Api.Controllers.Auth
         [AllowAnonymous]
         [ProducesResponseType(statusCode: 200)]
         [ProducesResponseType(statusCode: 401)]
-        [ProducesResponseType(statusCode: 400)]
         [ProducesResponseType(statusCode: 500)]
         public async Task<ActionResult<AuthResult>> Login([FromBody] LoginDto dto, CancellationToken ct)
         {
