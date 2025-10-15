@@ -9,6 +9,8 @@ import ActivityOccurrencePage from "./Pages/ActivityOccurrencePage";
 import MyBookings from "./Pages/MyBookings";
 import RequireAdmin from "./Components/RequireAdmin";
 import AdminPage from "./Pages/AdminPage";
+import ActivitiesPage from "./Pages/ActivitiesPage";
+import ActivityDetailsPage from "./Pages/ActivityDetailsPage";
 
 export default function App() {
   return (
@@ -20,6 +22,11 @@ export default function App() {
           path="/activity-occurrences"
           element={<ActivityOccurrencePage />}
         ></Route>
+        <Route path="/activities" element={<ActivitiesPage />} />
+        <Route
+          path="/activities/:activityId"
+          element={<ActivityDetailsPage />}
+        />
         <Route path="/login" element={<LoginForm />} />
         <Route path="/register" element={<RegisterPage />} />
 

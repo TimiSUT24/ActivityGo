@@ -29,6 +29,7 @@ export default function NavBar() {
       "/login": "login-body",
       "/register": "register-body",
       "/activity-occurrences": "activity-occurrences-body",
+      "/activities": "activity-occurrences-body",
       "/admin": "admin-body",
     };
     const newClass = bodyClassMap[location.pathname] || "default-body";
@@ -43,6 +44,7 @@ export default function NavBar() {
     location.pathname === "/user" ? "user-navbar" :
     location.pathname === "/register" ? "register-navbar" :
     location.pathname === "/activity-occurrences" ? "activity-occurrences-navbar" :
+    location.pathname === "/activities" ? "activity-occurrences-navbar" :
     location.pathname === "/admin" ? "admin-navbar" :
     "default-navbar";
 
@@ -53,6 +55,7 @@ export default function NavBar() {
       return (
         <>
           <NavLink to="/" className="nav-link" id="nav1"><img src="/IMG/Mario-Mushroom-Step-10.webp" alt="" width={20} height={20}/>Hem</NavLink>
+          <NavLink to="/activities" className="nav-link" id="nav-activities"><img src="/IMG/icons8-pixel-star-48.png" alt="" width={20} height={20}/>Aktiviteter</NavLink>
           <NavLink to="/activity-occurrences" className="nav-link" id="nav2"><img src="/IMG/icons8-pixel-star-48.png" alt="" width={20} height={20}/>Sök Aktivitet</NavLink>
           <NavLink to="/user" className="nav-link" id="nav6">Mina Sidor</NavLink>
           <NavLink to="/admin" className="nav-link" id="nav-admin">Admin</NavLink>
@@ -65,6 +68,7 @@ export default function NavBar() {
       return (
         <>
           <NavLink to="/" className="nav-link" id="nav1"><img src="/IMG/Mario-Mushroom-Step-10.webp" alt="" width={20} height={20}/>Hem</NavLink>
+          <NavLink to="/activities" className="nav-link" id="nav-activities"><img src="/IMG/icons8-pixel-star-48.png" alt="" width={20} height={20}/>Aktiviteter</NavLink>
           <NavLink to="/activity-occurrences" className="nav-link" id="nav2"><img src="/IMG/icons8-pixel-star-48.png" alt="" width={20} height={20}/>Sök Aktivitet</NavLink>
           <NavLink to="/me/bookings" className="nav-link" id="nav3"><img src="/IMG/bookinicon.png" alt="" width={20} height={20}/>Mina Bokningar</NavLink>
           <NavLink to="/user" className="nav-link" id="nav6">Mina Sidor</NavLink>
@@ -76,6 +80,7 @@ export default function NavBar() {
     return (
       <>
         <NavLink to="/" className="nav-link" id="nav1"><img src="/IMG/Mario-Mushroom-Step-10.webp" alt="" width={20} height={20}/>Hem</NavLink>
+        <NavLink to="/activities" className="nav-link" id="nav-activities"><img src="/IMG/icons8-pixel-star-48.png" alt="" width={20} height={20}/>Aktiviteter</NavLink>
         <NavLink to="/activity-occurrences" className="nav-link" id="nav2"><img src="/IMG/icons8-pixel-star-48.png" alt="" width={20} height={20}/>Sök Aktivitet</NavLink>
         <NavLink to="/login" className="nav-link" id="nav4">Logga in</NavLink>
         <NavLink to="/register" className="nav-link" id="nav5">Registrera</NavLink>
