@@ -15,5 +15,6 @@ public interface IUnitOfWork : IDisposable
     IPlaceRepository Places { get; }
     IActivityOccurrenceRepository Occurrences { get; }
     IUserRepository Users { get; }
+    ICategoryRepository Categories { get; }
     // ==============================
 }
