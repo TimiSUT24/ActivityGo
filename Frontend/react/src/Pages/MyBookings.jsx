@@ -43,6 +43,33 @@ const minutesUntil = (isoUtc) => {
   return Math.round((start - Date.now()) / 60000);
 };
 
+const toNumStatus = (s) => {
+  if (typeof s === "number") return s;
+  if (s === null || s === undefined) return -1;
+  // hantera "0","1","2" säkert
+  const n = Number(s);
+  if (!Number.isNaN(n)) return n;
+  // (valfritt) fallback om API någon gång skickar strängar
+  const t = String(s).toLowerCase();
+  if (t === "booked") return STATUS.BOOKED;
+  if (t === "cancelled" || t === "canceled") return STATUS.CANCELLED;
+  if (t === "completed" || t === "klar") return STATUS.COMPLETED;
+  return -1;
+};
+
+const getStart = (b) => b.startUtc ?? b.StartUtc;
+const getEnd   = (b) => b.endUtc   ?? b.EndUtc;
+
+// Gör "visuellt completed" om endUtc passerat, utan att lita på backend
+const coerceCompleted = (b) => {
+  const end = getEnd(b);
+  const s   = toNumStatus(b.status ?? b.Status);
+  if (s === STATUS.BOOKED && end && new Date(end).getTime() <= Date.now()) {
+    return { ...b, status: STATUS.COMPLETED, __coerced: true };
+  }
+  return b;
+};
+
 // stöd både camelCase (JSON default) och PascalCase (om nåt råkar läcka ut)
 const g = (obj, ...keys) => keys.find((k) => obj?.[k] !== undefined && obj?.[k] !== null) ? obj[keys.find((k) => obj?.[k] !== undefined && obj?.[k] !== null)] : undefined;
 const statusInt = (s) => (typeof s === "number" ? s : parseInt(s ?? -1, 10));
@@ -155,26 +182,52 @@ export default function MyBookings() {
     { key: "all", label: "Alla" },
   ], []);
 
-  async function load() {
-    setError(""); setLoading(true);
-    try {
-      const { data } = await api.get("/api/booking/me", {
-        params: scope === "all" ? undefined : { scope },
-      });
-      setBookings(Array.isArray(data) ? data : []);
-    } catch (e) {
-      const status = e?.response?.status;
-      const msg = e?.response?.data ?? e?.message ?? "Något gick fel.";
-      if (status === 401) {
-        setError("Du är inte inloggad eller din session har gått ut.");
-        try { logout?.(); } catch {}
-      } else {
-        setError(typeof msg === "string" ? msg : "Fel vid hämtning.");
-      }
-    } finally {
-      setLoading(false);
+  // ersätt din load() med denna
+async function load() {
+  setError(""); setLoading(true);
+  try {
+    // 1) Hämta alltid allt (ingen scope-param)
+    const { data } = await api.get("/api/booking/me");
+
+    // 2) Normalisera + “coerca” completed
+    let list = (Array.isArray(data) ? data : []).map(coerceCompleted);
+
+    // 3) Filtrera per flik
+    const now = Date.now();
+    if (scope === "upcoming") {
+      list = list.filter((b) =>
+        toNumStatus(b.status ?? b.Status) === STATUS.BOOKED &&
+        getStart(b) && new Date(getStart(b)).getTime() > now
+      );
+    } else if (scope === "past") {
+      // Historik = completed (antingen från DB eller coerce)
+      list = list.filter((b) => toNumStatus(b.status ?? b.Status) === STATUS.COMPLETED);
+    } else if (scope === "cancelled") {
+      list = list.filter((b) => toNumStatus(b.status ?? b.Status) === STATUS.CANCELLED);
+    } // scope === 'all' -> ingen extra filtrering
+
+    // 4) Sortering: historik nyast först, annars tidigast först
+    list.sort((a, b) => {
+      const aTime = new Date(getStart(a) ?? 0).getTime();
+      const bTime = new Date(getStart(b) ?? 0).getTime();
+      return scope === "past" ? bTime - aTime : aTime - bTime;
+    });
+
+    setBookings(list);
+  } catch (e) {
+    const status = e?.response?.status;
+    const msg = e?.response?.data ?? e?.message ?? "Något gick fel.";
+    if (status === 401) {
+      setError("Du är inte inloggad eller din session har gått ut.");
+      try { logout?.(); } catch {}
+    } else {
+      setError(typeof msg === "string" ? msg : "Fel vid hämtning.");
     }
+  } finally {
+    setLoading(false);
   }
+}
+
 
   useEffect(() => { if (ready && user) load(); }, [ready, user, scope]);
 
@@ -221,7 +274,7 @@ export default function MyBookings() {
       >
         <div style={styles.form}>
           <div style={styles.badge}>Mina bokningar</div>
-          <h2 style={styles.title}>Användarsida · Bokningar</h2>
+          <h2 style={styles.title}>Bokningar</h2>
           <div style={styles.error}>Du måste vara inloggad för att se dina bokningar.</div>
         </div>
       </div>
@@ -241,7 +294,7 @@ export default function MyBookings() {
     >
       <div style={styles.form}>
         <div style={styles.badge}>Mina bokningar</div>
-        <h2 style={styles.title}>Användarsida · Bokningar</h2>
+        <h2 style={styles.title}>Bokningar</h2>
 
         <div style={styles.tabs}>
           {tabs.map((t) => (
