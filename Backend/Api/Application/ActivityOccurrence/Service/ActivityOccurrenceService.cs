@@ -118,6 +118,11 @@ namespace Application.ActivityOccurrence.Service
                 dtos = dtos.Where(d => d.AvailableCapacity >= minAvailable.Value).ToList();
             }
 
+            if(onlyAvailable == true)
+            {
+                dtos = dtos.Where(d => d.AvailableCapacity > 0).ToList();
+            }
+
             var tasks = new List<Task>(dtos.Count);
             foreach (var dto in dtos.Where(d => d.Environment == EnvironmentType.Outdoor))
             {
