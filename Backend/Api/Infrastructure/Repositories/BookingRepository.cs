@@ -30,14 +30,18 @@ public class BookingRepository : GenericRepository<Booking>, IBookingRepository
             b.ActivityOccurrenceId == activityOccurrenceId &&
             b.Status == BookingStatus.Booked, ct);
 
-    public async Task<bool> ExistsOverlapForUserAsync(string userId, DateTime startUtc, DateTime endUtc, CancellationToken ct) =>
-        await _db.Bookings
+
+    public async Task<bool> ExistsOverlapForUserAsync(string userId, DateTime startUtc, DateTime endUtc, CancellationToken ct)
+    {
+        return await _db.Bookings
             .AsNoTracking()
-            .AnyAsync(b =>
-                b.UserId == userId &&
-                b.Status == BookingStatus.Booked &&
-                b.ActivityOccurrence.StartUtc < endUtc &&
-                b.ActivityOccurrence.EndUtc > startUtc, ct);
+            .Where(b => b.UserId == userId && b.Status == BookingStatus.Booked)
+            .Join(_db.ActivityOccurrences,
+                  b => b.ActivityOccurrenceId,
+                  o => o.Id,
+                  (b, o) => new { o.StartUtc, o.EndUtc })
+            .AnyAsync(x => x.StartUtc < endUtc && x.EndUtc > startUtc, ct);
+    }
 
     public async Task<IEnumerable<Booking>> GetByUserAsync(string userId, CancellationToken ct) =>
         await _db.Bookings

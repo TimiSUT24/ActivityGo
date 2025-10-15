@@ -148,11 +148,16 @@ export default function ActivityOccurrencePage() {
   const handleConfirm = async (people) => {
     try {
       // TODO: POST bokning
+      setLoading(true);
       await api.post("/api/Booking", {
         ActivityOccurrenceId: selectedId,
-        numberOfPeople: people,
+        peopleCount: people,
       });
+      await fetchOccurrences();
+    } catch (e) {
+      console.error("Error occurred while booking:", e);
     } finally {
+      setLoading(false);
       handleClose();
     }
   };
