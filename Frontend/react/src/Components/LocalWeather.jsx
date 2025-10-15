@@ -45,14 +45,16 @@ export default function LocalWeather (){
     const current = weather.slices[0]; //current hour
 
     return (
-        <div>
-            <h2>
-                Weather at your location
+        <div className="weather-container">
+            <h2 className="weather-title">
+                Local Weather
             </h2>
-            <p>
-                {Math.round(current.temperatureC)}*C - {current.conditionText}
+            <div className="weather-info">
+                <p>
+                {Math.round(current.temperatureC)}°C - {current.conditionText}
             </p>
-            <img src={`https://openweathermap.org/img/wn/${current.conditionIconUrl}@2x.png`} alt={current.conditionText} />
+                <img src={`https://openweathermap.org/img/wn/${current.conditionIconUrl}@2x.png`} alt={current.conditionText} width={60} height={60} />
+            </div>                     
         </div>
     )
 }

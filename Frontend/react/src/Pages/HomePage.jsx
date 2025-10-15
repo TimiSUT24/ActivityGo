@@ -6,9 +6,9 @@ export default function HomePage(){
 
     return(
         <div className="home-content">
-            <LocalWeather></LocalWeather>
-            <div className="mario-island">   
-                <img src="/IMG/HomePage/marioisland.png" alt="" className="mario-island"/>        
+            <div className="mario-island">                 
+                <img src="/IMG/HomePage/marioisland.png" alt="" className="mario-island" />  
+                <div className="weather"><LocalWeather></LocalWeather></div>                   
             </div>
             <div className ="activity-category">
                 <img src="/IMG/HomePage/Greencircle.png" alt="" className="category-img" width={100}/>
