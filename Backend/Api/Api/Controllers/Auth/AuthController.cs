@@ -49,6 +49,9 @@ namespace Api.Controllers.Auth
         [HttpPost("register")]
         [AllowAnonymous] // Tillåter anonyma användare att komma åt denna endpoint
         [ProducesResponseType(statusCode: 201)]
+        [ProducesResponseType(statusCode: 400)]
+        [ProducesResponseType(statusCode: 409)]
+        [ProducesResponseType(statusCode: 500)]
         public async Task<ActionResult<AuthResult>> Register([FromBody] RegisterDto dto, CancellationToken ct)
         {
             var register = await _authService.RegisterAsync(dto, ct);
@@ -59,7 +62,9 @@ namespace Api.Controllers.Auth
         // === Login (returnerar JWT-token + sätter refresh-cookie) ===
         [HttpPost("login")]
         [AllowAnonymous]
-        [ProducesResponseType(statusCode: 200)]       
+        [ProducesResponseType(statusCode: 200)]
+        [ProducesResponseType(statusCode: 401)]
+        [ProducesResponseType(statusCode: 500)]
         public async Task<ActionResult<AuthResult>> Login([FromBody] LoginDto dto, CancellationToken ct)
         {
             var login = await _authService.LoginAsync(dto, ct);
@@ -71,6 +76,9 @@ namespace Api.Controllers.Auth
         [HttpPost("refresh")]
         [AllowAnonymous]
         [ProducesResponseType(statusCode: 200)]
+        [ProducesResponseType(statusCode: 400)]
+        [ProducesResponseType(statusCode: 401)]
+        [ProducesResponseType(statusCode: 500)]
         public async Task<ActionResult<AuthResult>> Refresh([FromBody] RefreshRequest? body)
         {
             // Hämta från cookie i första hand, annars från body
@@ -96,6 +104,8 @@ namespace Api.Controllers.Auth
         [HttpPost("logout")]
         [Authorize]
         [ProducesResponseType(statusCode: 204)]
+        [ProducesResponseType(statusCode: 400)]
+        [ProducesResponseType(statusCode: 500)]
         public async Task<IActionResult> Logout(CancellationToken ct)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? User.FindFirst("sub")?.Value;
@@ -108,6 +118,7 @@ namespace Api.Controllers.Auth
         [HttpGet("me")]
         [Authorize]
         [ProducesResponseType(statusCode:200)]
+        [ProducesResponseType(statusCode:500)]
         public ActionResult<object> Me()
         {
             var id = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? User.FindFirst("sub")?.Value;
