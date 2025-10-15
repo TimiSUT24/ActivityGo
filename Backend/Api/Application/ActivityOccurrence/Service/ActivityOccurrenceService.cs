@@ -90,6 +90,7 @@ namespace Application.ActivityOccurrence.Service
             Guid? placeId,
             EnvironmentType? environment, 
             bool? onlyAvailable,
+            int? minAvailable,
             CancellationToken ct)
         {
             var (start, end) = Normalize(fromDate, toDate);
@@ -110,6 +111,11 @@ namespace Application.ActivityOccurrence.Service
             {
                 d.BookedPeople = bookedById.TryGetValue(d.Id, out var sum) ? sum : 0;
                 d.AvailableCapacity = Math.Max(0, d.EffectiveCapacity - d.BookedPeople);
+            }
+            // Filtrering på minsta antal platser kvar
+            if (minAvailable.HasValue)
+            {
+                dtos = dtos.Where(d => d.AvailableCapacity >= minAvailable.Value).ToList();
             }
 
             var tasks = new List<Task>(dtos.Count);
