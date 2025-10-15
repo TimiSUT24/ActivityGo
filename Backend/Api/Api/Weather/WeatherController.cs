@@ -15,7 +15,7 @@ namespace Api.Weather
             _weatherService = weatherService;
         }
 
-        [HttpGet("LocalWeather")]
+        [HttpGet("localweather")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult> GetWeather(double lat, double lon, CancellationToken ct)
         {

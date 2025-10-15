@@ -1,4 +1,5 @@
 import {useState, useEffect} from 'react';
+import api from "../lib/api";
 
 export default function LocalWeather (){
     const [weather, setWeather] = useState(null);
@@ -6,29 +7,52 @@ export default function LocalWeather (){
 
     useEffect (() => {
         if(navigator.geolocation){
-            navigator.geolocation.getCurrentPosition(sucess,failure)
+            navigator.geolocation.getCurrentPosition(success,failure)
         }
         else{
             setError("GeoLocation is not supported")
         }
     }, []);
 
-    const sucess = async (position) => {
+    const success = async (position) => {
         const {latitude, longitude} = position.coords;
 
         try{
-            const res = await fetch(
-                `/api/`
+            const res = await api.get(
+                `/api/Weather/localweather?lat=${latitude}&lon=${longitude}`
             );
-        }
-        catch{
+            setWeather(res.data);
 
         }
+        catch(error){
+            console.error("Failed to fetch weather", error);
+            setError(error.response?.data?.detail);
+        }
+    };
+
+    const failure = (error) => {
+        setError("Could not get location: " + error.message);
+    };
+
+    if(error){
+        return <p>Error: {error}</p>
     }
+
+    if(!weather){
+        return <p>Loading weather...</p>
+    }
+
+    const current = weather.slices[0]; //current hour
 
     return (
         <div>
-
+            <h2>
+                Weather at your location
+            </h2>
+            <p>
+                {Math.round(current.temperatureC)}*C - {current.conditionText}
+            </p>
+            <img src={`https://openweathermap.org/img/wn/${current.conditionIconUrl}@2x.png`} alt={current.conditionText} />
         </div>
     )
 }
