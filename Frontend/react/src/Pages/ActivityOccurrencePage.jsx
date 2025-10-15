@@ -69,12 +69,18 @@ export default function ActivityOccurrencePage() {
   // Bygg querystring (matchar OccurencyQuery)
   const queryString = useMemo(() => {
     const p = new URLSearchParams();
-
-    if (filters.startDate)
+    // const för att sätta dagens datum när aktivitet söks utan startdatum
+    const todayStartUtc = new Date(
+      new Date().setHours(0, 0, 0, 0)
+    ).toISOString();
+    if (filters.startDate) {
       p.set(
         "fromDate",
         new Date(`${filters.startDate}T00:00:00Z`).toISOString()
       );
+    } else {
+      p.set("fromDate", todayStartUtc);
+    }
     if (filters.endDate)
       p.set("toDate", new Date(`${filters.endDate}T23:59:59Z`).toISOString());
 
