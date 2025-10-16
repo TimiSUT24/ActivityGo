@@ -5,6 +5,7 @@ import OccurrenceCard from "../Components/OccurrenceCard";
 import api from "../lib/api";
 import "../CSS/Activities.css";
 import "../CSS/Occurrences.css";
+import { parseApiError } from "../lib/parseApiError";
 
 const formatPrice = (value) => {
   if (typeof value !== "number") return "–";
@@ -105,7 +106,6 @@ export default function ActivityDetailsPage() {
   const handleSelectOccurrence = (id) => {
     setSelectedOccurrenceId(id);
     setModalOpen(true);
-    setBookingMessage("");
   };
 
   const handleCloseModal = () => {
@@ -116,17 +116,17 @@ export default function ActivityDetailsPage() {
   const handleConfirmBooking = async (people) => {
     if (!selectedOccurrenceId) return;
     try {
-      await api.post("/api/Booking", {
+      const res = await api.post("/api/Booking", {
         ActivityOccurrenceId: selectedOccurrenceId,
         numberOfPeople: people,
       });
-      setBookingMessage("Bokningen är registrerad!");
-      handleCloseModal();
-      loadOccurrences();
+      await loadOccurrences();
+      return {ok: true, data: res?.data}
     } catch (e) {
-      console.warn("Booking failed:", e);
-      setBookingMessage("Det gick inte att boka aktiviteten.");
-      handleCloseModal();
+      const {message, list} = parseApiError(e);
+      return {ok: false, error: message, errors: list}
+    } finally{
+      setLoadingActivity(false)
     }
   };
 
@@ -274,7 +274,7 @@ export default function ActivityDetailsPage() {
             <OccurrenceCard
               key={occurrence.id}
               item={occurrence}
-              onBook={handleSelectOccurrence}
+              onBook={(id) => handleSelectOccurrence(id)}
             />
           ))}
         </div>
