@@ -12,6 +12,8 @@ public class Booking : BaseEntity
     public string UserId { get; set; } = default!;
     public User User { get; set; } = default!;
 
+    public int PeopleCount { get; set; } = 1;
+
     public BookingStatus Status { get; set; } = BookingStatus.Booked;
 
     public DateTime BookedAtUtc { get; set; } = DateTime.UtcNow;

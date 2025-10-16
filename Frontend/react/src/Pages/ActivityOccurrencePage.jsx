@@ -21,6 +21,7 @@ export default function ActivityOccurrencePage() {
     placeId: "",
     environment: "", // "" | "0" | "1"
     onlyAvailable: false,
+    minAvailable: "",
   });
 
   const [modalOpen, setModalOpen] = useState(false);
@@ -69,17 +70,22 @@ export default function ActivityOccurrencePage() {
   // Bygg querystring (matchar OccurencyQuery)
   const queryString = useMemo(() => {
     const p = new URLSearchParams();
-    // const för att sätta dagens datum när aktivitet söks utan startdatum
-    const todayStartUtc = new Date(
-      new Date().setHours(0, 0, 0, 0)
-    ).toISOString();
+    // Datum: om startDate saknas, sätt till nästa halvtimme (lokalt)
+    const nextHalfHourLocal = (() => {
+      const d = new Date();
+      d.setSeconds(0, 0);
+      const add = 30 - (d.getMinutes() % 30 || 30);
+      d.setMinutes(d.getMinutes() + add);
+      return d;
+    })();
+
     if (filters.startDate) {
       p.set(
         "fromDate",
         new Date(`${filters.startDate}T00:00:00Z`).toISOString()
       );
     } else {
-      p.set("fromDate", todayStartUtc);
+      p.set("fromDate", nextHalfHourLocal.toISOString());
     }
     if (filters.endDate)
       p.set("toDate", new Date(`${filters.endDate}T23:59:59Z`).toISOString());
@@ -87,9 +93,10 @@ export default function ActivityOccurrencePage() {
     if (filters.categoryId) p.set("categoryId", filters.categoryId);
     if (filters.activityId) p.set("activityId", filters.activityId);
     if (filters.placeId) p.set("placeId", filters.placeId);
-
     if (filters.environment !== "") p.set("environment", filters.environment);
     if (filters.onlyAvailable) p.set("onlyAvailable", "true");
+    if (filters.minAvailable !== "" && Number(filters.minAvailable) >= 0)
+      p.set("minAvailable", String(Number(filters.minAvailable)));
 
     return p.toString();
   }, [filters]);
@@ -134,6 +141,7 @@ export default function ActivityOccurrencePage() {
       placeId: "",
       environment: "",
       onlyAvailable: false,
+      minAvailable: "",
     });
 
   // Booking-modal
@@ -148,11 +156,16 @@ export default function ActivityOccurrencePage() {
   const handleConfirm = async (people) => {
     try {
       // TODO: POST bokning
+      setLoading(true);
       await api.post("/api/Booking", {
         ActivityOccurrenceId: selectedId,
-        numberOfPeople: people,
+        peopleCount: people,
       });
+      await fetchOccurrences();
+    } catch (e) {
+      console.error("Error occurred while booking:", e);
     } finally {
+      setLoading(false);
       handleClose();
     }
   };
@@ -245,6 +258,16 @@ export default function ActivityOccurrencePage() {
             <option value="0">Inomhus</option>
             <option value="1">Utomhus</option>
           </select>
+        </div>
+
+        <div className="occurence-field">
+          <label>Min. lediga platser</label>
+          <input
+            type="number"
+            min={0}
+            value={filters.minAvailable}
+            onChange={onChange("minAvailable")}
+          />
         </div>
 
         <div className="occurence-field">
