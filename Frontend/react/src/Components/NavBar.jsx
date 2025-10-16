@@ -1,11 +1,20 @@
 import { NavLink, useLocation } from 'react-router-dom';
-import { useEffect } from 'react';
+import { useEffect, useState} from 'react';
 import '../CSS/Navbar.css';
 import { useAuth } from '../context/AuthContext'; // du har redan denna i ditt projekt
 
 export default function NavBar() {
   const location = useLocation();
   const { user } = useAuth(); // t.ex. { email, role } eller { roles: [] }
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  const toggleMenu = () => {
+    setMenuOpen(prev => !prev)
+  }
+
+  useEffect(() => {
+    setMenuOpen(false)
+  }, [location])
 
   // ✅ Kolla roll
   const isAdmin =
@@ -94,7 +103,8 @@ export default function NavBar() {
         <div className="nav-img">
           <img src="/IMG/Activigotitle.png" alt="Activigo" className="activigo-title" />
         </div>
-        <div className="nav-links">
+        <button className ="menu-toggle" id="menu-toggle" onClick={toggleMenu}>☰</button>
+        <div className={`nav-links ${menuOpen ? 'open' : ''}`}>
           {renderLinks()}
         </div>
       </div>
