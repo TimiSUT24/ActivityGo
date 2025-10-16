@@ -7,7 +7,7 @@ import api from "../lib/api";
 const CANCEL_CUTOFF_MIN = 120;
 const STATUS = { BOOKED: 0, CANCELLED: 1, COMPLETED: 2 };
 
-// --- Styles (oförändrade från dig) ---
+// --- Styles ---
 const baseStyles = {
   form: { maxWidth: 960, margin: "40px auto", padding: 28, background: "linear-gradient(145deg, rgba(255,94,87,0.96), rgba(210,33,18,0.94))", borderRadius: 12, color: "#fff", boxShadow: "0 0 0 4px #ffd166, 0 0 0 10px rgba(10,10,10,0.85), 0 22px 30px rgba(0,0,0,0.45)", border: "4px solid #1f3fff", fontFamily: '"Press Start 2P","VT323","Courier New",monospace', letterSpacing: 0.5, position: "relative", overflow: "hidden" },
   badge: { position: "absolute", top: -22, left: "50%", transform: "translateX(-50%)", backgroundColor: "#ffd166", color: "#b3001b", padding: "8px 14px", borderRadius: 999, border: "3px solid #1f3fff", boxShadow: "0 6px 0 #1f3fff, 0 9px 16px rgba(0,0,0,0.35)", fontSize: 12, textTransform: "uppercase" },
@@ -49,7 +49,7 @@ const toNumStatus = (s) => {
   // hantera "0","1","2" säkert
   const n = Number(s);
   if (!Number.isNaN(n)) return n;
-  // (valfritt) fallback om API någon gång skickar strängar
+  // fallback om API någon gång skickar strängar
   const t = String(s).toLowerCase();
   if (t === "booked") return STATUS.BOOKED;
   if (t === "cancelled" || t === "canceled") return STATUS.CANCELLED;
@@ -182,7 +182,6 @@ export default function MyBookings() {
     { key: "all", label: "Alla" },
   ], []);
 
-  // ersätt din load() med denna
 async function load() {
   setError(""); setLoading(true);
   try {
