@@ -3,6 +3,7 @@ import api from "../lib/api";
 import OccurrenceCard from "../Components/OccurrenceCard";
 import BookingModal from "../Components/BookingModal";
 import "../CSS/Occurrences.css";
+import { parseApiError } from "../lib/parseApiError";
 
 export default function ActivityOccurrencePage() {
   const [categories, setCategories] = useState([]);
@@ -155,18 +156,18 @@ export default function ActivityOccurrencePage() {
   };
   const handleConfirm = async (people) => {
     try {
-      // TODO: POST bokning
       setLoading(true);
-      await api.post("/api/Booking", {
+      const res = await api.post("/api/Booking", {
         ActivityOccurrenceId: selectedId,
         peopleCount: people,
       });
-      await fetchOccurrences();
+      fetchOccurrences();
+      return { ok: true, data: res?.data };
     } catch (e) {
-      console.error("Error occurred while booking:", e);
+      const { message, list } = parseApiError(e);
+      return { ok: false, error: message, errors: list };
     } finally {
       setLoading(false);
-      handleClose();
     }
   };
 
