@@ -27,4 +27,5 @@ public interface IBookingRepository : IGenericRepository<Booking>
     Task<IEnumerable<TopItem>> GetTopActivitiesAsync(DateTime fromUtc, DateTime toUtc, int take, CancellationToken ct);
     Task<IEnumerable<TopItem>> GetTopPlacesAsync(DateTime fromUtc, DateTime toUtc, int take, CancellationToken ct);
     Task<IEnumerable<TopItem>> GetByCategoryAsync(DateTime fromUtc, DateTime toUtc, CancellationToken ct);
+    Task<int> SumActivePeopleForOccurrenceAsync(Guid id, CancellationToken ct);
 }

@@ -23,7 +23,9 @@ namespace Application.ActivityOccurrence.Mapper
                 .ForMember(d => d.Environment, o => o.MapFrom(s => s.Place.Environment))
                 .ForMember(d => d.CategoryName, o => o.MapFrom(s => s.Activity.Category != null ? s.Activity.Category.Name : null))
                 .ForMember(d => d.DurationMinutes, o => o.MapFrom(
-                    s => (int)(s.EndUtc - s.StartUtc).TotalMinutes));
+                    s => (int)(s.EndUtc - s.StartUtc).TotalMinutes))
+                .ForMember(d => d.BookedPeople, o => o.Ignore())          
+                .ForMember(d => d.AvailableCapacity, o => o.Ignore());
         }
     }
 }

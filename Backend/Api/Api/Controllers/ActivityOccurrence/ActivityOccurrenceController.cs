@@ -90,13 +90,15 @@ namespace Api.Controllers.ActivityOccurrence
         {
 
             var result = await _activityOccurrenceService.GetOccurrencesWithWeatherAsync(
-               q.FromDate, 
+                 q.FromDate, 
                  q.ToDate,
-              q.CategoryId, 
-              q.ActivityId, 
-                q.PlaceId,
-             q.Environment, 
-           q.OnlyAvailable, ct);
+                 q.CategoryId, 
+                 q.ActivityId, 
+                 q.PlaceId,
+                 q.Environment, 
+                 q.OnlyAvailable,
+                 q.MinAvailable,
+                 ct);
             return Ok(result);
         }
     }

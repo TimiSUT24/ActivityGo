@@ -24,6 +24,7 @@ namespace Application.ActivityOccurrence.Interface
             Guid? placeId,
             EnvironmentType? environment, 
             bool? onlyAvailable,
+            int? minAvailable,
             CancellationToken ct);
     }
 }
