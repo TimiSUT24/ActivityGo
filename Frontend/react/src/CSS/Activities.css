@@ -97,22 +97,14 @@
   background: #fff;
 }
 
-.activity-card .mario-title,
 .activity-detail__info .mario-title {
   color: #14325f;
   text-shadow: 2px 2px #ffcc00, 4px 4px rgba(0, 0, 0, 0.25);
 }
 
-.activity-card .mario-sub {
+.activity-detail__info .mario-sub {
   color: #1f3b70;
   text-shadow: none;
-}
-
-.activity-card__body {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  flex: 1;
 }
 
 .activity-card__desc {
@@ -125,10 +117,6 @@
   padding: 12px 14px;
   border-radius: 12px;
   border: 1px solid rgba(15, 47, 82, 0.16);
-}
-
-.activity-card__footer {
-  margin-top: auto;
 }
 
 .activity-detail {
