@@ -22,5 +22,8 @@ namespace Application.ActivityOccurrence.DTO.Request
 
         // If true, only return occurrences that have available capacity
         public bool OnlyAvailable { get; init; }
+
+        // If set, only return occurrences that have at least this many available spots
+        public int? MinAvailable { get; init; }
     }
 }

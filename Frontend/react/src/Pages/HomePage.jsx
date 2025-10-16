@@ -1,12 +1,14 @@
 import {useState} from 'react';
+import LocalWeather from '../Components/LocalWeather';
 import '../CSS/HomePage.css';
 
 export default function HomePage(){
 
     return(
         <div className="home-content">
-            <div className="mario-island">   
-                <img src="/IMG/HomePage/marioisland.png" alt="" className="mario-island"/>        
+            <div className="mario-island">                 
+                <img src="/IMG/HomePage/marioisland.png" alt="" className="mario-island" />  
+                <div className="weather"><LocalWeather></LocalWeather></div>                   
             </div>
             <div className ="activity-category">
                 <img src="/IMG/HomePage/Greencircle.png" alt="" className="category-img" width={100}/>

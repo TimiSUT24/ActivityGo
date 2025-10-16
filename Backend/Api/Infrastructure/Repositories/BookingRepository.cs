@@ -13,19 +13,35 @@ public class BookingRepository : GenericRepository<Booking>, IBookingRepository
     private readonly AppDbContext _db;
     public BookingRepository(AppDbContext db) : base(db) => _db = db;
 
+    // Denna metoden ska räkna ihop alla PeopleCount för aktiva (Booked) bokningar
+    
+    public async Task<int> SumActivePeopleForOccurrenceAsync(Guid occurrenceId, CancellationToken ct)
+    {
+        return await _db.Bookings
+            .AsNoTracking()
+            .Where(b => b.ActivityOccurrenceId == occurrenceId && b.Status == BookingStatus.Booked)
+            .SumAsync(b => (int?)b.PeopleCount ?? 0, ct);
+    }
+
+    // Denna metoden ska räkna antalet aktiva (Booked) bokningar för ett givet tillfälle
+    // Kanske blir denna överflödig om vi har SumActivePeopleForOccurrenceAsync? Men kan användas för statistik?
     public async Task<int> CountActiveForOccurrenceAsync(Guid activityOccurrenceId, CancellationToken ct) =>
         await _db.Bookings.CountAsync(b =>
             b.ActivityOccurrenceId == activityOccurrenceId &&
             b.Status == BookingStatus.Booked, ct);
 
-    public async Task<bool> ExistsOverlapForUserAsync(string userId, DateTime startUtc, DateTime endUtc, CancellationToken ct) =>
-        await _db.Bookings
+
+    public async Task<bool> ExistsOverlapForUserAsync(string userId, DateTime startUtc, DateTime endUtc, CancellationToken ct)
+    {
+        return await _db.Bookings
             .AsNoTracking()
-            .AnyAsync(b =>
-                b.UserId == userId &&
-                b.Status == BookingStatus.Booked &&
-                b.ActivityOccurrence.StartUtc < endUtc &&
-                b.ActivityOccurrence.EndUtc > startUtc, ct);
+            .Where(b => b.UserId == userId && b.Status == BookingStatus.Booked)
+            .Join(_db.ActivityOccurrences,
+                  b => b.ActivityOccurrenceId,
+                  o => o.Id,
+                  (b, o) => new { o.StartUtc, o.EndUtc })
+            .AnyAsync(x => x.StartUtc < endUtc && x.EndUtc > startUtc, ct);
+    }
 
     public async Task<IEnumerable<Booking>> GetByUserAsync(string userId, CancellationToken ct) =>
         await _db.Bookings
@@ -139,4 +155,6 @@ public async Task<IEnumerable<TopItem>> GetByCategoryAsync(DateTime fromUtc, Dat
         .Select(g => new TopItem(g.Key.CategoryId ?? Guid.Empty, g.Key.CategoryName, g.Count()))
         .OrderByDescending(x => x.Count)
         .ToListAsync(ct);
+
+    
 }

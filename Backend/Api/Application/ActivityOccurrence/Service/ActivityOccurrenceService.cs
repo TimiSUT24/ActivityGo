@@ -7,6 +7,7 @@ using Application.Weather.Interface;
 using AutoMapper;
 using Domain.Enums;
 using Domain.Interfaces;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Threading;
 
@@ -17,7 +18,6 @@ namespace Application.ActivityOccurrence.Service
         private readonly IUnitOfWork _uow;
         private readonly IMapper _mapper;
         private readonly IWeatherService _weatherService;
-
         public ActivityOccurrenceService(IUnitOfWork uow, IMapper mapper, IWeatherService weatherService)
         {
             _uow = uow;
@@ -90,6 +90,7 @@ namespace Application.ActivityOccurrence.Service
             Guid? placeId,
             EnvironmentType? environment, 
             bool? onlyAvailable,
+            int? minAvailable,
             CancellationToken ct)
         {
             var (start, end) = Normalize(fromDate, toDate);
@@ -99,6 +100,28 @@ namespace Application.ActivityOccurrence.Service
                 start, end, categoryId, activityId, placeId, environment, onlyAvailable, ct);
 
             var dtos = _mapper.Map<IReadOnlyList<ActivityOccurrenceWeatherDto>>(occurrences);
+            // Uträkning för antal platser kvar.
+            var bookedById = occurrences.ToDictionary(
+                o => o.Id,
+                o => o.Bookings
+                    .Where(b => b.Status == BookingStatus.Booked)
+                    .Sum(b => b.PeopleCount)
+                    );
+            foreach (var d in dtos)
+            {
+                d.BookedPeople = bookedById.TryGetValue(d.Id, out var sum) ? sum : 0;
+                d.AvailableCapacity = Math.Max(0, d.EffectiveCapacity - d.BookedPeople);
+            }
+            // Filtrering på minsta antal platser kvar
+            if (minAvailable.HasValue)
+            {
+                dtos = dtos.Where(d => d.AvailableCapacity >= minAvailable.Value).ToList();
+            }
+
+            if(onlyAvailable == true)
+            {
+                dtos = dtos.Where(d => d.AvailableCapacity > 0).ToList();
+            }
 
             var tasks = new List<Task>(dtos.Count);
             foreach (var dto in dtos.Where(d => d.Environment == EnvironmentType.Outdoor))
@@ -111,7 +134,6 @@ namespace Application.ActivityOccurrence.Service
             try { await Task.WhenAll(tasks); }
             catch (OperationCanceledException) { throw; }
             catch { /* ignorera enrichment-fel */ }
-
             return dtos;
         }
 

@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 namespace Application.Booking.DTO
 {
     public record BookingCreateDto(
-    Guid ActivityOccurrenceId
+    Guid ActivityOccurrenceId,
+    int PeopleCount = 1
 );
 }

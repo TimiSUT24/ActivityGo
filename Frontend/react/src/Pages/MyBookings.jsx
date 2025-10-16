@@ -1,10 +1,13 @@
 // src/pages/MyBookings.jsx
 import React, { useEffect, useMemo, useState } from "react";
 import { useAuth } from "../context/AuthContext";
-import api from "../lib/api"; // ⬅️ använd din axios-instans
+import api from "../lib/api";
 
+// --- Konstanter ---
 const CANCEL_CUTOFF_MIN = 120;
+const STATUS = { BOOKED: 0, CANCELLED: 1, COMPLETED: 2 };
 
+// --- Styles ---
 const baseStyles = {
   form: { maxWidth: 960, margin: "40px auto", padding: 28, background: "linear-gradient(145deg, rgba(255,94,87,0.96), rgba(210,33,18,0.94))", borderRadius: 12, color: "#fff", boxShadow: "0 0 0 4px #ffd166, 0 0 0 10px rgba(10,10,10,0.85), 0 22px 30px rgba(0,0,0,0.45)", border: "4px solid #1f3fff", fontFamily: '"Press Start 2P","VT323","Courier New",monospace', letterSpacing: 0.5, position: "relative", overflow: "hidden" },
   badge: { position: "absolute", top: -22, left: "50%", transform: "translateX(-50%)", backgroundColor: "#ffd166", color: "#b3001b", padding: "8px 14px", borderRadius: 999, border: "3px solid #1f3fff", boxShadow: "0 6px 0 #1f3fff, 0 9px 16px rgba(0,0,0,0.35)", fontSize: 12, textTransform: "uppercase" },
@@ -30,56 +33,141 @@ const styles = {
   empty: { textAlign: "center", padding: 22, fontSize: 12, border: "2px dashed rgba(255,239,159,0.65)", borderRadius: 12, color: "#ffef9f" },
 };
 
+// --- Helpers ---
 const fmt = (iso) =>
-  iso ? new Intl.DateTimeFormat("sv-SE", { dateStyle: "medium", timeStyle: "short" }).format(new Date(iso)) : "";
+  iso ? new Intl.DateTimeFormat("sv-SE", { dateStyle: "medium", timeStyle: "short" }).format(new Date(iso)) : "—";
 
 const minutesUntil = (isoUtc) => {
-  if (!isoUtc) return -99999;
+  if (!isoUtc) return null;
   const start = new Date(isoUtc).getTime();
   return Math.round((start - Date.now()) / 60000);
 };
 
+const toNumStatus = (s) => {
+  if (typeof s === "number") return s;
+  if (s === null || s === undefined) return -1;
+  // hantera "0","1","2" säkert
+  const n = Number(s);
+  if (!Number.isNaN(n)) return n;
+  // fallback om API någon gång skickar strängar
+  const t = String(s).toLowerCase();
+  if (t === "booked") return STATUS.BOOKED;
+  if (t === "cancelled" || t === "canceled") return STATUS.CANCELLED;
+  if (t === "completed" || t === "klar") return STATUS.COMPLETED;
+  return -1;
+};
+
+const getStart = (b) => b.startUtc ?? b.StartUtc;
+const getEnd   = (b) => b.endUtc   ?? b.EndUtc;
+
+// Gör "visuellt completed" om endUtc passerat, utan att lita på backend
+const coerceCompleted = (b) => {
+  const end = getEnd(b);
+  const s   = toNumStatus(b.status ?? b.Status);
+  if (s === STATUS.BOOKED && end && new Date(end).getTime() <= Date.now()) {
+    return { ...b, status: STATUS.COMPLETED, __coerced: true };
+  }
+  return b;
+};
+
+// stöd både camelCase (JSON default) och PascalCase (om nåt råkar läcka ut)
+const g = (obj, ...keys) => keys.find((k) => obj?.[k] !== undefined && obj?.[k] !== null) ? obj[keys.find((k) => obj?.[k] !== undefined && obj?.[k] !== null)] : undefined;
+const statusInt = (s) => (typeof s === "number" ? s : parseInt(s ?? -1, 10));
+
 function StatusPill({ status }) {
-  const s = (status || "").toLowerCase();
-  if (s === "booked") return <span style={styles.badgeStatus("#7fe18a", "#0b5c33", "#064b2d")}>Bokad</span>;
-  if (s === "cancelled") return <span style={styles.badgeStatus("#ff9aa2", "#7a101b", "#5a0a12")}>Avbokad</span>;
-  return <span style={styles.badgeStatus("#9ec1ff", "#1f3fff", "#06233d")}>Klar</span>;
+  const s = statusInt(status);
+  if (s === STATUS.BOOKED) return <span style={styles.badgeStatus("#7fe18a", "#0b5c33", "#064b2d")}>Bokad</span>;
+  if (s === STATUS.CANCELLED) return <span style={styles.badgeStatus("#ff9aa2", "#7a101b", "#5a0a12")}>Avbokad</span>;
+  if (s === STATUS.COMPLETED) return <span style={styles.badgeStatus("#9ec1ff", "#1f3fff", "#06233d")}>Klar</span>;
+  return <span style={styles.badgeStatus("#ffe39e", "#c49d2d", "#5b2b00")}>Okänd</span>;
 }
 
 function BookingCard({ b, onCancel, cancelling }) {
-  const start = b?.activityOccurrence?.startUtc;
-  const end = b?.activityOccurrence?.endUtc;
-  const actName = b?.activityOccurrence?.activity?.name ?? "Aktivitet";
-  const placeName = b?.activityOccurrence?.place?.name ?? "Plats";
-  const status = b?.status;
+  const start = g(b, "startUtc", "StartUtc");
+  const end = g(b, "endUtc", "EndUtc");
+  const actName = g(b, "activityName", "ActivityName") ?? "Aktivitet";
+  const placeName = g(b, "placeName", "PlaceName") ?? "Plats";
+  const bookedAt = g(b, "bookedAtUtc", "BookedAtUtc");
+  const cancelledAt = g(b, "cancelledAtUtc", "CancelledAtUtc");
+  const s = statusInt(g(b, "status", "Status"));
+
   const minsLeft = minutesUntil(start);
-  const canCancel = (status || "").toLowerCase() === "booked" && minsLeft > CANCEL_CUTOFF_MIN;
+  const canCancel = s === STATUS.BOOKED && minsLeft !== null && minsLeft > CANCEL_CUTOFF_MIN;
+
+  // 🧠 Lokal state för att visa förklaring bara när man klickar
+  const [showReason, setShowReason] = useState(false);
+  let reason = "";
+
+  if (!canCancel) {
+    if (minsLeft !== null && minsLeft <= CANCEL_CUTOFF_MIN) {
+      reason = `För sent för avbokning (mindre än ${CANCEL_CUTOFF_MIN} min kvar)`;
+    } else if (minsLeft === null) {
+      reason = "Tiden för aktiviteten kunde inte fastställas";
+    }
+  }
+
+  // 🧩 Klicklogik
+  const handleClick = () => {
+    if (canCancel) {
+      onCancel(b);
+    } else {
+      setShowReason(true);
+      setTimeout(() => setShowReason(false), 4000); // dölj igen efter 4 sek
+    }
+  };
 
   return (
     <div style={styles.card}>
-      <StatusPill status={status} />
+      <StatusPill status={s} />
       <div style={styles.cardTitle}>{actName}</div>
+
       <div style={styles.row}><span style={styles.subtle}>Plats</span><span>{placeName}</span></div>
       <div style={styles.row}><span style={styles.subtle}>Start</span><span>{fmt(start)}</span></div>
       <div style={styles.row}><span style={styles.subtle}>Slut</span><span>{fmt(end)}</span></div>
-      <div style={styles.row}><span style={styles.subtle}>Bokad</span><span>{fmt(b?.bookedAtUtc)}</span></div>
-      {b?.cancelledAtUtc && <div style={styles.row}><span style={styles.subtle}>Avbokad</span><span>{fmt(b.cancelledAtUtc)}</span></div>}
-      <div style={styles.footerBtns}>
-        <button
-          style={canCancel ? styles.dangerBtn : styles.ghostBtn}
-          disabled={!canCancel || cancelling}
-          onClick={() => onCancel(b)}
-          title={canCancel ? "Avboka" : "Avbokning spärrad (cutoff 120 min före start eller ej bokad)"}
+      <div style={styles.row}><span style={styles.subtle}>Bokad</span><span>{fmt(bookedAt)}</span></div>
+      {cancelledAt && (
+        <div style={styles.row}>
+          <span style={styles.subtle}>Avbokad</span><span>{fmt(cancelledAt)}</span>
+        </div>
+      )}
+
+      {/* ✅ Visa endast om status = BOOKED */}
+      {s === STATUS.BOOKED && (
+        <div style={styles.footerBtns}>
+          <button
+            style={styles.dangerBtn}
+            onClick={handleClick}
+            disabled={cancelling}
+          >
+            {cancelling ? "Avbokar…" : "Avboka"}
+          </button>
+        </div>
+      )}
+
+      {/* 💬 Visa orsaken endast efter klick */}
+      {showReason && reason && (
+        <div
+          style={{
+            marginTop: 8,
+            fontSize: 10,
+            color: "#ffef9f",
+            textAlign: "center",
+            opacity: 0.9,
+            transition: "opacity 0.3s ease",
+          }}
         >
-          {cancelling ? "Avbokar…" : "Avboka"}
-        </button>
-      </div>
+          {reason}
+        </div>
+      )}
     </div>
   );
 }
 
+
+
+
 export default function MyBookings() {
-  const { user, ready, logout } = useAuth(); // ⬅️ från din AuthContext
+  const { user, ready, logout } = useAuth();
 
   const [scope, setScope] = useState("upcoming");
   const [bookings, setBookings] = useState([]);
@@ -94,38 +182,64 @@ export default function MyBookings() {
     { key: "all", label: "Alla" },
   ], []);
 
-  // Hämta bokningar via axios-instansen (api har redan Bearer-token via setAccessToken)
-  async function load() {
-    setError(""); setLoading(true);
-    try {
-      const { data } = await api.get("/api/booking/me", {
-        params: scope === "all" ? undefined : { scope },
-      });
-      setBookings(Array.isArray(data) ? data : []);
-    } catch (e) {
-      const status = e?.response?.status;
-      const msg = e?.response?.data ?? e?.message ?? "Något gick fel.";
-      if (status === 401) {
-        setError("Du är inte inloggad eller din session har gått ut.");
-        // valfritt: auto-logout
-        try { logout?.(); } catch {}
-      } else {
-        setError(typeof msg === "string" ? msg : "Fel vid hämtning.");
-      }
-    } finally {
-      setLoading(false);
-    }
-  }
+async function load() {
+  setError(""); setLoading(true);
+  try {
+    // 1) Hämta alltid allt (ingen scope-param)
+    const { data } = await api.get("/api/booking/me");
 
-  useEffect(() => { if (ready && user) load(); }, [ready, user, scope]); // vänta på ready + user
+    // 2) Normalisera + “coerca” completed
+    let list = (Array.isArray(data) ? data : []).map(coerceCompleted);
+
+    // 3) Filtrera per flik
+    const now = Date.now();
+    if (scope === "upcoming") {
+      list = list.filter((b) =>
+        toNumStatus(b.status ?? b.Status) === STATUS.BOOKED &&
+        getStart(b) && new Date(getStart(b)).getTime() > now
+      );
+    } else if (scope === "past") {
+      // Historik = completed (antingen från DB eller coerce)
+      list = list.filter((b) => toNumStatus(b.status ?? b.Status) === STATUS.COMPLETED);
+    } else if (scope === "cancelled") {
+      list = list.filter((b) => toNumStatus(b.status ?? b.Status) === STATUS.CANCELLED);
+    } // scope === 'all' -> ingen extra filtrering
+
+    // 4) Sortering: historik nyast först, annars tidigast först
+    list.sort((a, b) => {
+      const aTime = new Date(getStart(a) ?? 0).getTime();
+      const bTime = new Date(getStart(b) ?? 0).getTime();
+      return scope === "past" ? bTime - aTime : aTime - bTime;
+    });
+
+    setBookings(list);
+  } catch (e) {
+    const status = e?.response?.status;
+    const msg = e?.response?.data ?? e?.message ?? "Något gick fel.";
+    if (status === 401) {
+      setError("Du är inte inloggad eller din session har gått ut.");
+      try { logout?.(); } catch {}
+    } else {
+      setError(typeof msg === "string" ? msg : "Fel vid hämtning.");
+    }
+  } finally {
+    setLoading(false);
+  }
+}
+
+
+  useEffect(() => { if (ready && user) load(); }, [ready, user, scope]);
 
   async function handleCancel(b) {
-    if (!confirm(`Avboka "${b?.activityOccurrence?.activity?.name}"?`)) return;
-    setError(""); setCancellingId(b.id);
+    const actName = b.activityName ?? b.ActivityName ?? "aktiviteten";
+    if (!confirm(`Avboka "${actName}"?`)) return;
+
+    setError(""); setCancellingId(b.id ?? b.Id);
     try {
-      const res = await api.delete(`/api/booking/${b.id}`);
+      const id = b.id ?? b.Id;
+      const res = await api.delete(`/api/booking/${id}`);
       if (res.status === 204) {
-        setBookings((prev) => prev.filter((x) => x.id !== b.id));
+        setBookings((prev) => prev.filter((x) => (x.id ?? x.Id) !== id));
       } else {
         throw new Error(`Kunde inte avboka (${res.status})`);
       }
@@ -143,49 +257,74 @@ export default function MyBookings() {
     }
   }
 
-  // Enkel guarding mot crash:
-  if (!ready) {
-    return <div style={styles.loader}>Initierar…</div>;
-  }
+  if (!ready) return <div style={styles.loader}>Initierar…</div>;
+
   if (!user) {
     return (
-      <div style={styles.form}>
-        <div style={styles.badge}>Mina bokningar</div>
-        <h2 style={styles.title}>Användarsida · Bokningar</h2>
-        <div style={styles.error}>Du måste vara inloggad för att se dina bokningar.</div>
+      <div
+        style={{
+          minHeight: "100vh",
+          backgroundImage: "url('/IMG/HomePageBack.png')",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundAttachment: "fixed",
+          padding: "40px 0",
+        }}
+      >
+        <div style={styles.form}>
+          <div style={styles.badge}>Mina bokningar</div>
+          <h2 style={styles.title}>Bokningar</h2>
+          <div style={styles.error}>Du måste vara inloggad för att se dina bokningar.</div>
+        </div>
       </div>
     );
   }
 
   return (
-    <div style={styles.form}>
-      <div style={styles.badge}>Mina bokningar</div>
-      <h2 style={styles.title}>Användarsida · Bokningar</h2>
+    <div
+      style={{
+        minHeight: "100vh",
+        backgroundImage: "url('/IMG/HomePageBack.png')", 
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundAttachment: "fixed",
+        padding: "40px 0",
+      }}
+    >
+      <div style={styles.form}>
+        <div style={styles.badge}>Mina bokningar</div>
+        <h2 style={styles.title}>Bokningar</h2>
 
-      <div style={styles.tabs}>
-        {tabs.map((t) => (
-          <button key={t.key} style={styles.tab(scope === t.key)} onClick={() => setScope(t.key)}>
-            {t.label}
-          </button>
-        ))}
-      </div>
-
-      {error && <div style={styles.error}>{error}</div>}
-      {loading && <div style={styles.loader}>Laddar bokningar…</div>}
-
-      {!loading && bookings.length === 0 && (
-        <div style={styles.empty}>
-          {scope === "upcoming" && "Du har inga kommande bokningar just nu."}
-          {scope === "past" && "Inga avslutade bokningar hittades."}
-          {scope === "cancelled" && "Du har inga avbokade bokningar."}
-          {scope === "all" && "Inga bokningar hittades."}
+        <div style={styles.tabs}>
+          {tabs.map((t) => (
+            <button key={t.key} style={styles.tab(scope === t.key)} onClick={() => setScope(t.key)}>
+              {t.label}
+            </button>
+          ))}
         </div>
-      )}
 
-      <div style={styles.grid}>
-        {bookings.map((b) => (
-          <BookingCard key={b.id} b={b} onCancel={handleCancel} cancelling={cancellingId === b.id} />
-        ))}
+        {error && <div style={styles.error}>{error}</div>}
+        {loading && <div style={styles.loader}>Laddar bokningar…</div>}
+
+        {!loading && bookings.length === 0 && (
+          <div style={styles.empty}>
+            {scope === "upcoming" && "Du har inga kommande bokningar just nu."}
+            {scope === "past" && "Inga avslutade bokningar hittades."}
+            {scope === "cancelled" && "Du har inga avbokade bokningar."}
+            {scope === "all" && "Inga bokningar hittades."}
+          </div>
+        )}
+
+        <div style={styles.grid}>
+          {bookings.map((b) => (
+            <BookingCard
+              key={b.id ?? b.Id}
+              b={b}
+              onCancel={handleCancel}
+              cancelling={(b.id ?? b.Id) === cancellingId}
+            />
+          ))}
+        </div>
       </div>
     </div>
   );

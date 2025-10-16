@@ -19,6 +19,9 @@ namespace Application.ActivityOccurrence.DTO
         public string? CategoryName { get; init; }
         public int DurationMinutes { get; init; }
 
+        // För att enklare kunna uppdatera lediga platser.
+        public int BookedPeople { get; set; }
+        public int AvailableCapacity { get; set; }
         // Enrichment efter mapping
         public ActivityWeatherForecastDto? WeatherForecast { get; set; }
 
