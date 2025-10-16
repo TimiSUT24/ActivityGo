@@ -1,0 +1,273 @@
+.activities-page {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 32px 20px 60px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.activities-page .mario-page-title,
+.activity-detail .mario-page-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 1.75rem;
+  justify-content: flex-start;
+  text-align: left;
+}
+
+.activities-meta {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 3px solid #0b5c33;
+  background: #f0fdf4;
+  font-family: "Press Start 2P", cursive;
+  font-size: 0.72rem;
+  color: #064b2d;
+  box-shadow: 0 6px 0 rgba(0, 0, 0, 0.2);
+  width: fit-content;
+}
+
+.activities-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 22px;
+}
+
+.activities-back {
+  font-family: "Press Start 2P", cursive;
+  font-size: 0.72rem;
+  padding: 10px 16px;
+  border: 3px dashed #0b5c33;
+  border-radius: 12px;
+  background: rgba(13, 36, 71, 0.08);
+  color: #0d2447;
+  width: fit-content;
+  cursor: pointer;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+  box-shadow: 0 4px 0 rgba(11, 92, 51, 0.5);
+}
+
+.activities-back:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 0 rgba(11, 92, 51, 0.5);
+}
+
+.activities-status {
+  font-family: "Press Start 2P", cursive;
+  font-size: 0.8rem;
+  color: #0d2447;
+}
+
+.activities-alert {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: 3px solid #d97706;
+  background: #fff7ed;
+  padding: 14px 16px;
+  border-radius: 12px;
+  font-family: "Press Start 2P", cursive;
+  font-size: 0.72rem;
+  color: #7c2d12;
+  box-shadow: 0 6px 0 rgba(0, 0, 0, 0.15);
+}
+
+.activities-empty {
+  font-family: "Press Start 2P", cursive;
+  font-size: 0.72rem;
+  color: #0d2447;
+  padding: 18px 16px;
+  border: 3px dashed rgba(13, 36, 71, 0.35);
+  border-radius: 12px;
+  text-align: center;
+}
+
+.activity-card {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.activity-card.brick-frame {
+  background: #fff;
+}
+
+.activity-detail__info .mario-title {
+  color: #14325f;
+  text-shadow: 2px 2px #ffcc00, 4px 4px rgba(0, 0, 0, 0.25);
+}
+
+.activity-detail__info .mario-sub {
+  color: #1f3b70;
+  text-shadow: none;
+}
+
+.activity-card__desc {
+  margin: 0;
+  font-size: 0.85rem;
+  line-height: 1.4;
+  font-family: "VT323", "Courier New", monospace;
+  color: #0f2f52;
+  background: rgba(15, 47, 82, 0.08);
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(15, 47, 82, 0.16);
+}
+
+.activity-detail {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 32px 20px 60px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.activity-detail__summary {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 18px;
+  border: 4px solid rgba(10, 34, 64, 0.2);
+  padding: 22px 24px;
+  box-shadow: 0 12px 24px rgba(10, 34, 64, 0.2),
+    0 6px 0 rgba(10, 34, 64, 0.25);
+}
+
+.activity-detail__summaryhead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.activity-detail__badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.activity-detail__desc {
+  font-family: "VT323", "Courier New", monospace;
+  font-size: 1.05rem;
+  color: #14325f;
+  line-height: 1.4;
+  background: rgba(20, 50, 95, 0.08);
+  padding: 16px;
+  border-radius: 12px;
+  margin: 0;
+}
+
+.activity-detail__meta {
+  display: grid;
+  gap: 10px;
+}
+
+.activity-detail__filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.9);
+  border: 3px solid rgba(11, 59, 35, 0.35);
+  box-shadow: 0 6px 0 rgba(0, 0, 0, 0.1);
+}
+
+.activity-detail__filterslabel {
+  font-family: "Press Start 2P", cursive;
+  font-size: 0.68rem;
+  color: #0b3a86;
+  text-transform: uppercase;
+}
+
+.activity-detail__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.mario-chip--filter {
+  border-color: rgba(16, 40, 79, 0.35);
+  background: rgba(16, 40, 79, 0.1);
+  color: #10284f;
+  cursor: pointer;
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+
+.mario-chip--filter:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 0 rgba(16, 40, 79, 0.25);
+}
+
+.mario-chip--active {
+  background: #ffd166;
+  border-color: #c49d2d;
+  color: #5b2b00;
+  box-shadow: 0 4px 0 rgba(91, 43, 0, 0.3);
+}
+
+.mario-chip--refresh {
+  border-color: rgba(11, 92, 51, 0.4);
+  background: rgba(11, 92, 51, 0.12);
+  color: #064b2d;
+  cursor: pointer;
+}
+
+.mario-chip--refresh:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 0 rgba(11, 92, 51, 0.25);
+}
+
+.activity-detail__row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  justify-content: flex-start;
+}
+
+.activity-detail__label {
+  font-weight: 700;
+  color: #0b3a86;
+}
+
+.activity-detail__value {
+  color: #064b2d;
+}
+
+.activity-detail__section {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.activity-detail__list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 22px;
+}
+
+.activity-detail__status {
+  font-family: "Press Start 2P", cursive;
+  font-size: 0.8rem;
+  color: #0d2447;
+}
+
+.m-btn--ghost {
+  background: transparent;
+  color: #0d2447;
+  border: 4px dashed #0b5c33;
+  box-shadow: none;
+}
+
+.m-btn--ghost:hover {
+  background: rgba(13, 36, 71, 0.08);
+}
