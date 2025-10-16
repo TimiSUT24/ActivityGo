@@ -1,3 +1,4 @@
+using Api.Middleware;
 using Application.Activity.Interface;
 using Application.Activity.Mapper;
 using Application.Activity.Service;
@@ -234,7 +235,7 @@ namespace Api
                 }
 
             app.UseHttpsRedirection();
-
+            app.UseMiddleware<GlobalExceptionMiddleware>();
             // Viktigt: AuthN före AuthZ
             app.UseAuthentication();
             app.UseAuthorization();

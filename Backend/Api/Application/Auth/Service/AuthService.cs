@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Application.Auth.DTO;
 using Application.Auth.Interface;
+using Application.Exceptions;
 using AutoMapper;
 using Azure;
 using Domain.Models;
@@ -78,7 +79,7 @@ namespace Application.Auth.Service
 
             var existing = await _users.FindByEmailAsync(dto.Email);
             if (existing is not null)
-                throw new InvalidOperationException("User with this email already exists.");
+                throw new ConflictException("User with this email already exists.");
 
             var user = new User
             {
