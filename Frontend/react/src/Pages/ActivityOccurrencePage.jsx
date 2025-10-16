@@ -161,7 +161,7 @@ export default function ActivityOccurrencePage() {
         ActivityOccurrenceId: selectedId,
         peopleCount: people,
       });
-      fetchOccurrences();
+      await fetchOccurrences();
       return { ok: true, data: res?.data };
     } catch (e) {
       const { message, list } = parseApiError(e);
