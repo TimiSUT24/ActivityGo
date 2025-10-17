@@ -16,8 +16,17 @@
   margin: 0 auto;
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
   gap: 20px;
+  padding: 0 20px;
+  width: 100%;
+}
+
+.nav-img {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
 }
 
 .menu-toggle{
@@ -27,11 +36,15 @@
 
 .nav-links {
   display: flex;
+  justify-content: center;
   gap: 24px;
   font-family: "Press Start 2P", cursive, system-ui;
+  flex: 1 1 auto;
+  margin-top: 9px;
 }
+
 .nav-link {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 10px;
   padding: 8px 16px;
@@ -40,12 +53,59 @@
   font-weight: 500;
   transition: all 0.2s ease;
   position: relative;
+  white-space: nowrap;
 }
 
-.nav-img {
+.nav-weather {
   display: flex;
   gap: 10px;
   position:sticky;
+  align-items: center;
+  justify-content: flex-end;
+  flex-shrink: 0;
+  margin-top: 9px;
+}
+
+.nav-weather .weather-container {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.85);
+  border: 3px solid rgba(11, 92, 51, 0.4);
+  font-family: "Press Start 2P", cursive;
+  color: #0b3a86;
+  font-size: 0.48rem;
+  white-space: nowrap;
+}
+
+.nav-weather .weather-title {
+  display: none;
+}
+
+.nav-weather .weather-info {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.48rem;
+}
+
+.nav-weather .weather-info img {
+  width: 20px;
+  height: 20px;
+}
+
+.nav-weather > p {
+  font-family: "Press Start 2P", cursive;
+  font-size: 0.45rem;
+  color: #0b3a86;
+  background: rgba(255, 255, 255, 0.85);
+  border: 3px solid rgba(11, 92, 51, 0.4);
+  border-radius: 999px;
+  padding: 3px 8px;
+  margin: 0;
+  white-space: nowrap;
 }
 
 #nav1{
@@ -104,12 +164,13 @@
     width: 140px;
   }
 
-  .nav-link {
-    width: 120px;
+  .nav-links {
+    gap: 14px;
+    flex-wrap: wrap;
   }
 
-  .nav-links {
-    gap: 13px;
+  .nav-weather {
+    display: none;
   }
 }
 

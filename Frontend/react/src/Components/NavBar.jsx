@@ -1,6 +1,7 @@
 import { NavLink, useLocation } from 'react-router-dom';
 import { useEffect, useState} from 'react';
 import '../CSS/Navbar.css';
+import LocalWeather from '../Components/LocalWeather';
 import { useAuth } from '../context/AuthContext'; // du har redan denna i ditt projekt
 
 export default function NavBar() {
@@ -106,6 +107,9 @@ export default function NavBar() {
         <button className ="menu-toggle" id="menu-toggle" onClick={toggleMenu}>☰</button>
         <div className={`nav-links ${menuOpen ? 'open' : ''}`}>
           {renderLinks()}
+        </div>
+        <div className="nav-weather">
+          <LocalWeather />
         </div>
       </div>
     </nav>

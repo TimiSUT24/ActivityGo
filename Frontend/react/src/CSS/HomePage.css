@@ -1,143 +1,274 @@
-.home-body{
-    background-image: url("/IMG/HomePageBack.png");
-    background-repeat: no-repeat;
-    background-position: center;
-    background-size: cover;   
-    background-attachment: fixed; 
-    margin:0 auto;
-    overflow-x: hidden;
-    place-self: center;
+.home-body {
+  background-image: url("/IMG/HomePageBack.png");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+  background-attachment: fixed;
+  margin: 0 auto;
+  overflow-x: hidden;
+  place-self: center;
 }
 
-.mario-island{
-    display: flex;
-    justify-content: center;
-    margin-left:200px;
-    margin-top:20px;
+.home-page {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 36px 20px 72px;
+  display: flex;
+  flex-direction: column;
+  gap: 36px;
 }
 
-.activity-category{
-    margin-top:15px;
-    display:flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
-    gap:120px;
+.home-hero {
+  display: grid;
+  gap: 28px;
+  padding: 28px;
+  background: rgba(255, 255, 255, 0.92);
+  border-radius: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  align-items: center;
 }
 
-.category-img{
-    display:flex;
+.home-hero__copy {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
-.activity-list{
-    width:500px;
-    height:430px;
-    display:grid;
-    grid-template-areas: 
-    "card card "
-    "card card ";
-    align-items: center;
-    justify-items: center;
-    justify-self: center; 
+.home-hero__copy h3,
+.home-highlight__title {
+  margin: 0;
 }
 
-.activity-card{
-    height:190px;
-    width:200px;
-    background-image: url("/IMG/HomePage/bricktile.png");
-    border-radius: 10px;
-    -webkit-border-radius: 10px;
-    -moz-border-radius: 10px;
-    -ms-border-radius: 10px;
-    -o-border-radius: 10px;
-    align-items: center;
-    justify-content:center;
-    display:flex;
+.home-eyebrow {
+  font-family: "Press Start 2P", cursive;
+  font-size: 0.68rem;
+  color: #0b3a86;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin: 0;
+}
+
+.home-title {
+  font-size: 1.8rem;
+  color: #ffcc00;
+  text-shadow: 3px 3px #d32f2f, 4px 4px #000;
+}
+
+.home-lead {
+  font-family: "VT323", "Courier New", monospace;
+  font-size: 1.2rem;
+  color: #10284f;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.home-hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.home-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-family: "Press Start 2P", cursive;
+  font-size: 0.7rem;
+  padding: 14px 18px;
+  border-radius: 12px;
+  border: 4px solid #0b5c33;
+  box-shadow: 0 6px 0 #0b5c33, 0 12px 18px rgba(0, 0, 0, 0.25);
+  text-decoration: none;
+  color: #064b2d;
+  background: #7fe18a;
+  transition: transform 0.12s ease, box-shadow 0.12s ease, filter 0.12s ease;
+}
+
+.home-btn:hover {
+  transform: translateY(-2px);
+  filter: saturate(1.08);
+  box-shadow: 0 9px 0 #0b5c33, 0 16px 24px rgba(0, 0, 0, 0.3);
+}
+
+.home-btn--ghost {
+  background: rgba(13, 36, 71, 0.08);
+  color: #0d2447;
+  border-color: rgba(13, 36, 71, 0.35);
+  box-shadow: none;
+}
+
+.home-btn--accent {
+  background: #ffd166;
+  border-color: #c49d2d;
+  color: #5b2b00;
+}
+
+.home-hero__perks {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-family: "Press Start 2P", cursive;
+  font-size: 0.62rem;
+  color: #0d2447;
+}
+
+.home-hero__art {
+  max-width: 100%;
+  height: auto;
+  filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.25));
+}
+
+.home-highlights {
+  display: grid;
+  gap: 22px;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+}
+
+.home-highlight {
+  background: rgba(255, 255, 255, 0.92);
+  border-radius: 16px;
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  align-items: flex-start;
+  text-align: left;
+  color: #0d2447;
+  box-shadow: 0 12px 24px rgba(10, 34, 64, 0.15);
+}
+
+.home-highlight__icon {
+  width: 72px;
+  height: 72px;
+  align-self: flex-start;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.25));
+}
+
+.home-highlight__title {
+  font-family: "Press Start 2P", cursive;
+  font-size: 0.82rem;
+  color: #0b3a86;
+}
+
+.home-highlight p {
+  font-family: "VT323", "Courier New", monospace;
+  font-size: 1.05rem;
+  margin: 0;
+  color: #10284f;
+}
+
+.home-how {
+  background: rgba(255, 255, 255, 0.94);
+  border-radius: 16px;
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.home-section-title {
+  font-family: "Press Start 2P", cursive;
+  font-size: 1.2rem;
+  color: #0b3a86;
+  margin: 0;
+  text-align: center;
+}
+
+.home-steps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+}
+
+.home-step {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  background: rgba(11, 59, 35, 0.08);
+  border: 3px solid rgba(11, 92, 51, 0.35);
+  border-radius: 12px;
+  padding: 18px;
+  color: #064b2d;
+  box-shadow: 0 8px 0 rgba(11, 92, 51, 0.2);
+}
+
+.home-step__number {
+  font-family: "Press Start 2P", cursive;
+  font-size: 0.82rem;
+  background: #ffd166;
+  color: #5b2b00;
+  border-radius: 50%;
+  min-width: 38px;
+  min-height: 38px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 3px solid #c49d2d;
+  box-shadow: 0 4px 0 rgba(0, 0, 0, 0.15);
+}
+
+.home-step h3 {
+  font-family: "Press Start 2P", cursive;
+  font-size: 0.75rem;
+  margin: 0 0 8px;
+}
+
+.home-step p {
+  font-family: "VT323", "Courier New", monospace;
+  font-size: 1rem;
+  margin: 0;
+  color: #0d2447;
+}
+
+.home-cta {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  align-items: center;
+  text-align: center;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 16px;
+  padding: 28px;
+}
+
+.home-cta p {
+  font-family: "VT323", "Courier New", monospace;
+  font-size: 1.1rem;
+  margin: 12px 0 0;
+  color: #10284f;
+}
+
+.home-cta__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: center;
+}
+
+@media (max-width: 720px) {
+  .home-title {
+    font-size: 1.4rem;
+  }
+
+  .home-lead {
+    font-size: 1rem;
+  }
+
+  .home-step {
     flex-direction: column;
-}
-
-.activity-img{
-    display:flex;
     align-items: center;
-    border-radius: 10px;
-    -webkit-border-radius: 10px;
-    -moz-border-radius: 10px;
-    -ms-border-radius: 10px;
-    -o-border-radius: 10px;
-}
+    text-align: center;
+  }
 
-.activity-card-btn{
-    border-radius: 10px;
-    -webkit-border-radius: 10px;
-    -moz-border-radius: 10px;
-    -ms-border-radius: 10px;
-    -o-border-radius: 10px;
-    border-style: none;
-    margin-top:5px;
-    width:150px;
-    cursor: pointer;
-    background-color: red;
-    color:white;
-    font-family:'Press Start 2P', cursive, system-ui;
-}
-
-#activity-btn4{
-    background-color: green;
-}
-
-#activity-btn2{
-    background-color: rgb(0, 140, 255);
-}
-
-.weather-container{
-    margin:0;
-    display:flex;
-    flex-direction: column;
-    width:85%;
-    height:48%;
-    border-radius:10px;
-    -webkit-border-radius:10px;
-    -moz-border-radius:10px;
-    -ms-border-radius:10px;
-    -o-border-radius:10px;
-    background-color:darkorange;
-    font-family: 'Press Start 2P', cursive, system-ui;
-    color:darkslategrey;
-}
-
-.weather{
-    display:flex;
-    margin-left:160px;
-    width:300px;
-    border-radius: 10px;
-    height:200px;
-    place-self: center;
+  .home-hero__actions,
+  .home-cta__actions {
     justify-content: center;
-    align-items: center;
-    -webkit-border-radius: 10px;
-    -moz-border-radius: 10px;
-    -ms-border-radius: 10px;
-    -o-border-radius: 10px;
-    background-image: url("/IMG/HomePage/woodenboard.png");
-    background-repeat: no-repeat;
-    background-position: center;
-}
-
-.weather-info{
-    margin-left:10px;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-}
-
-.weather-container h2{
-    padding-top:5px;
-    padding-left:10px;
-    margin:0;
-    font-size: 12px;
-}
-
-
-.weather-container p{
-    font-size: 10px;
+  }
 }
