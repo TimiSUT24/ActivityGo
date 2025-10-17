@@ -44,6 +44,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
 using System.Threading.Tasks;
+using Infrastructure.BackgroundJobs;
 
 namespace Api
 {
@@ -135,6 +136,9 @@ namespace Api
             builder.Services.AddScoped<IUserRepository, UserRepository>();
             builder.Services.AddScoped<IActivityOccurrenceRepository, ActivityOccurrenceRepository>();
             builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+
+            // === Hosted Service ===
+            builder.Services.AddHostedService<BookingStatusRefresher>();
 
 
             // ===  Validation ===   // Glöm inte att man bara behöver registrera detta en gång då den läser av alla Validators i Application.
