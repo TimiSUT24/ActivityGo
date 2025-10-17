@@ -157,4 +157,8 @@
     display:flex;
   }
 
+  .activigo-title{
+    width:140px
+  }
+
 }
