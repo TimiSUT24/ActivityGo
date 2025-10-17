@@ -1,5 +1,4 @@
 import { Link } from "react-router-dom";
-import LocalWeather from "../Components/LocalWeather";
 import "../CSS/HomePage.css";
 import "../CSS/Occurrences.css";
 

@@ -1,5 +1,19 @@
-body {
+.register-body {
   margin: 0 auto;
+  background-image: url("/IMG/registerbackground.png");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+  background-attachment: fixed;
+}
+
+.login-body{
+  margin: 0 auto;
+  background-image: url("/IMG/loginbackground.png");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+  background-attachment: fixed;
 }
 
 .register-form {
@@ -68,7 +82,7 @@ body {
 
 .register-subtitle {
   font-size: 0.8rem;
-  color: hsl(0, 0%, 70%);
+  color: hsl(0, 6%, 32%);
   margin-top: 1rem;
   font-family: "Press Start 2P", cursive, system-ui;
 }

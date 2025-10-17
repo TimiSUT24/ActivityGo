@@ -18,7 +18,6 @@
   align-items: center;
   justify-content: space-between;
   gap: 20px;
-  padding: 0 20px;
   width: 100%;
 }
 
@@ -37,10 +36,10 @@
 .nav-links {
   display: flex;
   justify-content: center;
-  gap: 24px;
   font-family: "Press Start 2P", cursive, system-ui;
   flex: 1 1 auto;
   margin-top: 9px;
+  gap:10px;
 }
 
 .nav-link {
@@ -58,18 +57,11 @@
 
 .nav-weather {
   display: flex;
-  gap: 10px;
   position:sticky;
   align-items: center;
   justify-content: flex-end;
   flex-shrink: 0;
   margin-top: 9px;
-}
-
-.nav-weather .weather-container {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
   padding: 3px 8px;
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.85);
@@ -109,30 +101,25 @@
 }
 
 #nav1{
-  grid-area: nav1;
   background-color: red;
   color: white;
 }
 
 #nav2 {
-  grid-area: nav2;
   background-color: yellow;
   color: red;
 }
 
 #nav3 {
-   grid-area: nav3;
   background-color: green;
   color: white;
 }
 
 #nav4 {
-   grid-area: nav4;
   color: snow;
 }
 
 #nav5 {
-   grid-area: nav5;
   color: moccasin;
 }
 
@@ -142,13 +129,8 @@
 }
 
 #nav-activities{
-  grid-area: nav6;
   background-color: green;
   color: white;
-}
-
-.activigo-title{
-  grid-area: activigo;
 }
 
 #nav-admin{
@@ -156,7 +138,7 @@
     background-color: purple;
 }
 
-@media screen and (max-width: 1288px ) {
+@media screen and (max-width: 1750px ) {
   .nav-bar {   
     font-size: 9.5px;
   }
@@ -166,52 +148,62 @@
 
   .nav-links {
     gap: 14px;
-    flex-wrap: wrap;
   }
 
-  .nav-weather {
-    display: none;
+  .nav-weather{
+    margin-right:50px;
   }
+
 }
 
-@media screen and (max-width: 987px){
+@media screen and (max-width: 1170px){
+
+  .navbar-container{
+    gap:5px;
+  }
   .nav-bar {   
-    font-size: 6.7px;
+    font-size: 7px;
   }
   .activigo-title {
-    width: 100px;
+    width: 120px;
   }
 
   .nav-link {
-    width: 90px;
+    width: fit-content;
     height:15px;
   
   }
   .nav-links {
-    gap: 10px;
+    gap: 5px;
   }
 }
 
-@media screen and (max-width: 790px){
+@media screen and (max-width: 900px){
 
   .menu-toggle{
     display:block;
     position:absolute;
     top:0px;
     left:0px;
-  }
+    background-color: burlywood;
+}
 
   .nav-links{
     display:none;
     flex-direction: column;
-    top:25px;
+    top:70px;
     left:0;
     position: absolute;
-    background-color: orange;
-    width:150px;
-    height:250px;
+    width:195px;
+    height:300px;
     align-items: center;
     justify-content: center;
+    gap:12px;
+    font-size: 8px;
+    background-image: url("/IMG/woodenboard2.png");
+  }
+  .nav-link{
+    width:fit-content;
   }
 
   .nav-links.open{
@@ -219,7 +211,12 @@
   }
 
   .activigo-title{
-    width:140px
+    width:140px;
+    margin-left:20px;
+  }
+
+  .nav-weather{
+    margin-right:10px;
   }
 
 }
