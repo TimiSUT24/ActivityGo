@@ -261,16 +261,7 @@ async function load() {
 
   if (!user) {
     return (
-      <div
-        style={{
-          minHeight: "100vh",
-          backgroundImage: "url('/IMG/HomePageBack.png')",
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          backgroundAttachment: "fixed",
-          padding: "40px 0",
-        }}
-      >
+      <div>
         <div style={styles.form}>
           <div style={styles.badge}>Mina bokningar</div>
           <h2 style={styles.title}>Bokningar</h2>
@@ -281,16 +272,7 @@ async function load() {
   }
 
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        backgroundImage: "url('/IMG/HomePageBack.png')", 
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-        backgroundAttachment: "fixed",
-        padding: "40px 0",
-      }}
-    >
+    <div>
       <div style={styles.form}>
         <div style={styles.badge}>Mina bokningar</div>
         <h2 style={styles.title}>Bokningar</h2>

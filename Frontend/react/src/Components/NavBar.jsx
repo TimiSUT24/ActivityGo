@@ -41,9 +41,11 @@ export default function NavBar() {
       "/activity-occurrences": "activity-occurrences-body",
       "/activities": "activity-occurrences-body",
       "/admin": "admin-body",
+      "/me/bookings": "booking-body",
+      "/user": "user-body"
     };
     const newClass = bodyClassMap[location.pathname] || "default-body";
-    document.body.classList.remove("home-body", "login-body", "register-body", "admin-body", "activity-occurrences-body", "default-body");
+    document.body.classList.remove("home-body", "login-body", "register-body", "admin-body", "activity-occurrences-body", "booking-body", "user-body", "default-body");
     document.body.classList.add(newClass);
     return () => document.body.classList.remove(newClass);
   }, [location]);

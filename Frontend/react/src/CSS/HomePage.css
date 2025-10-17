@@ -162,7 +162,7 @@
 }
 
 .home-how {
-  background: rgba(255, 255, 255, 0.94);
+  background: rgba(255, 255, 255, 0.92);
   border-radius: 16px;
   padding: 28px;
   display: flex;
@@ -233,7 +233,7 @@
   gap: 20px;
   align-items: center;
   text-align: center;
-  background: rgba(255, 255, 255, 0.95);
+  background: rgba(255, 255, 255, 0.92);
   border-radius: 16px;
   padding: 28px;
 }
