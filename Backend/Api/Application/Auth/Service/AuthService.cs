@@ -105,5 +105,83 @@ namespace Application.Auth.Service
                 Email: user.Email
             );
         }
+
+        public async Task<AuthResult> UpdateProfileAsync(string userId, UpdateProfileDto dto, CancellationToken ct)
+        {
+            if (string.IsNullOrWhiteSpace(userId))
+                throw new ArgumentException("User ID cannot be null or empty.", nameof(userId));
+
+            var user = await _users.FindByIdAsync(userId);
+            if (user is null)
+                throw new InvalidOperationException("User not found.");
+
+            // Uppdatera namn
+            user.Firstname = dto.FirstName;
+            user.Lastname = dto.LastName;
+
+            // E-post (valfri) — om ändrad: kontrollera krock + uppdatera Email & UserName
+            if (!string.IsNullOrWhiteSpace(dto.Email) &&
+                !dto.Email.Equals(user.Email, StringComparison.OrdinalIgnoreCase))
+            {
+                var existing = await _users.FindByEmailAsync(dto.Email);
+                if (existing is not null && existing.Id == user.Id == false)
+                    throw new ConflictException("User with this email already exists.");
+
+                var setEmail = await _users.SetEmailAsync(user, dto.Email);
+                if (!setEmail.Succeeded)
+                    throw new InvalidOperationException(string.Join("; ", setEmail.Errors.Select(e => e.Description)));
+
+                var setUsername = await _users.SetUserNameAsync(user, dto.Email);
+                if (!setUsername.Succeeded)
+                    throw new InvalidOperationException(string.Join("; ", setUsername.Errors.Select(e => e.Description)));
+
+                user.EmailConfirmed = true; // dev: hoppa över bekräftelseflöde
+            }
+
+            var update = await _users.UpdateAsync(user);
+            if (!update.Succeeded)
+                throw new InvalidOperationException(string.Join("; ", update.Errors.Select(e => e.Description)));
+
+            // Roterar tokens (nya claims för namn/e-post)
+            var (access, refresh) = await _tokens.IssueTokensAsync(user, GetIp());
+            return new AuthResult(
+                AccessToken: access,
+                RefreshToken: refresh,
+                UserId: user.Id,
+                Email: user.Email
+            );
+        }
+
+        public async Task<AuthResult> ChangePasswordAsync(string userId, ChangePasswordDto dto, CancellationToken ct)
+        {
+            if (string.IsNullOrWhiteSpace(userId))
+                throw new ArgumentException("User ID cannot be null or empty.", nameof(userId));
+
+            var user = await _users.FindByIdAsync(userId);
+            if (user is null)
+                throw new InvalidOperationException("User not found.");
+
+            var result = await _users.ChangePasswordAsync(user, dto.CurrentPassword, dto.NewPassword);
+            if (!result.Succeeded)
+            {
+                // Sätt vänligt fel om gamla lösenordet var fel (Identity ger ibland generiskt svar)
+                var incorrect = result.Errors.Any(e => e.Code.Contains("PasswordMismatch", StringComparison.OrdinalIgnoreCase));
+                if (incorrect)
+                    throw new UnauthorizedAccessException("Current password is incorrect.");
+
+                throw new InvalidOperationException(string.Join("; ", result.Errors.Select(e => e.Description)));
+            }
+
+            // Säkerhet: revoka tidigare refresh tokens och ge nya
+            await _tokens.RevokeAllAsync(userId, GetIp());
+            var (access, refresh) = await _tokens.IssueTokensAsync(user, GetIp());
+
+            return new AuthResult(
+                AccessToken: access,
+                RefreshToken: refresh,
+                UserId: user.Id,
+                Email: user.Email
+            );
+        }
     }
 }
