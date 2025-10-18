@@ -6,7 +6,6 @@
   background-attachment: fixed;
   margin: 0 auto;
   overflow-x: hidden;
-  place-self: center;
 }
 
 .home-page {
@@ -185,6 +184,7 @@
   display: grid;
   gap: 16px;
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  justify-content: center;
 }
 
 .home-step {
@@ -270,5 +270,14 @@
   .home-hero__actions,
   .home-cta__actions {
     justify-content: center;
+  }
+}
+
+@media (max-width:402px){
+  .home-hero__art{
+    width:210px;
+  }
+  .home-hero__copy{
+    width:200px;
   }
 }

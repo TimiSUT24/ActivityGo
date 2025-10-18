@@ -273,11 +273,20 @@ async function load() {
 
   return (
     <div>
+      <style>
+      {`
+        @media (max-width: 435px) {
+          .tabs {
+            grid-template-columns: repeat(2, 1fr) !important;
+          }
+        }
+      `}
+    </style>
       <div style={styles.form}>
         <div style={styles.badge}>Mina bokningar</div>
         <h2 style={styles.title}>Bokningar</h2>
 
-        <div style={styles.tabs}>
+        <div className="tabs" style={styles.tabs}>
           {tabs.map((t) => (
             <button key={t.key} style={styles.tab(scope === t.key)} onClick={() => setScope(t.key)}>
               {t.label}

@@ -16,6 +16,16 @@
   background-attachment: fixed;
 }
 
+.admin-body{
+  margin: 0 auto;
+  background-image: url("/IMG/HomePageBack.png");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+  background-attachment: fixed;
+}
+
+/*Register Css */
 .register-body {
   margin: 0 auto;
   background-image: url("/IMG/registerbackground.png");
@@ -52,7 +62,7 @@
   );
   width: 300px;
   height: 320px;
-  justify-self: center;
+  margin:0 auto;
 }
 
 .register-input {

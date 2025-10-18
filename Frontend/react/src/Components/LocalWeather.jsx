@@ -35,7 +35,7 @@ export default function LocalWeather (){
     };
 
     if(error){
-        return <p>Error: {error}</p>
+        return <p>Error: Could not get location {console.log(error)}</p>
     }
 
     if(!weather){

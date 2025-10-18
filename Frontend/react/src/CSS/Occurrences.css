@@ -1,4 +1,4 @@
-body.activity-occurrences-body {
+.activity-occurrences-body {
   background-image: url("/IMG/HomePageBack.png");
   background-repeat: no-repeat;
   background-position: center;
@@ -408,16 +408,6 @@ body.activity-occurrences-body {
   border-top: 1px solid #e5e7eb;
 }
 
-/* Responsiv */
-@media (max-width: 768px) {
-  .occurence-filters {
-    grid-template-columns: 1fr 1fr;
-  }
-  .occurence-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
 /* ===== BookingModal: Mario-stil ===== */
 .occurrence-modal.brick-frame {
   background: #fff;
@@ -565,5 +555,22 @@ body.activity-occurrences-body {
 @media (max-width: 900px) {
   .occurence-grid {
     grid-template-columns: 1fr;
+  }
+}
+
+/* Responsiv */
+@media (max-width: 768px) {
+  .occurence-filters {
+    grid-template-columns: 1fr;
+  }
+  .occurence-grid {
+    grid-template-columns: 1fr;
+  }
+  .occurrence-page{
+    width:100vw;
+  }
+
+  .occurrence-title{
+    font-size:17px;
   }
 }

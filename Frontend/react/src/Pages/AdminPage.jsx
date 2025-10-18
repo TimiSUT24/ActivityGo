@@ -79,7 +79,7 @@ const baseStyles = {
     marginBottom: 18,
   },
   grid: { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 12 },
-  row: { display: "flex", gap: 12 },
+  row: { display: "flex", gap: 12},
   input: {
     width: "92%",
     padding: "10px 12px",
@@ -113,7 +113,7 @@ const baseStyles = {
     cursor: "pointer",
     fontWeight: "bold",
   },
-  table: { width: "100%", borderCollapse: "separate", borderSpacing: "0 8px" },
+  table: { width: "100%", borderCollapse: "separate", borderSpacing: "0 8px"},
   th: { textAlign: "left", fontSize: 12, color: "#ffef9f", padding: "6px 8px" },
   td: { padding: "10px 8px", background: "#0b1b36", border: "2px solid #20345f", fontSize: 12 },
   right: { textAlign: "right" },
@@ -169,7 +169,7 @@ function Overview() {
   return (
     <div style={baseStyles.section}>
       <h3 style={{ marginTop: 0 }}>Översikt</h3>
-      <div style={baseStyles.row}>
+      <div className ="row" style={baseStyles.row}>
         <div style={{ flex: 1 }}>
           <label style={baseStyles.label}>Från</label>
           <input type="date" value={from} onChange={(e) => setFrom(e.target.value)} style={baseStyles.input} />
@@ -198,7 +198,8 @@ function Overview() {
             <StatCard label="Slutförda" value={`${summary.completionRatePercent?.toFixed?.(1)}%`} />
           </div>
 
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginTop: 16 }}>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: 12, marginTop: 16 }}>
+            <div className ="row" style={baseStyles.row}>
             <div style={baseStyles.section}>
               <h4 style={{ marginTop: 0 }}>Toppaktiviteter</h4>
               <table style={baseStyles.table}>
@@ -207,7 +208,7 @@ function Overview() {
                     <th style={baseStyles.th}>Namn</th>
                     <th style={{ ...baseStyles.th, ...baseStyles.right }}>Antal</th>
                   </tr>
-                </thead>
+                </thead>              
                 <tbody>
                   {topActs.map((x) => (
                     <tr key={x.id}>
@@ -215,7 +216,7 @@ function Overview() {
                       <td style={{ ...baseStyles.td, ...baseStyles.right }}>{x.count}</td>
                     </tr>
                   ))}
-                </tbody>
+                </tbody>           
               </table>
             </div>
             <div style={baseStyles.section}>
@@ -236,6 +237,7 @@ function Overview() {
                   ))}
                 </tbody>
               </table>
+            </div>
             </div>
           </div>
         </>
@@ -344,7 +346,7 @@ function Activities() {
       {err && <div style={baseStyles.error}>{err}</div>}
 
       <div style={{ ...baseStyles.section, background: "#0b1b36" }}>
-        <div style={baseStyles.row}>
+        <div className ="row" style={baseStyles.row}>
           <Field label="Namn">
             <input style={baseStyles.input} value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
           </Field>
@@ -363,7 +365,7 @@ function Activities() {
             <input style={baseStyles.input} value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />
           </Field>
         </div>
-        <div style={baseStyles.row}>
+        <div className ="row" style={baseStyles.row}>
           <Field label="Standardlängd (min)">
             <input
               type="number"
@@ -384,7 +386,7 @@ function Activities() {
             />
           </Field>
         </div>
-        <div style={baseStyles.row}>
+        <div className ="row" style={baseStyles.row}>
           <Field label="Bild-URL">
             <input style={baseStyles.input} value={form.imageUrl} onChange={(e) => setForm({ ...form, imageUrl: e.target.value })} />
           </Field>
@@ -418,6 +420,7 @@ function Activities() {
         </div>
       </div>
 
+      <div style={{ maxHeight: 300, overflowY: "auto"}}>
       <table style={baseStyles.table}>
         <thead>
           <tr>
@@ -447,6 +450,7 @@ function Activities() {
           ))}
         </tbody>
       </table>
+      </div>
     </div>
   );
 }
@@ -537,7 +541,7 @@ function Places() {
       {err && <div style={baseStyles.error}>{err}</div>}
 
       <div style={{ ...baseStyles.section, background: "#0b1b36" }}>
-        <div style={baseStyles.row}>
+        <div className ="row" style={baseStyles.row}>
           <Field label="Namn">
             <input style={baseStyles.input} value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
           </Field>
@@ -565,7 +569,7 @@ function Places() {
             <input style={baseStyles.input} value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} />
           </Field>
         </div>
-        <div style={baseStyles.row}>
+        <div className ="row" style={baseStyles.row}>
           <Field label="Lat">
             <input style={baseStyles.input} value={form.latitude} onChange={(e) => setForm({ ...form, latitude: e.target.value })} />
           </Field>
@@ -594,6 +598,7 @@ function Places() {
         </div>
       </div>
 
+      <div style={{ maxHeight: 300, overflowY: "auto"}}>
       <table style={baseStyles.table}>
         <thead>
           <tr>
@@ -626,6 +631,7 @@ function Places() {
           ))}
         </tbody>
       </table>
+      </div>
     </div>
   );
 }
@@ -726,7 +732,7 @@ function Categories() {
       {err && <div style={baseStyles.error}>{err}</div>}
 
       <div style={{ ...baseStyles.section, background: "#0b1b36" }}>
-        <div style={baseStyles.row}>
+        <div className ="row" style={baseStyles.row}>
           <Field label="Namn">
             <input
               style={baseStyles.input}
@@ -775,7 +781,8 @@ function Categories() {
           )}
         </div>
       </div>
-
+      
+      <div style={{ maxHeight: 300, overflowY: "auto"}}>
       <table style={baseStyles.table}>
         <thead>
           <tr>
@@ -806,6 +813,7 @@ function Categories() {
           ))}
         </tbody>
       </table>
+      </div>
     </div>
   );
 }
@@ -917,7 +925,7 @@ function Occurrences() {
       {err && <div style={baseStyles.error}>{err}</div>}
 
       <div style={{ ...baseStyles.section, background: "#0b1b36" }}>
-        <div style={baseStyles.row}>
+        <div className="row"style={baseStyles.row}>
           <Field label="Aktivitet">
             {/* 👇 Dropdown med aktivitetsnamn */}
             <Select
@@ -937,7 +945,7 @@ function Occurrences() {
             />
           </Field>
         </div>
-        <div style={baseStyles.row}>
+        <div className ="row" style={baseStyles.row}>
           <Field label="Start (lokal)">
             <input
               type="datetime-local"
@@ -955,7 +963,7 @@ function Occurrences() {
             />
           </Field>
         </div>
-        <div style={baseStyles.row}>
+        <div className ="row" style={baseStyles.row}>
           <Field label="Capacity override">
             <input
               type="number"
@@ -990,7 +998,7 @@ function Occurrences() {
           )}
         </div>
       </div>
-
+      <div style={{ maxHeight: 300, overflowY: "auto"}}>
       <table style={baseStyles.table}>
         <thead>
           <tr>
@@ -1021,6 +1029,7 @@ function Occurrences() {
           ))}
         </tbody>
       </table>
+      </div>
     </div>
   );
 }
@@ -1050,21 +1059,30 @@ export default function AdminPage() {
   const [tab, setTab] = useState("overview");
 
   return (
-    <div
-      style={{
-        minHeight: "100vh", // täcker hela höjden
-        backgroundImage: "url('/IMG/HomePageBack.png')", // <-- ändra till din bild
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-        backgroundAttachment: "fixed", // gör att bilden sitter still vid scroll
-        padding: "40px 0",
-      }}
-    >
+    <div>
+      <style>
+      {`
+        @media (max-width: 505px) {
+          .tabs {
+            grid-template-columns: repeat(2, 1fr) !important;
+          }
+        }
+
+        @media (max-width: 669px) {
+      .row {
+      display: flex !important;
+      flex-direction: column !important;
+      gap: 10px !important;
+    }
+  }
+      `}
+    </style>
+    
       <div style={baseStyles.wrap}>
         <div style={baseStyles.badge}>Admin</div>
         <h2 style={baseStyles.title}>Adminpanel</h2>
 
-        <div style={baseStyles.tabs}>
+        <div className="tabs" style={baseStyles.tabs}>
           {tabs.map((x) => (
             <button key={x.k} style={baseStyles.tab(tab === x.k)} onClick={() => setTab(x.k)}>
               {x.t}

@@ -178,7 +178,7 @@
   }
 }
 
-@media screen and (max-width: 900px){
+@media screen and (max-width: 913px){
 
   .menu-toggle{
     display:block;
@@ -219,4 +219,10 @@
     margin-right:10px;
   }
 
+}
+
+@media screen and (max-width:400px){
+  .activigo-title{
+    width:120px;
+  }
 }

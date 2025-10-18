@@ -44,7 +44,11 @@ export default function NavBar() {
       "/me/bookings": "booking-body",
       "/user": "user-body"
     };
-    const newClass = bodyClassMap[location.pathname] || "default-body";
+    let newClass = bodyClassMap[location.pathname] || "default-body";
+    
+    if (location.pathname.startsWith("/activities/") && location.pathname !== "/activities") {
+        newClass = "activity-occurrences-body";
+    }
     document.body.classList.remove("home-body", "login-body", "register-body", "admin-body", "activity-occurrences-body", "booking-body", "user-body", "default-body");
     document.body.classList.add(newClass);
     return () => document.body.classList.remove(newClass);
