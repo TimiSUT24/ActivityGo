@@ -4,7 +4,6 @@ import { useAuth } from "../context/AuthContext";
 
 import MarioStyles from "../Components/mario/MarioStyles";
 import Cloud from "../Components/mario/Cloud";
-import Ground from "../Components/mario/Ground";
 
 import "../CSS/UserPage.css";
 
@@ -48,7 +47,7 @@ function Field({ label, type = "text", value, onChange, placeholder }) {
 }
 
 export default function UserPage() {
-  const { user, logout, setUser } = useAuth();
+  const { user, logout, setUser, refreshMe } = useAuth();
 
   const firstName =
     user?.firstname || user?.firstName || user?.name || user?.email || "Användare";
@@ -140,12 +139,15 @@ export default function UserPage() {
     setSavingProfile(true);
     try {
       const body = { firstname: pfFirst, lastname: pfLast, email: pfEmail };
-      const res = await api.put("/api/Auth/me/profile", body);
+      const res = await api.put("/api/auth/me/profile", body);
 
       if (res?.data?.accessToken) setAccessToken(res.data.accessToken);
 
+      setUser((prev) => prev ? { ...prev, firstname: pfFirst, lastname: pfLast, email: pfEmail } : prev);
+      try { await refreshMe(); } catch {}
+
       try {
-        const me = await api.get("/api/Auth/me");
+        const me = await api.get("/api/auth/me");
         if (typeof setUser === "function") {
           setUser({
             ...user,
@@ -175,11 +177,12 @@ export default function UserPage() {
     }
     setSavingPwd(true);
     try {
-      const res = await api.put("/api/Auth/me/password", {
+      const res = await api.put("/api/auth/me/password", {
         currentPassword: curPwd,
         newPassword: newPwd,
       });
       if (res?.data?.accessToken) setAccessToken(res.data.accessToken);
+      try { await refreshMe(); } catch {}
       setCurPwd("");
       setNewPwd("");
       setShowPassword(false);
