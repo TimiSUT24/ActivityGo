@@ -124,6 +124,8 @@ namespace Api.Controllers.Auth
         {
             var id = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? User.FindFirst("sub")?.Value;
             var email = User.FindFirstValue(ClaimTypes.Email);
+            var firstname = User.FindFirst("firstname")?.Value;
+            var lastname = User.FindFirst("lastname")?.Value;
             var displayName = User.FindFirst("displayName")?.Value;
             var roles = User.FindAll(ClaimTypes.Role).Select(r => r.Value).ToArray();
 
@@ -131,6 +133,8 @@ namespace Api.Controllers.Auth
             {
                 id,
                 email,
+                firstname,
+                lastname,
                 name = displayName,
                 roles
             });
