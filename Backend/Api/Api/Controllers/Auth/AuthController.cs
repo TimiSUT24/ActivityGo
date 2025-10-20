@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using Application.Auth.DTO;         // RegisterDto, LoginDto, AuthResult, RefreshRequest (lägg till denna DTO)
 using Application.Auth.Interface;  // ITokenService
+using Application.Exceptions;
 using Domain.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -133,6 +134,37 @@ namespace Api.Controllers.Auth
                 name = displayName,
                 roles
             });
+        }
+
+        // === Update own profile ===
+        [HttpPut("me/profile")]
+        [Authorize]
+        [ProducesResponseType(statusCode: 200)]
+        [ProducesResponseType(statusCode: 400)]
+        [ProducesResponseType(statusCode: 401)]
+        [ProducesResponseType(statusCode: 409)]
+        [ProducesResponseType(statusCode: 500)]
+        public async Task<ActionResult<AuthResult>> UpdateProfile([FromBody] UpdateProfileDto dto, CancellationToken ct)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? User.FindFirst("sub")?.Value!;
+            var res = await _authService.UpdateProfileAsync(userId, dto, ct);
+            SetRefreshCookie(res.RefreshToken);
+            return Ok(res);
+        }
+
+        // === Change own password ===
+        [HttpPut("me/password")]
+        [Authorize]
+        [ProducesResponseType(statusCode: 200)]
+        [ProducesResponseType(statusCode: 400)]
+        [ProducesResponseType(statusCode: 401)]
+        [ProducesResponseType(statusCode: 500)]
+        public async Task<ActionResult<AuthResult>> ChangePassword([FromBody] ChangePasswordDto dto, CancellationToken ct)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? User.FindFirst("sub")?.Value!;
+            var res = await _authService.ChangePasswordAsync(userId, dto, ct);
+            SetRefreshCookie(res.RefreshToken);
+            return Ok(res);
         }
     }
 }
