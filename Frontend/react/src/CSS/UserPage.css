@@ -1,6 +1,12 @@
-/* Root layout */
+/* Base */
+body {
+  margin: 0;
+  overflow-x: hidden;
+}
+
 .up-root {
   min-height: 100vh;
+  width: 100%;
   overflow: hidden;
   background: linear-gradient(180deg, #6ec6ff 0%, #8bc34a 100%);
   font-family: 'Press Start 2P', cursive;
@@ -15,7 +21,7 @@
   z-index: 2;
   max-width: 1100px;
   margin: 0 auto;
-  padding: 9vh 16px 140px;
+  padding: clamp(56px, 8vh, 120px) 16px clamp(120px, 14vh, 160px);
 }
 
 /* Header */
@@ -28,7 +34,7 @@
 }
 
 .up-title {
-  font-size: 22px;
+  font-size: clamp(18px, 2.2vw, 28px);
   margin: 0;
   color: #ffcc00;
   text-shadow: 3px 3px #d32f2f, 5px 5px #000;
@@ -37,14 +43,15 @@
 .up-actions {
   display: flex;
   gap: 10px;
+  flex-wrap: wrap;           
 }
 
 /* Card */
 .up-card {
-  width: 100%;
+  width: 90%;
   max-width: 960px;
   margin: 0 auto 16px;
-  padding: 20px;
+  padding: clamp(14px, 2.2vw, 24px);
   border-radius: 14px;
   background: linear-gradient(145deg, rgba(255,94,87,0.96), rgba(210,33,18,0.94));
   box-shadow: 0 0 0 4px #ffd166, 0 0 0 10px rgba(0,0,0,0.85), 0 22px 30px rgba(0,0,0,0.4);
@@ -52,7 +59,7 @@
 }
 
 .up-card__title {
-  font-size: 18px;
+  font-size: clamp(16px, 1.6vw, 20px);
   margin: 0 0 12px;
   letter-spacing: 0.5px;
   text-shadow: 2px 2px #000;
@@ -66,6 +73,7 @@
   cursor: pointer;
   font-weight: 700;
   box-shadow: 0 4px 0 rgba(0,0,0,0.25);
+  font-size: clamp(11px, 1.6vw, 14px);
 }
 
 .up-btn--primary {
@@ -84,9 +92,10 @@
 .up-field {
   display: block;
   margin-bottom: 12px;
+  margin-right: 26px;
 }
 .up-field__label {
-  font-size: 12px;
+  font-size: clamp(11px, 1.4vw, 13px);
   opacity: 0.9;
   margin-bottom: 6px;
 }
@@ -98,12 +107,11 @@
   background: rgba(255,255,255,0.15);
   color: #fff;
   outline: none;
+  font-size: clamp(12px, 1.6vw, 14px);
 }
 
 /* Bookings */
-.up-dim {
-  opacity: 0.9;
-}
+.up-dim { opacity: 0.9; }
 
 .up-booking {
   display: flex;
@@ -116,11 +124,11 @@
   margin-bottom: 8px;
 }
 .up-booking__meta { text-align: left; }
-.up-booking__title { font-weight: 800; }
-.up-booking__sub { font-size: 12px; opacity: 0.95; }
+.up-booking__title { font-weight: 800; font-size: clamp(13px, 1.8vw, 15px); }
+.up-booking__sub { font-size: clamp(11px, 1.6vw, 13px); opacity: 0.95; }
 
 .up-badge {
-  font-size: 12px;
+  font-size: clamp(10px, 1.6vw, 12px);
   padding: 6px 10px;
   border-radius: 999px;
   background: rgba(255,209,102,0.9);
@@ -141,26 +149,28 @@
   padding: 16px;
 }
 .up-modal__box {
-  width: 100%;
+  width: min(560px, 94vw);          
   max-width: 560px;
   background: linear-gradient(145deg, rgba(255,94,87,0.98), rgba(210,33,18,0.98));
   border-radius: 16px;
-  padding: 20px;
+  padding: clamp(16px, 3vw, 24px);
   box-shadow: 0 0 0 4px #ffd166, 0 0 0 10px rgba(0,0,0,0.85), 0 22px 30px rgba(0,0,0,0.4);
 }
 .up-modal__title {
   margin: 0 0 12px 0;
+  font-size: clamp(16px, 2vw, 18px);
 }
 .up-modal__actions {
   display: flex;
   gap: 10px;
   justify-content: flex-end;
+  flex-wrap: wrap;                  
 }
 
 /* Toast */
 .up-toast {
   position: fixed;
-  bottom: 24px;
+  bottom: max(24px, env(safe-area-inset-bottom));
   left: 50%;
   transform: translateX(-50%);
   z-index: 60;
@@ -168,12 +178,58 @@
   border-radius: 10px;
   color: #fff;
   box-shadow: 0 8px 18px rgba(0,0,0,0.35);
+  font-size: clamp(12px, 1.8vw, 14px);
 }
 .up-toast--ok { background: #66bb6a; }
 .up-toast--err { background: #ef5350; }
 
-/* Small screens */
+/* Breakpoints */
+/* Laptops ~ ≤1200px */
+@media (max-width: 1200px) {
+  .up-inner { padding-left: 12px; padding-right: 12px; }
+  .up-card { max-width: 100%; }
+}
+
+/* Tablets ~ ≤900px */
+@media (max-width: 900px) {
+  .up-header {
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .up-actions {
+    justify-content: flex-start;
+  }
+}
+
+/* Mobiles ~ ≤720px */
 @media (max-width: 720px) {
-  .up-header { flex-direction: column; align-items: stretch; }
-  .up-actions { justify-content: space-between; flex-wrap: wrap; }
+  .up-header { 
+    flex-direction: column; 
+    align-items: stretch; 
+  }
+  .up-actions { 
+    justify-content: space-between; 
+    gap: 8px; 
+  }
+  .up-btn { 
+    flex: 1 1 auto;          
+    min-width: 120px;
+  }
+  .up-booking { 
+    align-items: flex-start;  
+  }
+}
+
+/* Small mobiles ~ ≤420px */
+@media (max-width: 420px) {
+  .up-actions { 
+    flex-direction: column;    
+  }
+  .up-btn { width: 100%; }
+  .up-title { text-align: center; }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  * { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
 }

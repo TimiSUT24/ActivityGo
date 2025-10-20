@@ -223,6 +223,7 @@ export default function UserPage() {
       <Cloud left="-10vw" duration="30s" />
       <Cloud left="-35vw" top="12vh" width={160} duration="38s" />
       <Cloud left="-55vw" top="22vh" width={110} height={55} duration="26s" />
+      <Cloud left="-55vw" top="28vh" width={110} height={55} duration="32s" />
 
       <div className="up-inner">
         <div className="up-header">
@@ -283,8 +284,7 @@ export default function UserPage() {
           {toast.msg}
         </div>
       )}
-
-      <Ground />
+      
     </div>
   );
 }
