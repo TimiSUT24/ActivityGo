@@ -48,7 +48,7 @@ export default function ActivitiesPage() {
 
   return (
     <div className="activities-page">
-      <h1 className="mario-page-title">
+      <h1 className="mario-page-title mario-title">
         <img
           src="/IMG/icons8-pixel-star-48.png"
           alt=""

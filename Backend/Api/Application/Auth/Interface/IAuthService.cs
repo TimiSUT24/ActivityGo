@@ -13,5 +13,7 @@ namespace Application.Auth.Interface
         Task LogoutAsync(string userId, CancellationToken ct);
         Task<AuthResult> RegisterAsync(RegisterDto dto, CancellationToken ct);
 
+        Task<AuthResult> UpdateProfileAsync(string userId, UpdateProfileDto dto, CancellationToken ct);
+        Task<AuthResult> ChangePasswordAsync(string userId, ChangePasswordDto dto, CancellationToken ct);
     }
 }
