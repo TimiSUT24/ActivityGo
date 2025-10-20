@@ -2,7 +2,7 @@
 .nav-bar {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease;
-  justify-self: center;
+  align-items: center;
   position: sticky;
   top: 0;
   width: 100vw;
@@ -18,15 +18,32 @@
   align-items: center;
   justify-content: center;
   gap: 20px;
+  width: 100%;
+}
+
+.nav-img {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.menu-toggle{
+  display: none;
+  cursor: pointer;
 }
 
 .nav-links {
   display: flex;
-  gap: 24px;
+  justify-content: center;
   font-family: "Press Start 2P", cursive, system-ui;
+  flex: 1 1 auto;
+  margin-top: 9px;
+  gap:10px;
 }
+
 .nav-link {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 10px;
   padding: 8px 16px;
@@ -35,14 +52,55 @@
   font-weight: 500;
   transition: all 0.2s ease;
   position: relative;
+  white-space: nowrap;
 }
 
-.nav-img {
+.nav-weather {
   display: flex;
-  gap: 10px;
+  position:sticky;
+  align-items: center;
+  justify-content: flex-end;
+  flex-shrink: 0;
+  margin-top: 9px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.85);
+  border: 3px solid rgba(11, 92, 51, 0.4);
+  font-family: "Press Start 2P", cursive;
+  color: #0b3a86;
+  font-size: 0.48rem;
+  white-space: nowrap;
 }
 
-#nav1 {
+.nav-weather .weather-title {
+  display: none;
+}
+
+.nav-weather .weather-info {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.48rem;
+}
+
+.nav-weather .weather-info img {
+  width: 20px;
+  height: 20px;
+}
+
+.nav-weather > p {
+  font-family: "Press Start 2P", cursive;
+  font-size: 0.45rem;
+  color: #0b3a86;
+  background: rgba(255, 255, 255, 0.85);
+  border: 3px solid rgba(11, 92, 51, 0.4);
+  border-radius: 999px;
+  padding: 3px 8px;
+  margin: 0;
+  white-space: nowrap;
+}
+
+#nav1{
   background-color: red;
   color: white;
 }
@@ -70,34 +128,101 @@
   color: white;
 }
 
+#nav-activities{
+  background-color: green;
+  color: white;
+}
+
 #nav-admin{
     color: white;
     background-color: purple;
 }
 
-
-@media screen and (max-width: 1400px){
-    .nav-bar{
-        width:1000px;
-        font-size: 10px;
-    }
-
-}
-
-@media screen and (max-width: 800px) {
-  .nav-bar {
-    width: 700px;
-    font-size: 7px;
+@media screen and (max-width: 1750px ) {
+  .nav-bar {   
+    font-size: 9.5px;
   }
   .activigo-title {
-    width: 70px;
-  }
-
-  .nav-link {
-    width: 80px;
+    width: 140px;
   }
 
   .nav-links {
-    gap: 13px;
+    gap: 14px;
+  }
+
+  .nav-weather{
+    margin-right:50px;
+  }
+
+}
+
+@media screen and (max-width: 1170px){
+
+  .navbar-container{
+    gap:5px;
+  }
+  .nav-bar {   
+    font-size: 7px;
+  }
+  .activigo-title {
+    width: 120px;
+  }
+
+  .nav-link {
+    width: fit-content;
+    height:15px;
+  
+  }
+  .nav-links {
+    gap: 5px;
+  }
+}
+
+@media screen and (max-width: 913px){
+
+  .menu-toggle{
+    display:block;
+    position:absolute;
+    top:0px;
+    left:0px;
+    background-color: burlywood;
+}
+
+  .nav-links{
+    display:none;
+    flex-direction: column;
+    top:70px;
+    left:0;
+    position: absolute;
+    width:195px;
+    height:300px;
+    align-items: center;
+    justify-content: center;
+    gap:12px;
+    font-size: 8px;
+    background-image: url("/IMG/woodenboard2.png");
+  }
+  .nav-link{
+    width:fit-content;
+  }
+
+  .nav-links.open{
+    display:flex;
+  }
+
+  .activigo-title{
+    width:140px;
+    margin-left:20px;
+  }
+
+  .nav-weather{
+    margin-right:10px;
+  }
+
+}
+
+@media screen and (max-width:400px){
+  .activigo-title{
+    width:120px;
   }
 }

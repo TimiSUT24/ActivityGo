@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using Application.Auth.DTO;         // RegisterDto, LoginDto, AuthResult, RefreshRequest (lägg till denna DTO)
 using Application.Auth.Interface;  // ITokenService
+using Application.Exceptions;
 using Domain.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -13,14 +14,12 @@ namespace Api.Controllers.Auth
     public class AuthController : ControllerBase
     {
         private readonly ITokenService _tokenService;
-        private readonly UserManager<User> _users;
-        private readonly SignInManager<User> _signIn;
+        private readonly IAuthService _authService;
 
-        public AuthController(ITokenService tokenService, UserManager<User> users, SignInManager<User> signIn)
+        public AuthController(ITokenService tokenService, IAuthService authService)
         {
             _tokenService = tokenService;
-            _users = users;
-            _signIn = signIn;
+            _authService = authService;
         }
 
         // === Helpers för refresh-cookie ===
@@ -30,67 +29,57 @@ namespace Api.Controllers.Auth
             {
                 HttpOnly = true,
                 Secure = true,
-                SameSite = SameSiteMode.Strict,
-                Expires = DateTimeOffset.UtcNow.AddDays(14) // matcha Jwt:RefreshDays
+                SameSite = SameSiteMode.None,
+                Expires = DateTimeOffset.UtcNow.AddDays(14), // matcha Jwt:RefreshDays
+                Path = "/"
             });
         }
 
-        private void ClearRefreshCookie() => Response.Cookies.Delete("refreshToken");
+        private void ClearRefreshCookie()
+        {
+            Response.Cookies.Delete("refreshToken", new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.None,
+                Path = "/"
+            });
+        }
 
         // === Register (skapar user + valfri default-roll) ===
         [HttpPost("register")]
         [AllowAnonymous] // Tillåter anonyma användare att komma åt denna endpoint
+        [ProducesResponseType(statusCode: 201)]
+        [ProducesResponseType(statusCode: 400)]
+        [ProducesResponseType(statusCode: 409)]
+        [ProducesResponseType(statusCode: 500)]
         public async Task<ActionResult<AuthResult>> Register([FromBody] RegisterDto dto, CancellationToken ct)
         {
-            // Finns användaren redan?
-            var existingUser = await _users.FindByEmailAsync(dto.Email);
-            if (existingUser is not null)
-                return Conflict(new { message = "User with this email already exists." });
-
-            var user = new User
-            {
-                Email = dto.Email,
-                Firstname = dto.Firstname,
-                Lastname = dto.Lastname,
-                UserName = dto.Email,
-                EmailConfirmed = true // dev: slipp mailflöde
-            };
-
-            var create = await _users.CreateAsync(user, dto.Password);
-            if (!create.Succeeded)
-                return BadRequest(create.Errors);
-
-            // Tilldela standardroll (seeda rollen 'User' vid uppstart)
-            await _users.AddToRoleAsync(user, "User");
-
-            // Skapa access + refresh, sätt cookie och returnera AuthResult (access token)
-            var (access, refresh) = await _tokenService.IssueTokensAsync(user, HttpContext.Connection.RemoteIpAddress?.ToString());
-            SetRefreshCookie(refresh);
-            return Ok(new AuthResult(access));
+            var register = await _authService.RegisterAsync(dto, ct);
+            SetRefreshCookie(register.RefreshToken); 
+            return CreatedAtAction(nameof(Register), new { id = register.Email }, register);
         }
 
         // === Login (returnerar JWT-token + sätter refresh-cookie) ===
         [HttpPost("login")]
         [AllowAnonymous]
+        [ProducesResponseType(statusCode: 200)]
+        [ProducesResponseType(statusCode: 401)]
+        [ProducesResponseType(statusCode: 500)]
         public async Task<ActionResult<AuthResult>> Login([FromBody] LoginDto dto, CancellationToken ct)
         {
-            var user = await _users.FindByEmailAsync(dto.Email);
-            if (user is null)
-                return Unauthorized(new { message = "Invalid email or password." });
-
-            // Viktigt: använd cookiesless variant för JWT
-            var result = await _signIn.CheckPasswordSignInAsync(user, dto.Password, lockoutOnFailure: false);
-            if (!result.Succeeded)
-                return Unauthorized(new { message = "Invalid email or password." });
-
-            var (access, refresh) = await _tokenService.IssueTokensAsync(user, HttpContext.Connection.RemoteIpAddress?.ToString());
-            SetRefreshCookie(refresh);
-            return Ok(new AuthResult(access));
+            var login = await _authService.LoginAsync(dto, ct);
+            SetRefreshCookie(login.RefreshToken);
+            return Ok(login);
         }
 
         // === Refresh (roterar refresh-token och ger ny access-token) ===
         [HttpPost("refresh")]
         [AllowAnonymous]
+        [ProducesResponseType(statusCode: 200)]
+        [ProducesResponseType(statusCode: 400)]
+        [ProducesResponseType(statusCode: 401)]
+        [ProducesResponseType(statusCode: 500)]
         public async Task<ActionResult<AuthResult>> Refresh([FromBody] RefreshRequest? body)
         {
             // Hämta från cookie i första hand, annars från body
@@ -103,7 +92,7 @@ namespace Api.Controllers.Auth
             {
                 var (access, newRefresh) = await _tokenService.RefreshAsync(presented, HttpContext.Connection.RemoteIpAddress?.ToString());
                 SetRefreshCookie(newRefresh); // rotation
-                return Ok(new AuthResult(access));
+                return Ok(new AuthResult(access,newRefresh));
             }
             catch
             {
@@ -115,12 +104,13 @@ namespace Api.Controllers.Auth
         // === Logout (revokerar alla refresh-tokens för användaren) ===
         [HttpPost("logout")]
         [Authorize]
-        public async Task<IActionResult> Logout()
+        [ProducesResponseType(statusCode: 204)]
+        [ProducesResponseType(statusCode: 400)]
+        [ProducesResponseType(statusCode: 500)]
+        public async Task<IActionResult> Logout(CancellationToken ct)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? User.FindFirst("sub")?.Value;
-            if (string.IsNullOrWhiteSpace(userId)) return Unauthorized();
-
-            await _tokenService.RevokeAllAsync(userId, HttpContext.Connection.RemoteIpAddress?.ToString());
+            await _authService.LogoutAsync(userId, ct);
             ClearRefreshCookie();
             return NoContent();
         }
@@ -128,10 +118,14 @@ namespace Api.Controllers.Auth
         // === Me (hämtar info om inloggad user) ===
         [HttpGet("me")]
         [Authorize]
+        [ProducesResponseType(statusCode:200)]
+        [ProducesResponseType(statusCode:500)]
         public ActionResult<object> Me()
         {
             var id = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? User.FindFirst("sub")?.Value;
             var email = User.FindFirstValue(ClaimTypes.Email);
+            var firstname = User.FindFirst("firstname")?.Value;
+            var lastname = User.FindFirst("lastname")?.Value;
             var displayName = User.FindFirst("displayName")?.Value;
             var roles = User.FindAll(ClaimTypes.Role).Select(r => r.Value).ToArray();
 
@@ -139,9 +133,42 @@ namespace Api.Controllers.Auth
             {
                 id,
                 email,
+                firstname,
+                lastname,
                 name = displayName,
                 roles
             });
+        }
+
+        // === Update own profile ===
+        [HttpPut("me/profile")]
+        [Authorize]
+        [ProducesResponseType(statusCode: 200)]
+        [ProducesResponseType(statusCode: 400)]
+        [ProducesResponseType(statusCode: 401)]
+        [ProducesResponseType(statusCode: 409)]
+        [ProducesResponseType(statusCode: 500)]
+        public async Task<ActionResult<AuthResult>> UpdateProfile([FromBody] UpdateProfileDto dto, CancellationToken ct)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? User.FindFirst("sub")?.Value!;
+            var res = await _authService.UpdateProfileAsync(userId, dto, ct);
+            SetRefreshCookie(res.RefreshToken);
+            return Ok(res);
+        }
+
+        // === Change own password ===
+        [HttpPut("me/password")]
+        [Authorize]
+        [ProducesResponseType(statusCode: 200)]
+        [ProducesResponseType(statusCode: 400)]
+        [ProducesResponseType(statusCode: 401)]
+        [ProducesResponseType(statusCode: 500)]
+        public async Task<ActionResult<AuthResult>> ChangePassword([FromBody] ChangePasswordDto dto, CancellationToken ct)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? User.FindFirst("sub")?.Value!;
+            var res = await _authService.ChangePasswordAsync(userId, dto, ct);
+            SetRefreshCookie(res.RefreshToken);
+            return Ok(res);
         }
     }
 }

@@ -14,14 +14,16 @@ public sealed class UnitOfWork : IUnitOfWork
     public IPlaceRepository Places { get; }
     public IUserRepository Users { get; }
     public IActivityOccurrenceRepository Occurrences { get; }
+    public ICategoryRepository Categories { get; }
     // ==============================
     public UnitOfWork(
         AppDbContext db
         , IActivityRepository activities
-         , IBookingRepository bookings
+        , IBookingRepository bookings
         , IPlaceRepository places
         , IUserRepository users
         , IActivityOccurrenceRepository occurrences
+        , ICategoryRepository categories
     )
     {
         _db = db;
@@ -30,7 +32,7 @@ public sealed class UnitOfWork : IUnitOfWork
         Places = places;
         Users = users;
         Occurrences = occurrences;
-
+        Categories = categories;
     }
 
     public Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)

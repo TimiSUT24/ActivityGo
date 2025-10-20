@@ -1,3 +1,4 @@
+using Api.Middleware;
 using Application.Activity.Interface;
 using Application.Activity.Mapper;
 using Application.Activity.Service;
@@ -13,6 +14,8 @@ using Application.Booking.Service;
 using Application.Place.Interface;
 using Application.Place.Mapper;
 using Application.Place.Service;
+using Application.Services.Interfaces;
+using Application.Services;
 using Application.Statistics.Interface;
 using Application.Statistics.Mapper;
 using Application.Statistics.Service;
@@ -41,6 +44,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
 using System.Threading.Tasks;
+using Infrastructure.BackgroundJobs;
 
 namespace Api
 {
@@ -59,6 +63,7 @@ namespace Api
             builder.Services.AddScoped<IStatisticsService, StatisticsService>();
             builder.Services.AddScoped<IWeatherService, WeatherService>();
             builder.Services.AddScoped<ITokenService, TokenService>();
+            builder.Services.AddScoped<ICategoryService, CategoryService>();
             //Fake Weather client for testing and development without API key
             builder.Services.AddSingleton<IWeatherClient, FakeWeatherClient>();
             //AutoMapper
@@ -130,6 +135,10 @@ namespace Api
             builder.Services.AddScoped<IPlaceRepository, PlaceRepository>();
             builder.Services.AddScoped<IUserRepository, UserRepository>();
             builder.Services.AddScoped<IActivityOccurrenceRepository, ActivityOccurrenceRepository>();
+            builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+
+            // === Hosted Service ===
+            builder.Services.AddHostedService<BookingStatusRefresher>();
 
 
             // ===  Validation ===   // Glöm inte att man bara behöver registrera detta en gång då den läser av alla Validators i Application.
@@ -198,8 +207,9 @@ namespace Api
             builder.Services.AddCors(options =>
             {
                 options.AddPolicy("AllowFrontend", policy =>
-                {                 
-                          policy.WithOrigins(allowedOrigins!)
+                {
+                        policy.WithOrigins(allowedOrigins!)
+                          .AllowCredentials()
                           .AllowAnyHeader()
                           .AllowAnyMethod();
                 });
@@ -229,7 +239,7 @@ namespace Api
                 }
 
             app.UseHttpsRedirection();
-
+            app.UseMiddleware<GlobalExceptionMiddleware>();
             // Viktigt: AuthN före AuthZ
             app.UseAuthentication();
             app.UseAuthorization();

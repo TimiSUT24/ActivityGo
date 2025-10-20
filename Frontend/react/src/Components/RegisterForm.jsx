@@ -32,7 +32,7 @@ export default function RegisterForm() {
         lastName: formData.lastname,
       });
 
-      if (res.status === 200 || res.status === 201) {
+      if (res.status === 201) {
         setMessage("Welcome to Mario Kingdom");
       } else {
         setMessage(`Registration completed (${res.status}).`);

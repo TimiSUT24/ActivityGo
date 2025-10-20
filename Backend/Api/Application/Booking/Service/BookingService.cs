@@ -44,15 +44,19 @@ public class BookingService : IBookingService
 
         // Kapacitet
         var capacity = occ.CapacityOverride ?? occ.Place.Capacity;
-        var bookedCount = await _uow.Bookings.CountActiveForOccurrenceAsync(occ.Id, ct);
-        if (bookedCount >= capacity)
-            throw new InvalidOperationException("Inga lediga platser kvar.");
+
+        var bookedSoFar = await _uow.Bookings.SumActivePeopleForOccurrenceAsync(occ.Id, ct);
+        if (bookedSoFar + dto.PeopleCount > capacity)
+        {
+            throw new InvalidOperationException("Det finns inte tillräckligt med lediga platser för det här tillfället.");
+        }
 
         // Skapa bokningen
         var entity = new Domain.Models.Booking
         {
             ActivityOccurrenceId = occ.Id,
             UserId = userId,
+            PeopleCount = dto.PeopleCount,
             Status = BookingStatus.Booked,
             BookedAtUtc = now
         };

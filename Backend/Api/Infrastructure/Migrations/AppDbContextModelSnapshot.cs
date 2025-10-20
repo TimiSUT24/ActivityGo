@@ -85,6 +85,9 @@ namespace Infrastructure.Migrations
                     b.Property<DateTime>("CreatedAtUtc")
                         .HasColumnType("datetime2");
 
+                    b.Property<int>("PeopleCount")
+                        .HasColumnType("int");
+
                     b.Property<byte[]>("RowVersion")
                         .IsConcurrencyToken()
                         .IsRequired()
@@ -104,7 +107,8 @@ namespace Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("ActivityOccurrenceId", "UserId")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasFilter("[Status] = 0");
 
                     b.HasIndex("UserId", "Status");
 

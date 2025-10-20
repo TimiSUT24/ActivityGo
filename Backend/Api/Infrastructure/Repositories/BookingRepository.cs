@@ -13,19 +13,35 @@ public class BookingRepository : GenericRepository<Booking>, IBookingRepository
     private readonly AppDbContext _db;
     public BookingRepository(AppDbContext db) : base(db) => _db = db;
 
+    // Denna metoden ska räkna ihop alla PeopleCount för aktiva (Booked) bokningar
+
+    public async Task<int> SumActivePeopleForOccurrenceAsync(Guid occurrenceId, CancellationToken ct)
+    {
+        return await _db.Bookings
+            .AsNoTracking()
+            .Where(b => b.ActivityOccurrenceId == occurrenceId && b.Status == BookingStatus.Booked)
+            .SumAsync(b => (int?)b.PeopleCount ?? 0, ct);
+    }
+
+    // Denna metoden ska räkna antalet aktiva (Booked) bokningar för ett givet tillfälle
+    // Kanske blir denna överflödig om vi har SumActivePeopleForOccurrenceAsync? Men kan användas för statistik?
     public async Task<int> CountActiveForOccurrenceAsync(Guid activityOccurrenceId, CancellationToken ct) =>
         await _db.Bookings.CountAsync(b =>
             b.ActivityOccurrenceId == activityOccurrenceId &&
             b.Status == BookingStatus.Booked, ct);
 
-    public async Task<bool> ExistsOverlapForUserAsync(string userId, DateTime startUtc, DateTime endUtc, CancellationToken ct) =>
-        await _db.Bookings
+
+    public async Task<bool> ExistsOverlapForUserAsync(string userId, DateTime startUtc, DateTime endUtc, CancellationToken ct)
+    {
+        return await _db.Bookings
             .AsNoTracking()
-            .AnyAsync(b =>
-                b.UserId == userId &&
-                b.Status == BookingStatus.Booked &&
-                b.ActivityOccurrence.StartUtc < endUtc &&
-                b.ActivityOccurrence.EndUtc > startUtc, ct);
+            .Where(b => b.UserId == userId && b.Status == BookingStatus.Booked)
+            .Join(_db.ActivityOccurrences,
+                  b => b.ActivityOccurrenceId,
+                  o => o.Id,
+                  (b, o) => new { o.StartUtc, o.EndUtc })
+            .AnyAsync(x => x.StartUtc < endUtc && x.EndUtc > startUtc, ct);
+    }
 
     public async Task<IEnumerable<Booking>> GetByUserAsync(string userId, CancellationToken ct) =>
         await _db.Bookings
@@ -83,60 +99,100 @@ public Task<decimal> SumRevenueCompletedInRangeAsync(DateTime fromUtc, DateTime 
         .Select(b => b.ActivityOccurrence.PriceOverride ?? b.ActivityOccurrence.Activity.Price)
         .SumAsync(ct);
 
-public async Task<IEnumerable<CountBucket>> GetBookingsPerDayAsync(DateTime fromUtc, DateTime toUtc, CancellationToken ct)
-    => await _db.Bookings.AsNoTracking()
-        .Include(b => b.ActivityOccurrence)
-        .Where(b => b.ActivityOccurrence.StartUtc >= fromUtc && b.ActivityOccurrence.StartUtc < toUtc)
-        .GroupBy(b => b.ActivityOccurrence.StartUtc.Date)
-        .Select(g => new CountBucket(g.Key, g.Count()))
-        .OrderBy(x => x.Bucket)
-        .ToListAsync(ct);
+    public async Task<IEnumerable<CountBucket>> GetBookingsPerDayAsync(
+    DateTime fromUtc, DateTime toUtc, CancellationToken ct)
+    {
+        var rows = await _db.Bookings
+            .AsNoTracking()
+            .Where(b => b.ActivityOccurrence.StartUtc >= fromUtc &&
+                        b.ActivityOccurrence.StartUtc < toUtc)
+            .GroupBy(b => EF.Functions.DateDiffDay(DateTime.UnixEpoch, b.ActivityOccurrence.StartUtc))
+            .Select(g => new { BucketKey = g.Key, Count = g.Count() })   // <-- inga custom typer här
+            .OrderBy(x => x.BucketKey)
+            .ToListAsync(ct);
 
-public async Task<IEnumerable<RevenueBucket>> GetRevenuePerDayAsync(DateTime fromUtc, DateTime toUtc, CancellationToken ct)
-    => await _db.Bookings.AsNoTracking()
-        .Include(b => b.ActivityOccurrence).ThenInclude(o => o.Activity)
-        .Where(b => b.ActivityOccurrence.StartUtc >= fromUtc && b.ActivityOccurrence.StartUtc < toUtc)
-        .Where(b => b.Status == BookingStatus.Completed)
-        .GroupBy(b => b.ActivityOccurrence.StartUtc.Date)
-        .Select(g => new RevenueBucket(
-            g.Key,
-            g.Sum(b => b.ActivityOccurrence.PriceOverride ?? b.ActivityOccurrence.Activity.Price)
-        ))
-        .OrderBy(x => x.Bucket)
-        .ToListAsync(ct);
+        return rows.Select(x =>
+            new CountBucket(DateTime.UnixEpoch.AddDays(x.BucketKey), x.Count));
+    }
 
-public async Task<IEnumerable<TopItem>> GetTopActivitiesAsync(DateTime fromUtc, DateTime toUtc, int take, CancellationToken ct)
-    => await _db.Bookings.AsNoTracking()
-        .Include(b => b.ActivityOccurrence).ThenInclude(o => o.Activity)
-        .Where(b => b.ActivityOccurrence.StartUtc >= fromUtc && b.ActivityOccurrence.StartUtc < toUtc)
-        .GroupBy(b => new { b.ActivityOccurrence.ActivityId, b.ActivityOccurrence.Activity.Name })
-        .Select(g => new TopItem(g.Key.ActivityId, g.Key.Name, g.Count()))
-        .OrderByDescending(x => x.Count)
-        .Take(take)
-        .ToListAsync(ct);
 
-public async Task<IEnumerable<TopItem>> GetTopPlacesAsync(DateTime fromUtc, DateTime toUtc, int take, CancellationToken ct)
-    => await _db.Bookings.AsNoTracking()
-        .Include(b => b.ActivityOccurrence).ThenInclude(o => o.Place)
-        .Where(b => b.ActivityOccurrence.StartUtc >= fromUtc && b.ActivityOccurrence.StartUtc < toUtc)
-        .GroupBy(b => new { b.ActivityOccurrence.PlaceId, b.ActivityOccurrence.Place.Name })
-        .Select(g => new TopItem(g.Key.PlaceId, g.Key.Name, g.Count()))
-        .OrderByDescending(x => x.Count)
-        .Take(take)
-        .ToListAsync(ct);
 
-public async Task<IEnumerable<TopItem>> GetByCategoryAsync(DateTime fromUtc, DateTime toUtc, CancellationToken ct)
-    => await _db.Bookings.AsNoTracking()
-        .Include(b => b.ActivityOccurrence).ThenInclude(o => o.Activity).ThenInclude(a => a.Category)
-        .Where(b => b.ActivityOccurrence.StartUtc >= fromUtc && b.ActivityOccurrence.StartUtc < toUtc)
-        .GroupBy(b => new
-        {
-            b.ActivityOccurrence.Activity.CategoryId,
-            CategoryName = b.ActivityOccurrence.Activity.Category != null
-                ? b.ActivityOccurrence.Activity.Category.Name
-                : "(Okänd kategori)"
-        })
-        .Select(g => new TopItem(g.Key.CategoryId ?? Guid.Empty, g.Key.CategoryName, g.Count()))
-        .OrderByDescending(x => x.Count)
-        .ToListAsync(ct);
+    public async Task<IEnumerable<RevenueBucket>> GetRevenuePerDayAsync(
+    DateTime fromUtc, DateTime toUtc, CancellationToken ct)
+    {
+        var rows = await _db.Bookings
+            .AsNoTracking()
+            .Where(b => b.ActivityOccurrence.StartUtc >= fromUtc &&
+                        b.ActivityOccurrence.StartUtc < toUtc)
+            .Where(b => b.Status == BookingStatus.Completed)
+            .GroupBy(b => EF.Functions.DateDiffDay(DateTime.UnixEpoch, b.ActivityOccurrence.StartUtc))
+            .Select(g => new {
+                BucketKey = g.Key,
+                Revenue = g.Sum(b => b.ActivityOccurrence.PriceOverride
+                                   ?? b.ActivityOccurrence.Activity.Price)
+            })
+            .OrderBy(x => x.BucketKey)
+            .ToListAsync(ct);
+
+        return rows.Select(x =>
+            new RevenueBucket(DateTime.UnixEpoch.AddDays(x.BucketKey), x.Revenue));
+    }
+
+
+    public async Task<IEnumerable<TopItem>> GetTopActivitiesAsync(
+    DateTime fromUtc, DateTime toUtc, int take, CancellationToken ct)
+    {
+        var rows = await _db.Bookings
+            .AsNoTracking()
+            .Where(b => b.ActivityOccurrence.StartUtc >= fromUtc &&
+                        b.ActivityOccurrence.StartUtc < toUtc)
+            .GroupBy(b => new { b.ActivityOccurrence.ActivityId, b.ActivityOccurrence.Activity.Name })
+            .Select(g => new { g.Key.ActivityId, g.Key.Name, Count = g.Count() })
+            .OrderByDescending(x => x.Count)
+            .Take(take)
+            .ToListAsync(ct);
+
+        return rows.Select(x => new TopItem(x.ActivityId, x.Name, x.Count));
+    }
+
+
+    public async Task<IEnumerable<TopItem>> GetTopPlacesAsync(
+    DateTime fromUtc, DateTime toUtc, int take, CancellationToken ct)
+    {
+        var rows = await _db.Bookings
+            .AsNoTracking()
+            .Where(b => b.ActivityOccurrence.StartUtc >= fromUtc &&
+                        b.ActivityOccurrence.StartUtc < toUtc)
+            .GroupBy(b => new { b.ActivityOccurrence.PlaceId, b.ActivityOccurrence.Place.Name })
+            .Select(g => new { g.Key.PlaceId, g.Key.Name, Count = g.Count() })
+            .OrderByDescending(x => x.Count)
+            .Take(take)
+            .ToListAsync(ct);
+
+        return rows.Select(x => new TopItem(x.PlaceId, x.Name, x.Count));
+    }
+
+
+    public async Task<IEnumerable<TopItem>> GetByCategoryAsync(
+    DateTime fromUtc, DateTime toUtc, CancellationToken ct)
+    {
+        var rows = await _db.Bookings
+            .AsNoTracking()
+            .Where(b => b.ActivityOccurrence.StartUtc >= fromUtc &&
+                        b.ActivityOccurrence.StartUtc < toUtc)
+            .GroupBy(b => new {
+                b.ActivityOccurrence.Activity.CategoryId,
+                CategoryName = b.ActivityOccurrence.Activity.Category != null
+                    ? b.ActivityOccurrence.Activity.Category.Name
+                    : "(Okänd kategori)"
+            })
+            .Select(g => new { CategoryId = g.Key.CategoryId ?? Guid.Empty, g.Key.CategoryName, Count = g.Count() })
+            .OrderByDescending(x => x.Count)
+            .ToListAsync(ct);
+
+        return rows.Select(x => new TopItem(x.CategoryId, x.CategoryName, x.Count));
+    }
+
+
+
 }

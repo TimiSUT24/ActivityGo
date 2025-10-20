@@ -1,4 +1,3 @@
-// src/Pages/AdminPage.jsx
 import React, { useEffect, useMemo, useState } from "react";
 import api from "../lib/api";
 import { useAuth } from "../context/AuthContext";
@@ -80,9 +79,9 @@ const baseStyles = {
     marginBottom: 18,
   },
   grid: { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 12 },
-  row: { display: "flex", gap: 12 },
+  row: { display: "flex", gap: 12},
   input: {
-    width: "100%",
+    width: "92%",
     padding: "10px 12px",
     borderRadius: 8,
     border: "3px solid #ffd166",
@@ -90,6 +89,7 @@ const baseStyles = {
     color: "#fff",
     fontSize: 13,
     boxShadow: "inset 0 4px 0 rgba(0,0,0,0.3)",
+    marginBottom: "10px",
   },
   label: { display: "block", marginBottom: 6, fontSize: 12, textTransform: "uppercase", color: "#ffef9f" },
   small: { fontSize: 11, color: "#ffef9f" },
@@ -113,7 +113,7 @@ const baseStyles = {
     cursor: "pointer",
     fontWeight: "bold",
   },
-  table: { width: "100%", borderCollapse: "separate", borderSpacing: "0 8px" },
+  table: { width: "100%", borderCollapse: "separate", borderSpacing: "0 8px"},
   th: { textAlign: "left", fontSize: 12, color: "#ffef9f", padding: "6px 8px" },
   td: { padding: "10px 8px", background: "#0b1b36", border: "2px solid #20345f", fontSize: 12 },
   right: { textAlign: "right" },
@@ -121,6 +121,18 @@ const baseStyles = {
 
 const fmtDate = (iso) =>
   iso ? new Intl.DateTimeFormat("sv-SE", { dateStyle: "medium", timeStyle: "short" }).format(new Date(iso)) : "";
+
+const toMap = (arr, key = "id", val = "name") =>
+  Object.fromEntries((arr || []).map(x => [x[key], x[val]]));
+
+const Select = ({ value, onChange, options, placeholder = "— Välj —" }) => (
+  <select style={baseStyles.input} value={value ?? ""} onChange={e => onChange(e.target.value || "")}>
+    <option value="">{placeholder}</option>
+    {options.map(o => (
+      <option key={o.value} value={o.value}>{o.label}</option>
+    ))}
+  </select>
+);
 
 // ---- ÖVERSIKT ----
 function Overview() {
@@ -157,7 +169,7 @@ function Overview() {
   return (
     <div style={baseStyles.section}>
       <h3 style={{ marginTop: 0 }}>Översikt</h3>
-      <div style={baseStyles.row}>
+      <div className ="row" style={baseStyles.row}>
         <div style={{ flex: 1 }}>
           <label style={baseStyles.label}>Från</label>
           <input type="date" value={from} onChange={(e) => setFrom(e.target.value)} style={baseStyles.input} />
@@ -186,7 +198,8 @@ function Overview() {
             <StatCard label="Slutförda" value={`${summary.completionRatePercent?.toFixed?.(1)}%`} />
           </div>
 
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginTop: 16 }}>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: 12, marginTop: 16 }}>
+            <div className ="row" style={baseStyles.row}>
             <div style={baseStyles.section}>
               <h4 style={{ marginTop: 0 }}>Toppaktiviteter</h4>
               <table style={baseStyles.table}>
@@ -195,7 +208,7 @@ function Overview() {
                     <th style={baseStyles.th}>Namn</th>
                     <th style={{ ...baseStyles.th, ...baseStyles.right }}>Antal</th>
                   </tr>
-                </thead>
+                </thead>              
                 <tbody>
                   {topActs.map((x) => (
                     <tr key={x.id}>
@@ -203,7 +216,7 @@ function Overview() {
                       <td style={{ ...baseStyles.td, ...baseStyles.right }}>{x.count}</td>
                     </tr>
                   ))}
-                </tbody>
+                </tbody>           
               </table>
             </div>
             <div style={baseStyles.section}>
@@ -225,6 +238,7 @@ function Overview() {
                 </tbody>
               </table>
             </div>
+            </div>
           </div>
         </>
       )}
@@ -245,7 +259,19 @@ function Activities() {
   const { ready } = useAuth();
   const [items, setItems] = useState([]);
   const [err, setErr] = useState("");
-  const [form, setForm] = useState({
+
+  // 👇 Nya states för kategorier (till select)
+  const [categories, setCategories] = useState([]);
+  const categoryOptions = useMemo(
+    () => categories.map(c => ({
+      value: c.id,
+      label: c.name + (c.isActive ? "" : " (inaktiv)")
+    })),
+    [categories]
+  );
+  const categoryNameById = useMemo(() => toMap(categories, "id", "name"), [categories]);
+
+  const emptyForm = {
     name: "",
     description: "",
     categoryId: "",
@@ -254,41 +280,36 @@ function Activities() {
     imageUrl: "",
     environment: 0,
     isActive: true,
-  });
+  };
+  const [form, setForm] = useState(emptyForm);
   const [editing, setEditing] = useState(null);
 
   async function load() {
     setErr("");
     try {
-      const { data } = await api.get(`/api/Activity?includeInactive=true`);
-      setItems(data || []);
+      const [acts, cats] = await Promise.all([
+        api.get(`/api/Activity?includeInactive=true`),
+        api.get(`/api/Category`) // ändra till din ev. "onlyActive" om du vill filtrera
+      ]);
+      setItems(acts.data || []);
+      setCategories(cats.data || []);
     } catch (e) {
       setErr(e?.response?.data?.detail || e.message);
     }
   }
-  useEffect(() => {
-    if (ready) load();
-  }, [ready]);
+  useEffect(() => { if (ready) load(); }, [ready]);
 
   async function save() {
     setErr("");
     try {
+      const payload = { ...form, categoryId: form.categoryId || null };
       if (editing) {
-        await api.put(`/api/Activity/${editing.id}`, form);
+        await api.put(`/api/Activity/${editing.id}`, payload);
       } else {
-        const { data: created } = await api.post(`/api/Activity`, form);
+        const { data: created } = await api.post(`/api/Activity`, payload);
         setEditing(created);
       }
-      setForm({
-        name: "",
-        description: "",
-        categoryId: "",
-        defaultDurationMinutes: 60,
-        price: 0,
-        imageUrl: "",
-        environment: 0,
-        isActive: true,
-      });
+      setForm(emptyForm);
       setEditing(null);
       await load();
     } catch (e) {
@@ -325,16 +346,17 @@ function Activities() {
       {err && <div style={baseStyles.error}>{err}</div>}
 
       <div style={{ ...baseStyles.section, background: "#0b1b36" }}>
-        <div style={baseStyles.row}>
+        <div className ="row" style={baseStyles.row}>
           <Field label="Namn">
             <input style={baseStyles.input} value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
           </Field>
-          <Field label="KategoriId">
-            <input
-              style={baseStyles.input}
+          <Field label="Kategori">
+            {/* 👇 Dropdown med namn */}
+            <Select
               value={form.categoryId}
-              onChange={(e) => setForm({ ...form, categoryId: e.target.value })}
-              placeholder="uuid eller tom"
+              onChange={(val) => setForm({ ...form, categoryId: val })}
+              options={categoryOptions}
+              placeholder="— Välj kategori —"
             />
           </Field>
         </div>
@@ -343,7 +365,7 @@ function Activities() {
             <input style={baseStyles.input} value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />
           </Field>
         </div>
-        <div style={baseStyles.row}>
+        <div className ="row" style={baseStyles.row}>
           <Field label="Standardlängd (min)">
             <input
               type="number"
@@ -364,7 +386,7 @@ function Activities() {
             />
           </Field>
         </div>
-        <div style={baseStyles.row}>
+        <div className ="row" style={baseStyles.row}>
           <Field label="Bild-URL">
             <input style={baseStyles.input} value={form.imageUrl} onChange={(e) => setForm({ ...form, imageUrl: e.target.value })} />
           </Field>
@@ -389,16 +411,7 @@ function Activities() {
               style={baseStyles.ghost}
               onClick={() => {
                 setEditing(null);
-                setForm({
-                  name: "",
-                  description: "",
-                  categoryId: "",
-                  defaultDurationMinutes: 60,
-                  price: 0,
-                  imageUrl: "",
-                  environment: 0,
-                  isActive: true,
-                });
+                setForm(emptyForm);
               }}
             >
               Avbryt
@@ -407,6 +420,7 @@ function Activities() {
         </div>
       </div>
 
+      <div style={{ maxHeight: 300, overflowY: "auto"}}>
       <table style={baseStyles.table}>
         <thead>
           <tr>
@@ -422,27 +436,25 @@ function Activities() {
           {items.map((x) => (
             <tr key={x.id}>
               <td style={baseStyles.td}>{x.name}</td>
-              <td style={baseStyles.td}>{x.categoryName || x.categoryId || "-"}</td>
+              <td style={baseStyles.td}>{x.categoryName || categoryNameById[x.categoryId] || x.categoryId || "-"}</td>
               <td style={baseStyles.td}>{x.defaultDurationMinutes} min</td>
               <td style={baseStyles.td}>{x.price} kr</td>
               <td style={baseStyles.td}>
                 {x.environment === 1 ? "Utomhus" : "Inomhus"} {x.isActive ? "" : "· (inaktiv)"}
               </td>
               <td style={{ ...baseStyles.td, ...baseStyles.right }}>
-                <button style={baseStyles.ghost} onClick={() => edit(x)}>
-                  Redigera
-                </button>{" "}
-                <button style={baseStyles.danger} onClick={() => remove(x.id)}>
-                  Ta bort
-                </button>
+                <button style={baseStyles.ghost} onClick={() => edit(x)}>Redigera</button>{" "}
+                <button style={baseStyles.danger} onClick={() => remove(x.id)}>Ta bort</button>
               </td>
             </tr>
           ))}
         </tbody>
       </table>
+      </div>
     </div>
   );
 }
+
 
 // ---- PLATSER (CRUD + aktivering) ----
 function Places() {
@@ -529,7 +541,7 @@ function Places() {
       {err && <div style={baseStyles.error}>{err}</div>}
 
       <div style={{ ...baseStyles.section, background: "#0b1b36" }}>
-        <div style={baseStyles.row}>
+        <div className ="row" style={baseStyles.row}>
           <Field label="Namn">
             <input style={baseStyles.input} value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
           </Field>
@@ -557,7 +569,7 @@ function Places() {
             <input style={baseStyles.input} value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} />
           </Field>
         </div>
-        <div style={baseStyles.row}>
+        <div className ="row" style={baseStyles.row}>
           <Field label="Lat">
             <input style={baseStyles.input} value={form.latitude} onChange={(e) => setForm({ ...form, latitude: e.target.value })} />
           </Field>
@@ -586,6 +598,7 @@ function Places() {
         </div>
       </div>
 
+      <div style={{ maxHeight: 300, overflowY: "auto"}}>
       <table style={baseStyles.table}>
         <thead>
           <tr>
@@ -618,15 +631,220 @@ function Places() {
           ))}
         </tbody>
       </table>
+      </div>
     </div>
   );
 }
+
+// ---- KATEGORIER (CRUD + aktivering/deaktivering) ----
+function Categories() {
+  const { ready } = useAuth();
+  const [items, setItems] = useState([]);
+  const [err, setErr] = useState("");
+
+  const empty = { name: "", description: "", isActive: true };
+  const [form, setForm] = useState(empty);
+  const [editing, setEditing] = useState(null);
+
+  function pickErr(e) {
+    // Plocka ut vettigt felmeddelande oavsett backend-format
+    return (
+      e?.response?.data?.detail ||
+      e?.response?.data?.message ||
+      (Array.isArray(e?.response?.data?.errors) && e.response.data.errors.map(x => x.errorMessage || x).join(", ")) ||
+      e?.message ||
+      "Något gick fel"
+    );
+  }
+
+  async function load() {
+    setErr("");
+    try {
+      const { data } = await api.get(`/api/Category`);
+      setItems(data || []);
+    } catch (e) {
+      setErr(pickErr(e));
+    }
+  }
+
+  useEffect(() => {
+    if (ready) load();
+  }, [ready]);
+
+  async function save() {
+    setErr("");
+    try {
+      if (editing) {
+        // Update – alla fält är optional i UpdateDto men vi skickar med aktuella
+        await api.put(`/api/Category/${editing.id}`, {
+          name: form.name,
+          description: form.description,
+          isActive: form.isActive,
+        });
+      } else {
+        // Create – CreateDto: name + description
+        await api.post(`/api/Category`, {
+          name: form.name,
+          description: form.description,
+        });
+      }
+      setForm(empty);
+      setEditing(null);
+      await load();
+    } catch (e) {
+      setErr(pickErr(e));
+    }
+  }
+
+  function edit(c) {
+    setEditing(c);
+    setForm({
+      name: c.name || "",
+      description: c.description || "",
+      isActive: c.isActive ?? true,
+    });
+  }
+
+  async function remove(id) {
+    if (!confirm("Ta bort kategori?")) return;
+    setErr("");
+    try {
+      await api.delete(`/api/Category/${id}`);
+      await load();
+    } catch (e) {
+      setErr(pickErr(e));
+    }
+  }
+
+  async function toggleActive(c) {
+  setErr("");
+  try {
+    await api.patch(`/api/Category/${c.id}/active/${(!c.isActive).toString()}`);
+    await load();
+  } catch (e) {
+    setErr(pickErr(e));
+  }
+}
+
+  return (
+    <div style={baseStyles.section}>
+      <h3 style={{ marginTop: 0 }}>Kategorier</h3>
+      {err && <div style={baseStyles.error}>{err}</div>}
+
+      <div style={{ ...baseStyles.section, background: "#0b1b36" }}>
+        <div className ="row" style={baseStyles.row}>
+          <Field label="Namn">
+            <input
+              style={baseStyles.input}
+              value={form.name}
+              onChange={(e) => setForm({ ...form, name: e.target.value })}
+              placeholder="t.ex. Padel"
+            />
+          </Field>
+          <Field label="Aktiv?">
+            <select
+              style={baseStyles.input}
+              value={String(form.isActive)}
+              onChange={(e) => setForm({ ...form, isActive: e.target.value === "true" })}
+              disabled={!editing} // vid create styrs isActive i backend (default true)
+            >
+              <option value="true">Ja</option>
+              <option value="false">Nej</option>
+            </select>
+          </Field>
+        </div>
+        <div style={baseStyles.row}>
+          <Field label="Beskrivning">
+            <input
+              style={baseStyles.input}
+              value={form.description}
+              onChange={(e) => setForm({ ...form, description: e.target.value })}
+              placeholder="valfritt"
+            />
+          </Field>
+        </div>
+
+        <div style={{ display: "flex", gap: 10, marginTop: 10 }}>
+          <button style={baseStyles.button} onClick={save}>
+            {editing ? "Spara ändringar" : "Skapa kategori"}
+          </button>
+          {editing && (
+            <button
+              style={baseStyles.ghost}
+              onClick={() => {
+                setEditing(null);
+                setForm(empty);
+              }}
+            >
+              Avbryt
+            </button>
+          )}
+        </div>
+      </div>
+      
+      <div style={{ maxHeight: 300, overflowY: "auto"}}>
+      <table style={baseStyles.table}>
+        <thead>
+          <tr>
+            <th style={baseStyles.th}>Namn</th>
+            <th style={baseStyles.th}>Beskrivning</th>
+            <th style={baseStyles.th}>Status</th>
+            <th style={{ ...baseStyles.th, ...baseStyles.right }}>Åtgärder</th>
+          </tr>
+        </thead>
+        <tbody>
+          {items.map((c) => (
+            <tr key={c.id}>
+              <td style={baseStyles.td}>{c.name}</td>
+              <td style={baseStyles.td}>{c.description || "-"}</td>
+              <td style={baseStyles.td}>{c.isActive ? "Aktiv" : "Inaktiv"}</td>
+              <td style={{ ...baseStyles.td, ...baseStyles.right }}>
+                <button style={baseStyles.ghost} onClick={() => edit(c)}>
+                  Redigera
+                </button>{" "}
+                <button style={baseStyles.button} onClick={() => toggleActive(c)}>
+                  {c.isActive ? "Inaktivera" : "Aktivera"}
+                </button>{" "}
+                <button style={baseStyles.danger} onClick={() => remove(c.id)}>
+                  Ta bort
+                </button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      </div>
+    </div>
+  );
+}
+
 
 // ---- TILLFÄLLEN (CRUD) ----
 function Occurrences() {
   const { ready } = useAuth();
   const [items, setItems] = useState([]);
   const [err, setErr] = useState("");
+
+  // 👇 Nya listor för select + tabell-lookup
+  const [activities, setActivities] = useState([]);
+  const [places, setPlaces] = useState([]);
+
+  const activityOptions = useMemo(
+    () => activities.map(a => ({
+      value: a.id,
+      label: a.name + (a.isActive ? "" : " (inaktiv)")
+    })), [activities]
+  );
+  const placeOptions = useMemo(
+    () => places.map(p => ({
+      value: p.id,
+      label: p.name + (p.isActive ? "" : " (inaktiv)")
+    })), [places]
+  );
+
+  const activityNameById = useMemo(() => toMap(activities, "id", "name"), [activities]);
+  const placeNameById    = useMemo(() => toMap(places, "id", "name"), [places]);
+
   const [form, setForm] = useState({
     id: "",
     activityId: "",
@@ -641,24 +859,28 @@ function Occurrences() {
   async function load() {
     setErr("");
     try {
-      const { data } = await api.get(`/api/ActivityOccurrence`);
-      setItems(data || []);
+      const [occ, acts, pls] = await Promise.all([
+        api.get(`/api/ActivityOccurrence`),
+        api.get(`/api/Activity?includeInactive=true`),
+        api.get(`/api/Place`)
+      ]);
+      setItems(occ.data || []);
+      setActivities(acts.data || []);
+      setPlaces(pls.data || []);
     } catch (e) {
       setErr(e?.response?.data?.detail || e.message);
     }
   }
-  useEffect(() => {
-    if (ready) load();
-  }, [ready]);
+  useEffect(() => { if (ready) load(); }, [ready]);
 
   async function save() {
     setErr("");
     try {
       const payload = {
-        activityId: form.activityId,
+        activityId: form.activityId || null,
+        placeId: form.placeId || null,
         startUtc: form.startUtc ? new Date(form.startUtc).toISOString() : null,
         endUtc: form.endUtc ? new Date(form.endUtc).toISOString() : null,
-        placeId: form.placeId,
         capacityOverride: form.capacityOverride === "" ? null : +form.capacityOverride,
         priceOverride: form.priceOverride === "" ? null : +form.priceOverride,
       };
@@ -678,8 +900,8 @@ function Occurrences() {
     setEditing(true);
     setForm({
       id: o.id,
-      activityId: o.activityId,
-      placeId: o.placeId,
+      activityId: o.activityId || "",
+      placeId: o.placeId || "",
       startUtc: o.startUtc ? new Date(o.startUtc).toISOString().slice(0, 16) : "",
       endUtc: o.endUtc ? new Date(o.endUtc).toISOString().slice(0, 16) : "",
       capacityOverride: o.capacityOverride ?? "",
@@ -703,15 +925,27 @@ function Occurrences() {
       {err && <div style={baseStyles.error}>{err}</div>}
 
       <div style={{ ...baseStyles.section, background: "#0b1b36" }}>
-        <div style={baseStyles.row}>
-          <Field label="ActivityId (uuid)">
-            <input style={baseStyles.input} value={form.activityId} onChange={(e) => setForm({ ...form, activityId: e.target.value })} />
+        <div className="row"style={baseStyles.row}>
+          <Field label="Aktivitet">
+            {/* 👇 Dropdown med aktivitetsnamn */}
+            <Select
+              value={form.activityId}
+              onChange={(val) => setForm({ ...form, activityId: val })}
+              options={activityOptions}
+              placeholder="— Välj aktivitet —"
+            />
           </Field>
-          <Field label="PlaceId (uuid)">
-            <input style={baseStyles.input} value={form.placeId} onChange={(e) => setForm({ ...form, placeId: e.target.value })} />
+          <Field label="Plats">
+            {/* 👇 Dropdown med platsnamn */}
+            <Select
+              value={form.placeId}
+              onChange={(val) => setForm({ ...form, placeId: val })}
+              options={placeOptions}
+              placeholder="— Välj plats —"
+            />
           </Field>
         </div>
-        <div style={baseStyles.row}>
+        <div className ="row" style={baseStyles.row}>
           <Field label="Start (lokal)">
             <input
               type="datetime-local"
@@ -721,10 +955,15 @@ function Occurrences() {
             />
           </Field>
           <Field label="Slut (lokal)">
-            <input type="datetime-local" style={baseStyles.input} value={form.endUtc} onChange={(e) => setForm({ ...form, endUtc: e.target.value })} />
+            <input
+              type="datetime-local"
+              style={baseStyles.input}
+              value={form.endUtc}
+              onChange={(e) => setForm({ ...form, endUtc: e.target.value })}
+            />
           </Field>
         </div>
-        <div style={baseStyles.row}>
+        <div className ="row" style={baseStyles.row}>
           <Field label="Capacity override">
             <input
               type="number"
@@ -759,12 +998,12 @@ function Occurrences() {
           )}
         </div>
       </div>
-
+      <div style={{ maxHeight: 300, overflowY: "auto"}}>
       <table style={baseStyles.table}>
         <thead>
           <tr>
-            <th style={baseStyles.th}>ActivityId</th>
-            <th style={baseStyles.th}>PlaceId</th>
+            <th style={baseStyles.th}>Aktivitet</th>
+            <th style={baseStyles.th}>Plats</th>
             <th style={baseStyles.th}>Start</th>
             <th style={baseStyles.th}>Slut</th>
             <th style={baseStyles.th}>Cap (eff)</th>
@@ -774,8 +1013,8 @@ function Occurrences() {
         <tbody>
           {items.map((o) => (
             <tr key={o.id}>
-              <td style={baseStyles.td}>{o.activityId}</td>
-              <td style={baseStyles.td}>{o.placeId}</td>
+              <td style={baseStyles.td}>{activityNameById[o.activityId] || o.activityName || o.activityId}</td>
+              <td style={baseStyles.td}>{placeNameById[o.placeId] || o.placeName || o.placeId}</td>
               <td style={baseStyles.td}>{fmtDate(o.startUtc)}</td>
               <td style={baseStyles.td}>{fmtDate(o.endUtc)}</td>
               <td style={baseStyles.td}>
@@ -783,20 +1022,18 @@ function Occurrences() {
                 {o.capacityOverride ? ` (override ${o.capacityOverride})` : ""}
               </td>
               <td style={{ ...baseStyles.td, ...baseStyles.right }}>
-                <button style={baseStyles.ghost} onClick={() => edit(o)}>
-                  Redigera
-                </button>{" "}
-                <button style={baseStyles.danger} onClick={() => remove(o.id)}>
-                  Ta bort
-                </button>
+                <button style={baseStyles.ghost} onClick={() => edit(o)}>Redigera</button>{" "}
+                <button style={baseStyles.danger} onClick={() => remove(o.id)}>Ta bort</button>
               </td>
             </tr>
           ))}
         </tbody>
       </table>
+      </div>
     </div>
   );
 }
+
 
 function Field({ label, children }) {
   return (
@@ -814,6 +1051,7 @@ export default function AdminPage() {
       { k: "overview", t: "Översikt" },
       { k: "activities", t: "Aktiviteter" },
       { k: "places", t: "Platser" },
+      { k: "categories", t: "Kategorier" },
       { k: "occ", t: "Tillfällen" },
     ],
     []
@@ -821,22 +1059,44 @@ export default function AdminPage() {
   const [tab, setTab] = useState("overview");
 
   return (
-    <div style={baseStyles.wrap}>
-      <div style={baseStyles.badge}>Admin</div>
-      <h2 style={baseStyles.title}>Adminpanel</h2>
+    <div>
+      <style>
+      {`
+        @media (max-width: 505px) {
+          .tabs {
+            grid-template-columns: repeat(2, 1fr) !important;
+          }
+        }
 
-      <div style={baseStyles.tabs}>
-        {tabs.map((x) => (
-          <button key={x.k} style={baseStyles.tab(tab === x.k)} onClick={() => setTab(x.k)}>
-            {x.t}
-          </button>
-        ))}
+        @media (max-width: 669px) {
+      .row {
+      display: flex !important;
+      flex-direction: column !important;
+      gap: 10px !important;
+    }
+  }
+      `}
+    </style>
+    
+      <div style={baseStyles.wrap}>
+        <div style={baseStyles.badge}>Admin</div>
+        <h2 style={baseStyles.title}>Adminpanel</h2>
+
+        <div className="tabs" style={baseStyles.tabs}>
+          {tabs.map((x) => (
+            <button key={x.k} style={baseStyles.tab(tab === x.k)} onClick={() => setTab(x.k)}>
+              {x.t}
+            </button>
+          ))}
+        </div>
+
+        {tab === "overview" && <Overview />}
+        {tab === "activities" && <Activities />}
+        {tab === "places" && <Places />}
+        {tab === "categories" && <Categories />}
+        {tab === "occ" && <Occurrences />}
       </div>
-
-      {tab === "overview" && <Overview />}
-      {tab === "activities" && <Activities />}
-      {tab === "places" && <Places />}
-      {tab === "occ" && <Occurrences />}
     </div>
   );
 }
+

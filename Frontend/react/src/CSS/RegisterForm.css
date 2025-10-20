@@ -1,5 +1,38 @@
-body {
+.login-body{
   margin: 0 auto;
+  background-image: url("/IMG/loginbackground.png");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+  background-attachment: fixed;
+}
+
+.booking-body{
+  margin: 0 auto;
+  background-image: url("/IMG/HomePageBack.png");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+  background-attachment: fixed;
+}
+
+.admin-body{
+  margin: 0 auto;
+  background-image: url("/IMG/HomePageBack.png");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+  background-attachment: fixed;
+}
+
+/*Register Css */
+.register-body {
+  margin: 0 auto;
+  background-image: url("/IMG/registerbackground.png");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+  background-attachment: fixed;
 }
 
 .register-form {
@@ -29,7 +62,7 @@ body {
   );
   width: 300px;
   height: 320px;
-  justify-self: center;
+  margin:0 auto;
 }
 
 .register-input {
@@ -68,7 +101,7 @@ body {
 
 .register-subtitle {
   font-size: 0.8rem;
-  color: hsl(0, 0%, 70%);
+  color: hsl(0, 6%, 32%);
   margin-top: 1rem;
   font-family: "Press Start 2P", cursive, system-ui;
 }

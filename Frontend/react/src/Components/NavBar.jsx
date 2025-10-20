@@ -1,11 +1,21 @@
 import { NavLink, useLocation } from 'react-router-dom';
-import { useEffect } from 'react';
+import { useEffect, useState} from 'react';
 import '../CSS/Navbar.css';
+import LocalWeather from '../Components/LocalWeather';
 import { useAuth } from '../context/AuthContext'; // du har redan denna i ditt projekt
 
 export default function NavBar() {
   const location = useLocation();
   const { user } = useAuth(); // t.ex. { email, role } eller { roles: [] }
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  const toggleMenu = () => {
+    setMenuOpen(prev => !prev)
+  }
+
+  useEffect(() => {
+    setMenuOpen(false)
+  }, [location])
 
   // ✅ Kolla roll
   const isAdmin =
@@ -29,10 +39,17 @@ export default function NavBar() {
       "/login": "login-body",
       "/register": "register-body",
       "/activity-occurrences": "activity-occurrences-body",
+      "/activities": "activity-occurrences-body",
       "/admin": "admin-body",
+      "/me/bookings": "booking-body",
+      "/user": "user-body"
     };
-    const newClass = bodyClassMap[location.pathname] || "default-body";
-    document.body.classList.remove("home-body", "login-body", "register-body", "admin-body", "activity-occurrences-body", "default-body");
+    let newClass = bodyClassMap[location.pathname] || "default-body";
+    
+    if (location.pathname.startsWith("/activities/") && location.pathname !== "/activities") {
+        newClass = "activity-occurrences-body";
+    }
+    document.body.classList.remove("home-body", "login-body", "register-body", "admin-body", "activity-occurrences-body", "booking-body", "user-body", "default-body");
     document.body.classList.add(newClass);
     return () => document.body.classList.remove(newClass);
   }, [location]);
@@ -43,6 +60,7 @@ export default function NavBar() {
     location.pathname === "/user" ? "user-navbar" :
     location.pathname === "/register" ? "register-navbar" :
     location.pathname === "/activity-occurrences" ? "activity-occurrences-navbar" :
+    location.pathname === "/activities" ? "activity-occurrences-navbar" :
     location.pathname === "/admin" ? "admin-navbar" :
     "default-navbar";
 
@@ -52,8 +70,9 @@ export default function NavBar() {
     if (isAdmin) {
       return (
         <>
-          <NavLink to="/" className="nav-link" id="nav1">Hem</NavLink>
-          <NavLink to="/activity-occurrences" className="nav-link" id="nav2">Sök Aktivitet</NavLink>
+          <NavLink to="/" className="nav-link" id="nav1"><img src="/IMG/Mario-Mushroom-Step-10.webp" alt="" width={20} height={20}/>Hem</NavLink>
+          <NavLink to="/activities" className="nav-link" id="nav-activities"><img src="/IMG/icons8-pixel-star-48.png" alt="" width={20} height={20}/>Aktiviteter</NavLink>
+          <NavLink to="/activity-occurrences" className="nav-link" id="nav2"><img src="/IMG/icons8-pixel-star-48.png" alt="" width={20} height={20}/>Sök Aktivitet</NavLink>
           <NavLink to="/user" className="nav-link" id="nav6">Mina Sidor</NavLink>
           <NavLink to="/admin" className="nav-link" id="nav-admin">Admin</NavLink>
         </>
@@ -64,9 +83,10 @@ export default function NavBar() {
     if (isUser) {
       return (
         <>
-          <NavLink to="/" className="nav-link" id="nav1">Hem</NavLink>
-          <NavLink to="/activity-occurrences" className="nav-link" id="nav2">Sök Aktivitet</NavLink>
-          <NavLink to="/me/bookings" className="nav-link" id="nav3">Mina Bokningar</NavLink>
+          <NavLink to="/" className="nav-link" id="nav1"><img src="/IMG/Mario-Mushroom-Step-10.webp" alt="" width={20} height={20}/>Hem</NavLink>
+          <NavLink to="/activities" className="nav-link" id="nav-activities"><img src="/IMG/icons8-pixel-star-48.png" alt="" width={20} height={20}/>Aktiviteter</NavLink>
+          <NavLink to="/activity-occurrences" className="nav-link" id="nav2"><img src="/IMG/icons8-pixel-star-48.png" alt="" width={20} height={20}/>Sök Aktivitet</NavLink>
+          <NavLink to="/me/bookings" className="nav-link" id="nav3"><img src="/IMG/bookinicon.png" alt="" width={20} height={20}/>Mina Bokningar</NavLink>
           <NavLink to="/user" className="nav-link" id="nav6">Mina Sidor</NavLink>
         </>
       );
@@ -75,8 +95,9 @@ export default function NavBar() {
     // --- UTSKRIVEN / EJ INLOGGAD ---
     return (
       <>
-        <NavLink to="/" className="nav-link" id="nav1">Hem</NavLink>
-        <NavLink to="/activity-occurrences" className="nav-link" id="nav2">Sök Aktivitet</NavLink>
+        <NavLink to="/" className="nav-link" id="nav1"><img src="/IMG/Mario-Mushroom-Step-10.webp" alt="" width={20} height={20}/>Hem</NavLink>
+        <NavLink to="/activities" className="nav-link" id="nav-activities"><img src="/IMG/icons8-pixel-star-48.png" alt="" width={20} height={20}/>Aktiviteter</NavLink>
+        <NavLink to="/activity-occurrences" className="nav-link" id="nav2"><img src="/IMG/icons8-pixel-star-48.png" alt="" width={20} height={20}/>Sök Aktivitet</NavLink>
         <NavLink to="/login" className="nav-link" id="nav4">Logga in</NavLink>
         <NavLink to="/register" className="nav-link" id="nav5">Registrera</NavLink>
       </>
@@ -89,8 +110,12 @@ export default function NavBar() {
         <div className="nav-img">
           <img src="/IMG/Activigotitle.png" alt="Activigo" className="activigo-title" />
         </div>
-        <div className="nav-links">
+        <button className ="menu-toggle" id="menu-toggle" onClick={toggleMenu}>☰</button>
+        <div className={`nav-links ${menuOpen ? 'open' : ''}`}>
           {renderLinks()}
+        </div>
+        <div className="nav-weather">
+          <LocalWeather />
         </div>
       </div>
     </nav>

@@ -116,7 +116,9 @@ public sealed class TokenService : ITokenService
             new(JwtRegisteredClaimNames.Sub, user.Id),
             new(JwtRegisteredClaimNames.UniqueName, user.UserName ?? user.Email ?? user.Id),
             new(JwtRegisteredClaimNames.Email, user.Email ?? string.Empty),
-            new("displayName", $"{user.Firstname} {user.Lastname}".Trim())
+            new("displayName", $"{user.Firstname} {user.Lastname}".Trim()),
+            new("firstname", user.Firstname ?? ""),
+            new("lastname", user.Lastname ?? "")
         };
         claims.AddRange(roles.Select(r => new Claim(ClaimTypes.Role, r)));
 

@@ -13,13 +13,27 @@ export default function OccurrenceCard({ item, onBook }) {
   )}:${pad2(end.getMinutes())}`;
 
   const durationMin = Math.max(0, Math.round((end - start) / 60000));
-
+  // För uträkning av platser
   const cap = item.effectiveCapacity ?? item.capacity ?? 0;
+  const booked = item.bookedPeople ?? 0;
+  // Om availableCapacity finns används den, annars räknas det ut
+  // baserat på kapacitet minus bokade platser
+  const remaining = item.availableCapacity ?? Math.max(0, cap - booked);
+  const full = remaining <= 0;
+
   const isOutdoor = item.environment === 1;
 
   const title = item.activityName ?? item.activity ?? item.name ?? "Activity";
   const place = item.placeName ?? item.place ?? "Unknown";
-  const full = cap <= 0;
+  
+  const category =
+    item.categoryName ??
+    item.category ??
+    item.activityCategory ??
+    "Okänd kategori";
+
+  console.log("occ", { cap, booked, remaining, raw: item });
+
 
   return (
     <article className="occurrence-card brick-frame mario-card">
@@ -39,6 +53,13 @@ export default function OccurrenceCard({ item, onBook }) {
             />
             {title}
           </h3>
+          {category && (
+            <div className="mario-card__meta">
+              <span className="mario-chip mario-chip--category">
+                Kategori: {category}
+              </span>
+            </div>
+          )}
         </div>
 
         <span
@@ -80,7 +101,7 @@ export default function OccurrenceCard({ item, onBook }) {
             full ? "mario-value--danger" : "mario-value--ok"
           }`}
         >
-          {!full ? `🟢 ${cap} kvar` : "🔴 Fullt"}
+          {full ? "🔴 Fullt" : `🟢 ${remaining} kvar`}
         </span>
       </div>
 

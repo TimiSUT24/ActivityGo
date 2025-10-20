@@ -1,4 +1,4 @@
-body.activity-occurrences-body {
+.activity-occurrences-body {
   background-image: url("/IMG/HomePageBack.png");
   background-repeat: no-repeat;
   background-position: center;
@@ -40,8 +40,8 @@ body.activity-occurrences-body {
 
 .occurence-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 12px;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 16px;
 }
 .occurence-empty {
   border: 1px dashed #d1d5db;
@@ -55,10 +55,11 @@ body.activity-occurrences-body {
 .occurrence-card {
   background: #fff;
   border-radius: 12px;
-  padding: 14px;
+  padding: 22px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 18px;
+  min-height: 340px;
 }
 .occurrence-card-header {
   display: flex;
@@ -222,11 +223,19 @@ body.activity-occurrences-body {
   padding: 16px;
 }
 .mario-card__header {
-  align-items: center;
+  align-items: flex-start;
+  gap: 12px;
 }
 .mario-card__titlewrap {
   display: flex;
   flex-direction: column;
+  gap: 10px;
+  align-items: flex-start;
+}
+.mario-card__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 .mario-badge {
   font-family: "Press Start 2P", cursive;
@@ -235,6 +244,27 @@ body.activity-occurrences-body {
   border-radius: 999px;
   box-shadow: 0 3px 0 rgba(0, 0, 0, 0.25);
   border: 3px solid #0b5c33;
+}
+.mario-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: "Press Start 2P", cursive;
+  font-size: 0.62rem;
+  letter-spacing: 0.02em;
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 3px solid #14325f;
+  background: rgba(20, 50, 95, 0.1);
+  color: #10284f;
+  box-shadow: 0 3px 0 rgba(16, 40, 79, 0.28);
+  text-transform: uppercase;
+}
+.mario-chip--category {
+  border-color: #0b5c33;
+  background: rgba(11, 92, 51, 0.12);
+  color: #064b2d;
+  box-shadow: 0 3px 0 rgba(11, 92, 51, 0.28);
 }
 .mario-badge--out {
   background: #d1fae5;
@@ -376,16 +406,6 @@ body.activity-occurrences-body {
   justify-content: flex-end;
   padding: 12px 16px;
   border-top: 1px solid #e5e7eb;
-}
-
-/* Responsiv */
-@media (max-width: 768px) {
-  .occurence-filters {
-    grid-template-columns: 1fr 1fr;
-  }
-  .occurence-grid {
-    grid-template-columns: 1fr;
-  }
 }
 
 /* ===== BookingModal: Mario-stil ===== */
@@ -535,5 +555,22 @@ body.activity-occurrences-body {
 @media (max-width: 900px) {
   .occurence-grid {
     grid-template-columns: 1fr;
+  }
+}
+
+/* Responsiv */
+@media (max-width: 768px) {
+  .occurence-filters {
+    grid-template-columns: 1fr;
+  }
+  .occurence-grid {
+    grid-template-columns: 1fr;
+  }
+  .occurrence-page{
+    width:100vw;
+  }
+
+  .occurrence-title{
+    font-size:17px;
   }
 }

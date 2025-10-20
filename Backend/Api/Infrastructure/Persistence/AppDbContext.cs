@@ -107,7 +107,10 @@ namespace Infrastructure.Persistence
                     .HasForeignKey(x => x.UserId)
                     .OnDelete(DeleteBehavior.Restrict);
 
-                e.HasIndex(x => new { x.ActivityOccurrenceId, x.UserId }).IsUnique();
+                e.HasIndex(x => new { x.ActivityOccurrenceId, x.UserId })
+                .HasFilter("[Status] = 0")
+                .IsUnique();
+
                 e.HasIndex(x => new { x.UserId, x.Status });
             });
 
