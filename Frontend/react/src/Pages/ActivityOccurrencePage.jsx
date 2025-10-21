@@ -23,6 +23,7 @@ export default function ActivityOccurrencePage() {
     environment: "", // "" | "0" | "1"
     onlyAvailable: false,
     minAvailable: "",
+    freeTextSearch: "",
   });
 
   const [modalOpen, setModalOpen] = useState(false);
@@ -61,10 +62,6 @@ export default function ActivityOccurrencePage() {
       setCategories(cats);
       setPlaces(pls);
       setActivities(acts);
-
-      console.log("CATEGORIES sample:", cats[0]);
-      console.log("PLACES sample:", pls[0]); // ska inte vara undefined
-      console.log("ACTIVITIES sample:", acts[0]);
     })();
   }, []);
 
@@ -88,8 +85,15 @@ export default function ActivityOccurrencePage() {
     } else {
       p.set("fromDate", nextHalfHourLocal.toISOString());
     }
-    if (filters.endDate)
+    if (filters.endDate) {
       p.set("toDate", new Date(`${filters.endDate}T23:59:59Z`).toISOString());
+    } else {
+      // Om inget slutdatum är satt, sätt till 30 dagar framåt från startdatum
+      const to = new Date(
+        new Date(p.get("fromDate")).getTime() + 30 * 24 * 60 * 60 * 1000
+      );
+      p.set("toDate", to.toISOString());
+    }
 
     if (filters.categoryId) p.set("categoryId", filters.categoryId);
     if (filters.activityId) p.set("activityId", filters.activityId);
@@ -98,7 +102,9 @@ export default function ActivityOccurrencePage() {
     if (filters.onlyAvailable) p.set("onlyAvailable", "true");
     if (filters.minAvailable !== "" && Number(filters.minAvailable) >= 0)
       p.set("minAvailable", String(Number(filters.minAvailable)));
-
+    // Fritextssökning (minst 2 tecken)
+    const q = (filters.freeTextSearch ?? "").trim();
+    if (q.length >= 2) p.set("freeTextSearch", q);
     return p.toString();
   }, [filters]);
 
@@ -113,8 +119,9 @@ export default function ActivityOccurrencePage() {
       const res = await api.get(url);
       const payload = res?.data;
       const items = Array.isArray(payload) ? payload : payload?.items ?? [];
+      const flat = items.map((x) => (x.raw ? { ...x, ...x.raw } : x));
       console.log("RESULT count:", items.length); // DEBUG
-      setData(items);
+      setData(flat);
     } catch {
       setErr("Kunde inte hämta tillfällen");
       setData([]);
@@ -143,6 +150,7 @@ export default function ActivityOccurrencePage() {
       environment: "",
       onlyAvailable: false,
       minAvailable: "",
+      freeTextSearch: "",
     });
 
   // Booking-modal
@@ -171,16 +179,6 @@ export default function ActivityOccurrencePage() {
     }
   };
 
-  /*=======LOGGAR OCH DYLIKT FÖR FELSÖKNING======*/
-  useEffect(() => {
-    console.log("state placeId:", filters.placeId);
-  }, [filters.placeId]);
-
-  useEffect(() => {
-    console.log("queryString:", queryString);
-  }, [queryString]);
-
-  /*===========================================*/
   return (
     <div className="occurrence-page">
       <h1 className="occurrence-title mario-page-title">
@@ -195,6 +193,15 @@ export default function ActivityOccurrencePage() {
       </h1>
 
       <section className="occurence-filters brick-frame brick-filters">
+        <div className="occurence-field">
+          <label>Fritext</label>
+          <input
+            type="text"
+            value={filters.freeTextSearch}
+            onChange={onChange("freeTextSearch")}
+          />
+        </div>
+
         <div className="occurence-field">
           <label>Från datum</label>
           <input
