@@ -14,7 +14,7 @@ namespace Infrastructure.Data.Seeding
     {
         public static async Task SeedAsync(AppDbContext context)
         {
-            if (!context.Categories.Any() &&!context.Places.Any() && !context.Activities.Any() && !context.ActivityOccurrences.Any())
+            if (!context.Categories.Any() &&!context.Places.Any() && !context.Activities.Any() && !context.ActivityOccurrences.Any() && !context.ActivityPlaces.Any())
             {
                 // Kategorier
                 var categories = new List<Category>
@@ -80,6 +80,41 @@ namespace Infrastructure.Data.Seeding
 
                 await context.Activities.AddRangeAsync(activities);
 
+                //ActivityPlaces
+                var activityPlaces = new List<ActivityPlace>();
+                foreach (var activity in activities)
+                {
+                    // Match by environment
+                    var allowedPlaces = new List<Place>();
+
+                    if (activity.Environment == EnvironmentType.Indoor)
+                    {
+                        allowedPlaces.Add(place1);
+                    }                       
+                    else
+                    {
+                        if (activity.Name.Contains("Padel"))
+                        {
+                            allowedPlaces.Add(place2);
+                        }
+                        else
+                        {
+                            allowedPlaces.Add(place3);
+                        }
+                    }
+
+                    foreach (var place in allowedPlaces)
+                    {
+                        activityPlaces.Add(new ActivityPlace
+                        {
+                            SportActivityId = activity.Id,
+                            PlaceId = place.Id
+                        });
+                    }
+                }
+
+                await context.ActivityPlaces.AddRangeAsync(activityPlaces);
+
                 // Occurrences
                 var occurrences = new List<ActivityOccurrence>();
                 var rnd = new Random();
@@ -98,14 +133,13 @@ namespace Infrastructure.Data.Seeding
                             DateTime start = date.AddHours(hour);
                             DateTime end = start.AddMinutes(activity.DefaultDurationMinutes);
 
-                            var placeId = activity.Environment == EnvironmentType.Indoor ? place1.Id :
-                                          activity.Name.Contains("Padel") ? place2.Id : place3.Id;
+                            var place = activityPlaces.First(ap => ap.SportActivityId == activity.Id);
 
                             occurrences.Add(new ActivityOccurrence
                             {
                                 Id = Guid.NewGuid(),
                                 ActivityId = activity.Id,
-                                PlaceId = placeId,
+                                PlaceId = place.PlaceId,
                                 StartUtc = start,
                                 EndUtc = end,
                                 CapacityOverride = null,
