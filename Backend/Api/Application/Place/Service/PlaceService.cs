@@ -90,4 +90,16 @@ public class PlaceService : IPlaceService
         await _uow.SaveChangesAsync(ct);
         return true;
     }
+
+    public async Task<List<GetActivityPlaceDto>> GetPlaceForActivity(Guid id, CancellationToken ct)
+    {
+        var activityPlaces = await _uow.ActivityPlaces.GetPlaceForActivityAsync(id, ct);
+        if (activityPlaces == null || !activityPlaces.Any())
+        {
+            throw new ArgumentException($"No places linked to Activity with ID {id}.");
+        }
+        // Assuming we return the first linked place for simplicity
+        
+        return _mapper.Map<List<GetActivityPlaceDto>>(activityPlaces);
+    }
 }

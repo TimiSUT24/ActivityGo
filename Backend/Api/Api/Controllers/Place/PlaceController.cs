@@ -51,4 +51,11 @@ public class PlaceController : ControllerBase
         var ok = await _svc.SetActiveAsync(id, isActive, ct);
         return ok ? NoContent() : NotFound();
     }
+
+    [HttpGet("{activityId}/places")]
+    public async Task<ActionResult<List<GetActivityPlaceDto>>> GetPlacesByActivityId(Guid activityId, CancellationToken ct)
+    {
+        var places = await _svc.GetPlaceForActivity(activityId, ct);
+        return Ok(places);
+    }
 }

@@ -136,6 +136,7 @@ namespace Api
             builder.Services.AddScoped<IUserRepository, UserRepository>();
             builder.Services.AddScoped<IActivityOccurrenceRepository, ActivityOccurrenceRepository>();
             builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+            builder.Services.AddScoped<IActivityPlaceRepository, ActivityPlaceRepository>();
 
             // === Hosted Service ===
             builder.Services.AddHostedService<BookingStatusRefresher>();

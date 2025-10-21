@@ -9,6 +9,6 @@ namespace Domain.Interfaces
 {
     public interface IActivityPlaceRepository : IGenericRepository<ActivityPlace>
     {
-
+        Task<List<ActivityPlace>> GetPlaceForActivityAsync(Guid id, CancellationToken ct);
     }
 }

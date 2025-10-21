@@ -10,4 +10,5 @@ public interface IPlaceService
     Task<bool> UpdateAsync(Guid id, PlaceUpdateDto dto, CancellationToken ct);
     Task<bool> DeleteAsync(Guid id, CancellationToken ct);
     Task<bool> SetActiveAsync(Guid id, bool isActive, CancellationToken ct);
+    Task<List<GetActivityPlaceDto>> GetPlaceForActivity(Guid id, CancellationToken ct);
 }

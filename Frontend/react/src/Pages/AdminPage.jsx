@@ -828,6 +828,7 @@ function Occurrences() {
   // 👇 Nya listor för select + tabell-lookup
   const [activities, setActivities] = useState([]);
   const [places, setPlaces] = useState([]);
+  const [allPlaces, setAllPlaces] = useState([]);
 
   const activityOptions = useMemo(
     () => activities.map(a => ({
@@ -866,12 +867,32 @@ function Occurrences() {
       ]);
       setItems(occ.data || []);
       setActivities(acts.data || []);
+      setAllPlaces(pls.data || []);
       setPlaces(pls.data || []);
     } catch (e) {
       setErr(e?.response?.data?.detail || e.message);
     }
   }
   useEffect(() => { if (ready) load(); }, [ready]);
+
+  useEffect(() => {
+    async function fetchAllowedPlaces() {
+      if (!form.activityId) {
+        setPlaces(allPlaces); // no activity selected, show all
+        return;
+      }
+
+      try {
+        const res = await api.get(`/api/Place/${form.activityId}/places`);
+        setPlaces(res.data || []);
+      } catch (e) {
+        console.error(e);
+        setErr(e?.response?.data?.detail || e.message);
+      }
+    }
+
+    fetchAllowedPlaces();
+  }, [form.activityId]); // triggers every time activity change
 
   async function save() {
     setErr("");

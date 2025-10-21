@@ -34,7 +34,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Place\DTO\" />
     <Folder Include="Place\Validator\" />
     <Folder Include="Booking\DTO\" />
     <Folder Include="Booking\Validator\" />
