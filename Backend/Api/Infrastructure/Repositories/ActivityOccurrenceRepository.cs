@@ -81,7 +81,7 @@ public sealed class ActivityOccurrenceRepository : GenericRepository<ActivityOcc
             EF.Functions.Like(o.Activity.Name, s) ||
             EF.Functions.Like(o.Place.Name, s) ||
             EF.Functions.Like(o.Activity.Description, s) ||
-            EF.Functions.Like(o.Activity.Category.Name, s));
+            (o.Activity.Category != null && EF.Functions.Like(o.Activity.Category.Name, s)));
         }
         return await q.OrderBy(o => o.StartUtc).ToListAsync(ct);
 

@@ -98,7 +98,7 @@ namespace Application.ActivityOccurrence.Service
 
             var repo = (IActivityOccurrenceRepository)_uow.Occurrences;
             var occurrences = await repo.GetBetweenDatesFilteredAsync(
-                start, end, categoryId, activityId, placeId, environment,freeTextSearch, ct);
+                start, end, categoryId, activityId, placeId, environment, freeTextSearch, ct);
 
             var dtos = _mapper.Map<IReadOnlyList<ActivityOccurrenceWeatherDto>>(occurrences);
             // Uträkning för antal platser kvar.
