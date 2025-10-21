@@ -14,6 +14,7 @@ namespace Application.ActivityOccurrence.DTO
         public DateTime EndUtc { get; init; }
         public int EffectiveCapacity { get; init; }
         public string ActivityName { get; init; } = string.Empty;
+        public string ActivityDescription { get; init; } = string.Empty;
         public string PlaceName { get; init; } = string.Empty;
         public EnvironmentType Environment { get; init; }
         public string? CategoryName { get; init; }

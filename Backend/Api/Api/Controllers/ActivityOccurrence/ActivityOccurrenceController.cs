@@ -98,6 +98,7 @@ namespace Api.Controllers.ActivityOccurrence
                  q.Environment, 
                  q.OnlyAvailable,
                  q.MinAvailable,
+                 q.FreeTextSearch,
                  ct);
             return Ok(result);
         }

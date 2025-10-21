@@ -12,7 +12,7 @@ public interface IActivityOccurrenceRepository : IGenericRepository<ActivityOccu
     Task<IReadOnlyList<ActivityOccurrence>> GetBetweenDatesFilteredAsync(
         DateTime fromDate, DateTime toDate,
         Guid? categoryId, Guid? activityId, Guid? placeId,
-        EnvironmentType? environment, bool? onlyAvailable,
+        EnvironmentType? environment, string? freeTextSearch ,
         CancellationToken ct);
 }
 
