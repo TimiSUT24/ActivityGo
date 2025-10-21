@@ -109,13 +109,14 @@ namespace Application.ActivityOccurrence.Service
             EnvironmentType? environment, 
             bool? onlyAvailable,
             int? minAvailable,
+            string? freeTextSearch,
             CancellationToken ct)
         {
             var (start, end) = Normalize(fromDate, toDate);
 
             var repo = (IActivityOccurrenceRepository)_uow.Occurrences;
             var occurrences = await repo.GetBetweenDatesFilteredAsync(
-                start, end, categoryId, activityId, placeId, environment, onlyAvailable, ct);
+                start, end, categoryId, activityId, placeId, environment, freeTextSearch, ct);
 
             var dtos = _mapper.Map<IReadOnlyList<ActivityOccurrenceWeatherDto>>(occurrences);
             // Uträkning för antal platser kvar.

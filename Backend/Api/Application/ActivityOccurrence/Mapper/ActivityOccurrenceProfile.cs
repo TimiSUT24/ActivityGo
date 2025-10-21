@@ -19,6 +19,7 @@ namespace Application.ActivityOccurrence.Mapper
             CreateMap<Domain.Models.ActivityOccurrence, ActivityOccurrenceWeatherDto>()
                 .ForMember(d => d.EffectiveCapacity, o => o.MapFrom(s => s.CapacityOverride ?? s.Place.Capacity))
                 .ForMember(d => d.ActivityName, o => o.MapFrom(s => s.Activity.Name))
+                .ForMember(d => d.ActivityDescription, o => o.MapFrom(s => s.Activity.Description ?? string.Empty))
                 .ForMember(d => d.PlaceName, o => o.MapFrom(s => s.Place.Name))
                 .ForMember(d => d.Environment, o => o.MapFrom(s => s.Place.Environment))
                 .ForMember(d => d.CategoryName, o => o.MapFrom(s => s.Activity.Category != null ? s.Activity.Category.Name : null))

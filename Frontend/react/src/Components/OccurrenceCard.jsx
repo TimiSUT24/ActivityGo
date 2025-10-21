@@ -24,16 +24,14 @@ export default function OccurrenceCard({ item, onBook }) {
   const isOutdoor = item.environment === 1;
 
   const title = item.activityName ?? item.activity ?? item.name ?? "Activity";
-  const place = item.placeName ?? item.place ?? "Unknown";
-  
+  const place = item.placeName ?? item.place ?? "Okänd plats";
+  const description =
+    item.raw?.activityDescription ?? item.activityDescription ?? "";
   const category =
     item.categoryName ??
     item.category ??
     item.activityCategory ??
     "Okänd kategori";
-
-  console.log("occ", { cap, booked, remaining, raw: item });
-
 
   return (
     <article className="occurrence-card brick-frame mario-card">
@@ -75,6 +73,13 @@ export default function OccurrenceCard({ item, onBook }) {
         <span className="mario-label">Var:</span>
         <span className="mario-value one-line" title={place}>
           {place}
+        </span>
+      </div>
+
+      <div className="mario-row">
+        <span className="mario-label">Vad:</span>
+        <span className="mario-value one-line" title={description}>
+          {description}
         </span>
       </div>
 

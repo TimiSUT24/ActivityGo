@@ -25,5 +25,7 @@ namespace Application.ActivityOccurrence.DTO.Request
 
         // If set, only return occurrences that have at least this many available spots
         public int? MinAvailable { get; init; }
+
+        public string? FreeTextSearch { get; init; } = string.Empty;
     }
 }

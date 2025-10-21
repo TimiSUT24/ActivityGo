@@ -25,6 +25,7 @@ namespace Application.ActivityOccurrence.Interface
             EnvironmentType? environment, 
             bool? onlyAvailable,
             int? minAvailable,
+            string? freeTextSearch,
             CancellationToken ct);
     }
 }
