@@ -15,6 +15,13 @@ public sealed class ActivityOccurrenceRepository : GenericRepository<ActivityOcc
 
     public ActivityOccurrenceRepository(AppDbContext db) : base(db) => _db = db;
 
+    // För att minimera fel som kan ske på olika sökningar med vissa tecken, då SQL har vissa tecken med särskild betydelse
+    private static string EscapeLike(string s) => s
+    .Replace("[", "[[]")
+    .Replace("]", "[]]")
+    .Replace("%", "[%]")
+    .Replace("_", "[_]");
+
     public override async Task<ActivityOccurrence?> GetByIdAsync(Guid id, CancellationToken ct)
     {
         return await _db.ActivityOccurrences
@@ -36,13 +43,18 @@ public sealed class ActivityOccurrenceRepository : GenericRepository<ActivityOcc
 
     // Method to improve query for alternative filters
     public async Task<IReadOnlyList<ActivityOccurrence>> GetBetweenDatesFilteredAsync(
-        DateTime fromDate, DateTime toDate,
-        Guid? categoryId, Guid? activityId, Guid? placeId,
-        EnvironmentType? environment, bool? onlyAvailable,
+        DateTime fromDate, 
+        DateTime toDate,
+        Guid? categoryId, 
+        Guid? activityId, 
+        Guid? placeId,
+        EnvironmentType? environment,
+        string? freeTextSearch,
         CancellationToken ct)
     {
         var q = _db.ActivityOccurrences
             .AsNoTracking()
+            .AsSplitQuery()
             .Include(o => o.Activity)
             .ThenInclude(a => a.Category)
             .Include(o => o.Place)
@@ -62,14 +74,15 @@ public sealed class ActivityOccurrenceRepository : GenericRepository<ActivityOcc
         if (environment.HasValue)
             q = q.Where(o => o.Place.Environment == environment.Value);
 
-        if (onlyAvailable == true)
+        if (!string.IsNullOrWhiteSpace(freeTextSearch))
         {
+            var s = "%" + EscapeLike(freeTextSearch.Trim()) + "%";
             q = q.Where(o =>
-                _db.Bookings.Count(b => b.ActivityOccurrenceId == o.Id && b.Status == BookingStatus.Booked)
-                < (o.CapacityOverride.HasValue ? o.CapacityOverride.Value : o.Place.Capacity));
+            EF.Functions.Like(o.Activity.Name, s) ||
+            EF.Functions.Like(o.Place.Name, s) ||
+            EF.Functions.Like(o.Activity.Description, s) ||
+            (o.Activity.Category != null && EF.Functions.Like(o.Activity.Category.Name, s)));
         }
-
-
         return await q.OrderBy(o => o.StartUtc).ToListAsync(ct);
 
     }
