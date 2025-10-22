@@ -63,6 +63,7 @@ namespace Application.Activity.Service
             }
 
             _mapper.Map(request, entity);
+            _uow.Activities.Update(entity);
             entity.UpdatedAtUtc = DateTime.UtcNow;
 
             await _uow.SaveChangesAsync(cancellationToken);
