@@ -100,6 +100,17 @@ namespace Application.ActivityPlace.Service
                 _uow.Occurrences.Update(occ);
             }
 
+            var activity = await _uow.Activities.GetByIdAsync(dto.SportActivityId, ct);
+            if (activity != null)
+            {
+                var newPlace = await _uow.Places.GetByIdAsync(dto.PlaceId, ct);
+                if (newPlace != null)
+                {
+                    activity.Environment = newPlace.Environment; // sync environment
+                    _uow.Activities.Update(activity);
+                }
+            }
+
             await _uow.SaveChangesAsync(ct);
             return true;
         }
