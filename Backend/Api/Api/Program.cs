@@ -45,6 +45,8 @@ using Microsoft.OpenApi.Models;
 using System.Text;
 using System.Threading.Tasks;
 using Infrastructure.BackgroundJobs;
+using Application.ActivityPlace.Interface;
+using Application.ActivityPlace.Service;
 
 namespace Api
 {
@@ -64,6 +66,7 @@ namespace Api
             builder.Services.AddScoped<IWeatherService, WeatherService>();
             builder.Services.AddScoped<ITokenService, TokenService>();
             builder.Services.AddScoped<ICategoryService, CategoryService>();
+            builder.Services.AddScoped<IActivityPlaceService, ActivityPlaceService>();
             //Fake Weather client for testing and development without API key
             builder.Services.AddSingleton<IWeatherClient, FakeWeatherClient>();
             //AutoMapper

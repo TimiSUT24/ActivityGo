@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Application.Place.DTO
+namespace Application.ActivityPlace.DTO.Response
 {
     public class GetActivityPlaceDto
     {

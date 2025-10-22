@@ -10,5 +10,7 @@ namespace Domain.Interfaces
     public interface IActivityPlaceRepository : IGenericRepository<ActivityPlace>
     {
         Task<List<ActivityPlace>> GetPlaceForActivityAsync(Guid id, CancellationToken ct);
+        Task<ActivityPlace?> FirstOrDefaultAsync(Func<ActivityPlace, bool> predicate, CancellationToken ct);
+        Task<IEnumerable<ActivityPlace>> GetAllAsync(CancellationToken ct);
     }
 }

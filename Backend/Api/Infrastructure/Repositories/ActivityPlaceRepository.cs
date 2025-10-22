@@ -25,6 +25,21 @@ namespace Infrastructure.Repositories
 
             return places;
         }
-   
+
+        public async Task<ActivityPlace?> FirstOrDefaultAsync(Func<ActivityPlace, bool> predicate, CancellationToken ct)
+        {
+            return await Task.FromResult(_db.ActivityPlaces.AsNoTracking().FirstOrDefault(predicate));
+        }
+
+        public override async Task<IEnumerable<ActivityPlace>> GetAllAsync(CancellationToken ct)
+        {
+            var entities = await _db.ActivityPlaces
+                .Include(ap => ap.Place)
+                .Include(ap => ap.SportActivity)
+                .ToListAsync(ct);
+
+            return entities;
+        }
+
     }
 }

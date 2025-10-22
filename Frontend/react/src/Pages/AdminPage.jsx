@@ -883,7 +883,7 @@ function Occurrences() {
       }
 
       try {
-        const res = await api.get(`/api/Place/${form.activityId}/places`);
+        const res = await api.get(`/api/ActivityPlace/${form.activityId}/places`);
         setPlaces(res.data || []);
       } catch (e) {
         console.error(e);
@@ -1056,6 +1056,180 @@ function Occurrences() {
 }
 
 
+// ActivityPlace // 
+function ActivityPlaces() {
+  const { ready } = useAuth();
+  const [items, setItems] = useState([]);
+  const [err, setErr] = useState("");
+  const [activities, setActivities] = useState([]);
+  const [places, setPlaces] = useState([]);
+
+  const [form, setForm] = useState({
+    sportActivityId: "",
+    placeId: "",
+  });
+  const [editing, setEditing] = useState(false);
+
+  // Select options
+  const activityOptions = useMemo(
+    () =>
+      activities.map(a => ({
+        value: a.id,
+        label: a.name + (a.isActive ? "" : " (inaktiv)"),
+      })),
+    [activities]
+  );
+
+  const placeOptions = useMemo(
+    () =>
+      places.map(p => ({
+        value: p.id,
+        label: p.name + (p.isActive ? "" : " (inaktiv)"),
+      })),
+    [places]
+  );
+
+  // Name lookup maps
+  const activityNameById = useMemo(() => toMap(activities, "id", "name"), [activities]);
+  const placeNameById = useMemo(() => toMap(places, "id", "name"), [places]);
+
+  async function load() {
+    setErr("");
+    try {
+      const [acts, pls, aps] = await Promise.all([
+        api.get(`/api/Activity?includeInactive=true`),
+        api.get(`/api/Place`),
+        api.get(`/api/ActivityPlace`), // 👈 you'll expose a GET endpoint for all
+      ]);
+      setActivities(acts.data || []);
+      setPlaces(pls.data || []);
+      setItems(aps.data || []);
+    } catch (e) {
+      setErr(e?.response?.data?.detail || e.message);
+    }
+  }
+
+  useEffect(() => {
+    if (ready) load();
+  }, [ready]);
+
+  async function save() {
+    setErr("");
+    try {
+      const payload = {
+        sportActivityId: form.sportActivityId,
+        placeId: form.placeId,
+      };
+
+      if (editing) {
+        await api.put(`/api/ActivityPlace`, payload);
+      } else {
+        await api.post(`/api/ActivityPlace`, payload);
+      }
+
+      setForm({ sportActivityId: "", placeId: "" });
+      setEditing(false);
+      await load();
+    } catch (e) {
+      setErr(e?.response?.data?.detail || e.message);
+    }
+  }
+
+  async function edit(item) {
+    setEditing(true);
+    setForm({
+      sportActivityId: item.sportActivityId,
+      placeId: item.placeId,
+    });
+  }
+
+  async function remove(item) {
+    if (!confirm("Ta bort koppling mellan aktivitet och plats?")) return;
+    setErr("");
+    try {
+      await api.delete(`/api/ActivityPlace`, { data: item });
+      await load();
+    } catch (e) {
+      setErr(e?.response?.data?.detail || e.message);
+    }
+  }
+
+  return (
+    <div style={baseStyles.section}>
+      <h3 style={{ marginTop: 0 }}>Aktivitetsplatser</h3>
+      {err && <div style={baseStyles.error}>{err}</div>}
+
+      {/* Form section */}
+      <div style={{ ...baseStyles.section, background: "#0b1b36" }}>
+        <div className="row" style={baseStyles.row}>
+          <Field label="Aktivitet">
+            <Select
+              value={form.sportActivityId}
+              onChange={val => setForm({ ...form, sportActivityId: val })}
+              options={activityOptions}
+              placeholder="— Välj aktivitet —"
+            />
+          </Field>
+          <Field label="Plats">
+            <Select
+              value={form.placeId}
+              onChange={val => setForm({ ...form, placeId: val })}
+              options={placeOptions}
+              placeholder="— Välj plats —"
+            />
+          </Field>
+        </div>
+        <div style={{ display: "flex", gap: 10, marginTop: 10 }}>
+          <button style={baseStyles.button} onClick={save}>
+            {editing ? "Spara ändringar" : "Lägg till koppling"}
+          </button>
+          {editing && (
+            <button
+              style={baseStyles.ghost}
+              onClick={() => {
+                setEditing(false);
+                setForm({ sportActivityId: "", placeId: "" });
+              }}
+            >
+              Avbryt
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* Table section */}
+      <div style={{ maxHeight: 300, overflowY: "auto" }}>
+        <table style={baseStyles.table}>
+          <thead>
+            <tr>
+              <th style={baseStyles.th}>Aktivitet</th>
+              <th style={baseStyles.th}>Plats</th>
+              <th style={{ ...baseStyles.th, ...baseStyles.right }}>Åtgärder</th>
+            </tr>
+          </thead>
+          <tbody>
+            {items.map(item => (
+              <tr key={`${item.sportActivityId}-${item.placeId}`}>
+                <td style={baseStyles.td}>{activityNameById[item.sportActivityId] || item.sportActivityId}</td>
+                <td style={baseStyles.td}>{placeNameById[item.placeId] || item.placeId}</td>
+                <td style={{ ...baseStyles.td, ...baseStyles.right }}>
+                  <button style={baseStyles.ghost} onClick={() => edit(item)}>
+                    Redigera
+                  </button>{" "}
+                  <button style={baseStyles.danger} onClick={() => remove(item)}>
+                    Ta bort
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
+
 function Field({ label, children }) {
   return (
     <div style={{ flex: 1 }}>
@@ -1074,6 +1248,7 @@ export default function AdminPage() {
       { k: "places", t: "Platser" },
       { k: "categories", t: "Kategorier" },
       { k: "occ", t: "Tillfällen" },
+      { k: "actplc", t: "AktivitetStällen"}
     ],
     []
   );
@@ -1116,6 +1291,7 @@ export default function AdminPage() {
         {tab === "places" && <Places />}
         {tab === "categories" && <Categories />}
         {tab === "occ" && <Occurrences />}
+        {tab === "actplc" && <ActivityPlaces/>}
       </div>
     </div>
   );
