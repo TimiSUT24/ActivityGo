@@ -10,7 +10,7 @@ namespace Api.Controllers.ActivityOccurrence
 {
     [Route("api/[controller]")]
     [ApiController]
-    //[Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin")]
     public class ActivityOccurrenceController : ControllerBase
     {
         private readonly IActivityOccurrenceService _activityOccurrenceService;
@@ -28,7 +28,7 @@ namespace Api.Controllers.ActivityOccurrence
             var created = await _activityOccurrenceService.AddAsync(dto, ct);
             return CreatedAtAction(nameof(Create), new { id = created.Id }, created);
         }
-
+        [AllowAnonymous]
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -82,6 +82,7 @@ namespace Api.Controllers.ActivityOccurrence
             return Ok();
         }
 
+        [AllowAnonymous]
         [HttpGet("with-weather")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult<IEnumerable<ActivityOccurrenceWeatherDto>>> GetOccurrencesWithWeather(

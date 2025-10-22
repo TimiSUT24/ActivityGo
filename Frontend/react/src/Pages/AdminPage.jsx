@@ -1156,6 +1156,15 @@ function ActivityPlaces() {
 
   return (
     <div style={baseStyles.section}>
+      <style>
+      {`
+        @media (max-width: 505px) {
+          h3 {
+            font-size: 14px !important;
+          }
+        }       
+      `}
+    </style>
       <h3 style={{ marginTop: 0 }}>Aktivitetsplatser</h3>
       {err && <div style={baseStyles.error}>{err}</div>}
 
@@ -1248,7 +1257,7 @@ export default function AdminPage() {
       { k: "places", t: "Platser" },
       { k: "categories", t: "Kategorier" },
       { k: "occ", t: "Tillfällen" },
-      { k: "actplc", t: "AktivitetStällen"}
+      { k: "actplc", t: "Aktivitetsplatser"}
     ],
     []
   );

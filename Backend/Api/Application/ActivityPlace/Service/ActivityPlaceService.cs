@@ -30,7 +30,7 @@ namespace Application.ActivityPlace.Service
             var isExist = await _uow.ActivityPlaces.AnyAsync(ap => ap.SportActivityId == dto.SportActivityId && ap.PlaceId == dto.PlaceId, ct);
             if (isExist)
             {
-                return false; // Relation already exists
+                throw new ConflictException("Relation already exists");
             }
             var entity = _mapper.Map<Domain.Models.ActivityPlace>(dto);
             await _uow.ActivityPlaces.AddAsync(entity, ct);
@@ -53,6 +53,10 @@ namespace Application.ActivityPlace.Service
         public async Task<IEnumerable<GetAllActivityPlaceDto>> GetAllAsync(CancellationToken ct)
         {
             var list = await _uow.ActivityPlaces.GetAllAsync(ct);
+            if(list == null || !list.Any())
+            {
+                throw new ArgumentException("No ActivityPlace relations found.");
+            }
             return _mapper.Map<IEnumerable<GetAllActivityPlaceDto>>(list);
         }
 
@@ -103,9 +107,9 @@ namespace Application.ActivityPlace.Service
         public async Task<bool> DeleteAsync(CreateActivityPlaceDto dto, CancellationToken ct)
         {
             var entity = await _uow.ActivityPlaces.FirstOrDefaultAsync(ap => ap.SportActivityId == dto.SportActivityId && ap.PlaceId == dto.PlaceId, ct);
-            if (entity == null)
+            if(entity == null)
             {
-                return false; // Relation does not exist
+                throw new KeyNotFoundException("Relation does not exist");
             }
             _uow.ActivityPlaces.Delete(entity);
             await _uow.SaveChangesAsync(ct);

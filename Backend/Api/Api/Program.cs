@@ -47,6 +47,7 @@ using System.Threading.Tasks;
 using Infrastructure.BackgroundJobs;
 using Application.ActivityPlace.Interface;
 using Application.ActivityPlace.Service;
+using Application.ActivityPlace.Mapper;
 
 namespace Api
 {
@@ -80,7 +81,8 @@ namespace Api
                typeof(BookingProfile), 
                typeof(PlaceProfile), 
                typeof(StatisticsProfile), 
-               typeof(WeatherProfile));
+               typeof(WeatherProfile),
+               typeof(ActivityPlaceProfile));
 
             // ===  Connection string + DbContext (SQL Server) ===
             builder.Services.AddDbContext<AppDbContext>(opts =>
