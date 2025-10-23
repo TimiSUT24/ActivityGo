@@ -75,7 +75,7 @@ export default function LoginForm() {
       textShadow: "2px 2px 0 rgba(0,0,0,0.3)",
     },
     input: {
-      width: "100%",
+      width: "90%",
       padding: "12px 14px",
       borderRadius: 8,
       border: "3px solid #ffd166",

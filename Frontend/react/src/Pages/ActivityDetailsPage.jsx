@@ -199,7 +199,7 @@ export default function ActivityDetailsPage() {
                 <span className="mario-chip mario-chip--category">
                   Kategori: {categoryName}
                 </span>
-              )}
+              )}              
             </div>
           </div>
 
