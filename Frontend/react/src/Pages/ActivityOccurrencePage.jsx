@@ -61,6 +61,7 @@ export default function ActivityOccurrencePage() {
       const acts = toArray(actsRaw);
 
       setCategories(cats);
+      setAllPlaces(pls);
       setPlaces(pls);
       setActivities(acts);
     })();
