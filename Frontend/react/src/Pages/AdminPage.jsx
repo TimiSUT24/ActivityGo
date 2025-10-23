@@ -271,6 +271,11 @@ function Activities() {
   );
   const categoryNameById = useMemo(() => toMap(categories, "id", "name"), [categories]);
 
+  const environmentOptions = [  
+      {value: 0, label: "Inomhus"},
+      {value: 1, label: "Utomhus"}   
+  ];
+
   const emptyForm = {
     name: "",
     description: "",
@@ -377,12 +382,12 @@ function Activities() {
           <Field label="Pris">
             <input type="number" style={baseStyles.input} value={form.price} onChange={(e) => setForm({ ...form, price: +e.target.value })} />
           </Field>
-          <Field label="Miljö (0=Indoor,1=Outdoor)">
-            <input
-              type="number"
-              style={baseStyles.input}
+          <Field label="Miljö">
+            <Select
               value={form.environment}
-              onChange={(e) => setForm({ ...form, environment: +e.target.value })}
+              onChange={(val) => setForm({ ...form, environment: Number(val) })}
+              options={environmentOptions}
+              placeholder="— Välj Miljö —"
             />
           </Field>
         </div>
@@ -464,6 +469,11 @@ function Places() {
   const empty = { name: "", address: "", latitude: "", longitude: "", environment: "", capacity: 0, isActive: true };
   const [form, setForm] = useState(empty);
   const [editing, setEditing] = useState(null);
+
+   const environmentOptions = [  
+      {value: 0, label: "Inomhus"},
+      {value: 1, label: "Utomhus"}   
+  ];
 
   async function load() {
     setErr("");
@@ -576,8 +586,13 @@ function Places() {
           <Field label="Lon">
             <input style={baseStyles.input} value={form.longitude} onChange={(e) => setForm({ ...form, longitude: e.target.value })} />
           </Field>
-          <Field label="Miljö (text)">
-            <input style={baseStyles.input} value={form.environment} onChange={(e) => setForm({ ...form, environment: e.target.value })} />
+          <Field label="Miljö">
+            <Select
+              value={form.environment}
+              onChange={(val) => setForm({ ...form, environment: Number(val) })}
+              options={environmentOptions}
+              placeholder="— Välj Miljö —"
+            />
           </Field>
         </div>
         <div style={{ display: "flex", gap: 10, marginTop: 10 }}>
@@ -614,7 +629,9 @@ function Places() {
             <tr key={p.id}>
               <td style={baseStyles.td}>{p.name}</td>
               <td style={baseStyles.td}>{p.capacity}</td>
-              <td style={baseStyles.td}>{p.environment || "-"}</td>
+              <td style={baseStyles.td}>
+                {p.environment === 1 ? "Utomhus" : "Inomhus"} {p.isActive ? "" : "· (inaktiv)"}
+              </td>
               <td style={baseStyles.td}>{p.isActive ? "Aktiv" : "Inaktiv"}</td>
               <td style={{ ...baseStyles.td, ...baseStyles.right }}>
                 <button style={baseStyles.ghost} onClick={() => edit(p)}>
