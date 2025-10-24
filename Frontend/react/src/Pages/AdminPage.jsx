@@ -1070,7 +1070,7 @@ function Occurrences() {
         </div>
       </div>
       <div style={{ ...baseStyles.section, background: "#0e2446", marginTop: 16 }}>
-        <div className="row" style={{ ...baseStyles.row, alignItems: "flex-end", gap: 16 }}>
+        <div className="row" style={{ ...baseStyles.row, gap: 16}}>
           <Field label="Filtrera aktivitet">
             <Select
               value={filters.activityId}
