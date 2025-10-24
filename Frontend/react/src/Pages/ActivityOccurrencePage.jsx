@@ -9,6 +9,7 @@ export default function ActivityOccurrencePage() {
   const [categories, setCategories] = useState([]);
   const [activities, setActivities] = useState([]);
   const [places, setPlaces] = useState([]);
+  const [allPlaces, setAllPlaces] = useState([]);
 
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -60,10 +61,30 @@ export default function ActivityOccurrencePage() {
       const acts = toArray(actsRaw);
 
       setCategories(cats);
+      setAllPlaces(pls);
       setPlaces(pls);
       setActivities(acts);
     })();
   }, []);
+
+  useEffect(() => {
+    async function fetchAllowedPlaces() {
+      if (!filters.activityId) {
+        setPlaces(allPlaces); // no activity selected, show all
+        return;
+      }
+
+      try {
+        const res = await api.get(`/api/ActivityPlace/${filters.activityId}/places`);
+        setPlaces(res.data || []);
+      } catch (e) {
+        console.error(e);
+        setErr(e?.response?.data?.detail || e.message);
+      }
+    }
+
+    fetchAllowedPlaces();
+  }, [filters.activityId])
 
   // Bygg querystring (matchar OccurencyQuery)
   const queryString = useMemo(() => {

@@ -52,6 +52,10 @@ namespace Infrastructure.Repositories
         {
             return await _dbSet.Where(predicate).ToListAsync(cancellationToken);
         }
+        public virtual async Task<bool> AnyAsync(Expression<Func<TEntity, bool>> predicate, CancellationToken cancellationToken = default)
+        {
+            return await _dbSet.AnyAsync(predicate, cancellationToken);
+        }
 
         public Task<IEnumerable<TEntity>> FindAsync(Expression<Func<TEntity, bool>> predicate)
         {

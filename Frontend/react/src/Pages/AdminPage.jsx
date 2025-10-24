@@ -271,6 +271,11 @@ function Activities() {
   );
   const categoryNameById = useMemo(() => toMap(categories, "id", "name"), [categories]);
 
+  const environmentOptions = [  
+      {value: 0, label: "Inomhus"},
+      {value: 1, label: "Utomhus"}   
+  ];
+
   const emptyForm = {
     name: "",
     description: "",
@@ -377,12 +382,12 @@ function Activities() {
           <Field label="Pris">
             <input type="number" style={baseStyles.input} value={form.price} onChange={(e) => setForm({ ...form, price: +e.target.value })} />
           </Field>
-          <Field label="Miljö (0=Indoor,1=Outdoor)">
-            <input
-              type="number"
-              style={baseStyles.input}
+          <Field label="Miljö">
+            <Select
               value={form.environment}
-              onChange={(e) => setForm({ ...form, environment: +e.target.value })}
+              onChange={(val) => setForm({ ...form, environment: Number(val) })}
+              options={environmentOptions}
+              placeholder="— Välj Miljö —"
             />
           </Field>
         </div>
@@ -464,6 +469,11 @@ function Places() {
   const empty = { name: "", address: "", latitude: "", longitude: "", environment: "", capacity: 0, isActive: true };
   const [form, setForm] = useState(empty);
   const [editing, setEditing] = useState(null);
+
+   const environmentOptions = [  
+      {value: 0, label: "Inomhus"},
+      {value: 1, label: "Utomhus"}   
+  ];
 
   async function load() {
     setErr("");
@@ -576,8 +586,13 @@ function Places() {
           <Field label="Lon">
             <input style={baseStyles.input} value={form.longitude} onChange={(e) => setForm({ ...form, longitude: e.target.value })} />
           </Field>
-          <Field label="Miljö (text)">
-            <input style={baseStyles.input} value={form.environment} onChange={(e) => setForm({ ...form, environment: e.target.value })} />
+          <Field label="Miljö">
+            <Select
+              value={form.environment}
+              onChange={(val) => setForm({ ...form, environment: Number(val) })}
+              options={environmentOptions}
+              placeholder="— Välj Miljö —"
+            />
           </Field>
         </div>
         <div style={{ display: "flex", gap: 10, marginTop: 10 }}>
@@ -614,7 +629,9 @@ function Places() {
             <tr key={p.id}>
               <td style={baseStyles.td}>{p.name}</td>
               <td style={baseStyles.td}>{p.capacity}</td>
-              <td style={baseStyles.td}>{p.environment || "-"}</td>
+              <td style={baseStyles.td}>
+                {p.environment === 1 ? "Utomhus" : "Inomhus"} {p.isActive ? "" : "· (inaktiv)"}
+              </td>
               <td style={baseStyles.td}>{p.isActive ? "Aktiv" : "Inaktiv"}</td>
               <td style={{ ...baseStyles.td, ...baseStyles.right }}>
                 <button style={baseStyles.ghost} onClick={() => edit(p)}>
@@ -828,6 +845,7 @@ function Occurrences() {
   // 👇 Nya listor för select + tabell-lookup
   const [activities, setActivities] = useState([]);
   const [places, setPlaces] = useState([]);
+  const [allPlaces, setAllPlaces] = useState([]);
 
   const activityOptions = useMemo(
     () => activities.map(a => ({
@@ -866,12 +884,32 @@ function Occurrences() {
       ]);
       setItems(occ.data || []);
       setActivities(acts.data || []);
+      setAllPlaces(pls.data || []);
       setPlaces(pls.data || []);
     } catch (e) {
       setErr(e?.response?.data?.detail || e.message);
     }
   }
   useEffect(() => { if (ready) load(); }, [ready]);
+
+  useEffect(() => {
+    async function fetchAllowedPlaces() {
+      if (!form.activityId) {
+        setPlaces(allPlaces); // no activity selected, show all
+        return;
+      }
+
+      try {
+        const res = await api.get(`/api/ActivityPlace/${form.activityId}/places`);
+        setPlaces(res.data || []);
+      } catch (e) {
+        console.error(e);
+        setErr(e?.response?.data?.detail || e.message);
+      }
+    }
+
+    fetchAllowedPlaces();
+  }, [form.activityId]); // triggers every time activity change
 
   async function save() {
     setErr("");
@@ -1035,6 +1073,189 @@ function Occurrences() {
 }
 
 
+// ActivityPlace // 
+function ActivityPlaces() {
+  const { ready } = useAuth();
+  const [items, setItems] = useState([]);
+  const [err, setErr] = useState("");
+  const [activities, setActivities] = useState([]);
+  const [places, setPlaces] = useState([]);
+
+  const [form, setForm] = useState({
+    sportActivityId: "",
+    placeId: "",
+  });
+  const [editing, setEditing] = useState(false);
+
+  // Select options
+  const activityOptions = useMemo(
+    () =>
+      activities.map(a => ({
+        value: a.id,
+        label: a.name + (a.isActive ? "" : " (inaktiv)"),
+      })),
+    [activities]
+  );
+
+  const placeOptions = useMemo(
+    () =>
+      places.map(p => ({
+        value: p.id,
+        label: p.name + (p.isActive ? "" : " (inaktiv)"),
+      })),
+    [places]
+  );
+
+  // Name lookup maps
+  const activityNameById = useMemo(() => toMap(activities, "id", "name"), [activities]);
+  const placeNameById = useMemo(() => toMap(places, "id", "name"), [places]);
+
+  async function load() {
+    setErr("");
+    try {
+      const [acts, pls, aps] = await Promise.all([
+        api.get(`/api/Activity?includeInactive=true`),
+        api.get(`/api/Place`),
+        api.get(`/api/ActivityPlace`), // 👈 you'll expose a GET endpoint for all
+      ]);
+      setActivities(acts.data || []);
+      setPlaces(pls.data || []);
+      setItems(aps.data || []);
+    } catch (e) {
+      setErr(e?.response?.data?.detail || e.message);
+    }
+  }
+
+  useEffect(() => {
+    if (ready) load();
+  }, [ready]);
+
+  async function save() {
+    setErr("");
+    try {
+      const payload = {
+        sportActivityId: form.sportActivityId,
+        placeId: form.placeId,
+      };
+
+      if (editing) {
+        await api.put(`/api/ActivityPlace`, payload);
+      } else {
+        await api.post(`/api/ActivityPlace`, payload);
+      }
+
+      setForm({ sportActivityId: "", placeId: "" });
+      setEditing(false);
+      await load();
+    } catch (e) {
+      setErr(e?.response?.data?.detail || e.message);
+    }
+  }
+
+  async function edit(item) {
+    setEditing(true);
+    setForm({
+      sportActivityId: item.sportActivityId,
+      placeId: item.placeId,
+    });
+  }
+
+  async function remove(item) {
+    if (!confirm("Ta bort koppling mellan aktivitet och plats?")) return;
+    setErr("");
+    try {
+      await api.delete(`/api/ActivityPlace`, { data: item });
+      await load();
+    } catch (e) {
+      setErr(e?.response?.data?.detail || e.message);
+    }
+  }
+
+  return (
+    <div style={baseStyles.section}>
+      <style>
+      {`
+        @media (max-width: 505px) {
+          h3 {
+            font-size: 14px !important;
+          }
+        }       
+      `}
+    </style>
+      <h3 style={{ marginTop: 0 }}>Aktivitetsplatser</h3>
+      {err && <div style={baseStyles.error}>{err}</div>}
+
+      {/* Form section */}
+      <div style={{ ...baseStyles.section, background: "#0b1b36" }}>
+        <div className="row" style={baseStyles.row}>
+          <Field label="Aktivitet">
+            <Select
+              value={form.sportActivityId}
+              onChange={val => setForm({ ...form, sportActivityId: val })}
+              options={activityOptions}
+              placeholder="— Välj aktivitet —"
+            />
+          </Field>
+          <Field label="Plats">
+            <Select
+              value={form.placeId}
+              onChange={val => setForm({ ...form, placeId: val })}
+              options={placeOptions}
+              placeholder="— Välj plats —"
+            />
+          </Field>
+        </div>
+        <div style={{ display: "flex", gap: 10, marginTop: 10 }}>
+          <button style={baseStyles.button} onClick={save}>
+            {editing ? "Spara ändringar" : "Lägg till koppling"}
+          </button>
+          {editing && (
+            <button
+              style={baseStyles.ghost}
+              onClick={() => {
+                setEditing(false);
+                setForm({ sportActivityId: "", placeId: "" });
+              }}
+            >
+              Avbryt
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* Table section */}
+      <div style={{ maxHeight: 300, overflowY: "auto" }}>
+        <table style={baseStyles.table}>
+          <thead>
+            <tr>
+              <th style={baseStyles.th}>Aktivitet</th>
+              <th style={baseStyles.th}>Plats</th>
+              <th style={{ ...baseStyles.th, ...baseStyles.right }}>Åtgärder</th>
+            </tr>
+          </thead>
+          <tbody>
+            {items.map(item => (
+              <tr key={`${item.sportActivityId}-${item.placeId}`}>
+                <td style={baseStyles.td}>{activityNameById[item.sportActivityId] || item.sportActivityId}</td>
+                <td style={baseStyles.td}>{placeNameById[item.placeId] || item.placeId}</td>
+                <td style={{ ...baseStyles.td, ...baseStyles.right }}>
+                  <button style={baseStyles.ghost} onClick={() => edit(item)}>
+                    Redigera
+                  </button>{" "}
+                  <button style={baseStyles.danger} onClick={() => remove(item)}>
+                    Ta bort
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
+
 function Field({ label, children }) {
   return (
     <div style={{ flex: 1 }}>
@@ -1053,6 +1274,7 @@ export default function AdminPage() {
       { k: "places", t: "Platser" },
       { k: "categories", t: "Kategorier" },
       { k: "occ", t: "Tillfällen" },
+      { k: "actplc", t: "Aktivitetsplatser"}
     ],
     []
   );
@@ -1095,6 +1317,7 @@ export default function AdminPage() {
         {tab === "places" && <Places />}
         {tab === "categories" && <Categories />}
         {tab === "occ" && <Occurrences />}
+        {tab === "actplc" && <ActivityPlaces/>}
       </div>
     </div>
   );
