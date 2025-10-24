@@ -847,6 +847,13 @@ function Occurrences() {
   const [places, setPlaces] = useState([]);
   const [allPlaces, setAllPlaces] = useState([]);
 
+  const [filters, setFilters] = useState({ activityId: "", placeId: "" });
+  const [sort, setSort] = useState({ by: "startUtc", dir: "asc" }); // by: "startUtc" | "activity", dir: "asc" | "desc"
+
+  function toggleSort(col) {
+    setSort(s => (s.by === col ? { by: col, dir: s.dir === "asc" ? "desc" : "asc" } : { by: col, dir: "asc" }));
+  }
+
   const activityOptions = useMemo(
     () => activities.map(a => ({
       value: a.id,
@@ -957,6 +964,30 @@ function Occurrences() {
     }
   }
 
+  const filteredSortedItems = useMemo(() => {
+    // 1) filtrera
+    let arr = items;
+    if (filters.activityId) arr = arr.filter(x => x.activityId === filters.activityId);
+    if (filters.placeId)    arr = arr.filter(x => x.placeId === filters.placeId);
+
+    // 2) sortera
+    const getActivityName = (o) => (activityNameById[o.activityId] || o.activityName || "").toLowerCase();
+    const getKey = (o) => {
+      if (sort.by === "activity") return getActivityName(o);
+      // default: startUtc (datum)
+      const t = o.startUtc ? new Date(o.startUtc).getTime() : 0;
+      return Number.isFinite(t) ? t : 0;
+    };
+
+    const sorted = [...arr].sort((a, b) => {
+      const A = getKey(a), B = getKey(b);
+      if (A < B) return sort.dir === "asc" ? -1 : 1;
+      if (A > B) return sort.dir === "asc" ?  1 : -1;
+      return 0;
+    });
+    return sorted;
+  }, [items, filters, sort, activityNameById]);
+
   return (
     <div style={baseStyles.section}>
       <h3 style={{ marginTop: 0 }}>Tillfällen</h3>
@@ -1002,19 +1033,21 @@ function Occurrences() {
           </Field>
         </div>
         <div className ="row" style={baseStyles.row}>
-          <Field label="Capacity override">
+          <Field label="Kapacitetsöverskridning">
             <input
               type="number"
               style={baseStyles.input}
+              placeholder="Valfritt"
               value={form.capacityOverride}
               onChange={(e) => setForm({ ...form, capacityOverride: e.target.value })}
             />
           </Field>
-          <Field label="Price override (kr)">
+          <Field label="Prisöverskridning (kr)">
             <input
               type="number"
               style={baseStyles.input}
               value={form.priceOverride}
+              placeholder="Valfritt"
               onChange={(e) => setForm({ ...form, priceOverride: e.target.value })}
             />
           </Field>
@@ -1036,20 +1069,79 @@ function Occurrences() {
           )}
         </div>
       </div>
-      <div style={{ maxHeight: 300, overflowY: "auto"}}>
+      <div style={{ ...baseStyles.section, background: "#0e2446", marginTop: 16 }}>
+        <div className="row" style={{ ...baseStyles.row, gap: 16}}>
+          <Field label="Filtrera aktivitet">
+            <Select
+              value={filters.activityId}
+              onChange={(val) => setFilters(f => ({ ...f, activityId: val }))}
+              options={[{ value: "", label: "Alla aktiviteter" }, ...activityOptions]}
+              placeholder="— Alla —"
+            />
+          </Field>
+
+          <Field label="Filtrera plats">
+            <Select
+              value={filters.placeId}
+              onChange={(val) => setFilters(f => ({ ...f, placeId: val }))}
+              options={[{ value: "", label: "Alla platser" }, ...placeOptions]}
+              placeholder="— Alla —"
+            />
+          </Field>
+
+          <Field label="Sortera">
+            <select
+              style={baseStyles.input}
+              value={`${sort.by}:${sort.dir}`}
+              onChange={(e) => {
+                const [by, dir] = e.target.value.split(":");
+                setSort({ by, dir });
+              }}
+            >
+              <option value="startUtc:asc">Datum ↑ (tidigast först)</option>
+              <option value="startUtc:desc">Datum ↓ (senast först)</option>
+              <option value="activity:asc">Aktivitet A–Ö</option>
+              <option value="activity:desc">Aktivitet Ö–A</option>
+            </select>
+          </Field>
+
+          <button
+            style={{ ...baseStyles.ghost, height: 40 }}
+            onClick={() => {
+              setFilters({ activityId: "", placeId: "" });
+              setSort({ by: "startUtc", dir: "asc" });
+            }}
+          >
+            Återställ
+          </button>
+        </div>
+      </div>
+      <div style={{ maxHeight: 700, overflowY: "auto"}}>
       <table style={baseStyles.table}>
         <thead>
           <tr>
-            <th style={baseStyles.th}>Aktivitet</th>
+            <th
+              style={{ ...baseStyles.th, cursor: "pointer", userSelect: "none" }}
+              onClick={() => toggleSort("activity")}
+              title="Sortera på aktivitet"
+            >
+              Aktivitet {sort.by === "activity" ? (sort.dir === "asc" ? "▲" : "▼") : ""}
+            </th>
             <th style={baseStyles.th}>Plats</th>
-            <th style={baseStyles.th}>Start</th>
+            <th
+              style={{ ...baseStyles.th, cursor: "pointer", userSelect: "none" }}
+              onClick={() => toggleSort("startUtc")}
+              title="Sortera på startdatum"
+            >
+              Start {sort.by === "startUtc" ? (sort.dir === "asc" ? "▲" : "▼") : ""}
+            </th>
             <th style={baseStyles.th}>Slut</th>
             <th style={baseStyles.th}>Cap (eff)</th>
             <th style={{ ...baseStyles.th, ...baseStyles.right }}>Åtgärder</th>
           </tr>
         </thead>
         <tbody>
-          {items.map((o) => (
+          {filteredSortedItems.map((o) => (
             <tr key={o.id}>
               <td style={baseStyles.td}>{activityNameById[o.activityId] || o.activityName || o.activityId}</td>
               <td style={baseStyles.td}>{placeNameById[o.placeId] || o.placeName || o.placeId}</td>
