@@ -34,7 +34,7 @@ public class BookingService : IBookingService
                   ?? throw new InvalidOperationException("Tillfället finns inte.");
 
         var now = DateTime.UtcNow;
-        if (occ.StartUtc <= now)
+        if (occ.StartUtc <= now || occ.StartUtc <= DateTime.Now)
             throw new InvalidOperationException("Du kan inte boka ett tillfälle som redan startat.");
 
         // Dubbelbokningsskydd (överlapp)

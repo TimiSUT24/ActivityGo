@@ -15,6 +15,7 @@ public sealed class UnitOfWork : IUnitOfWork
     public IUserRepository Users { get; }
     public IActivityOccurrenceRepository Occurrences { get; }
     public ICategoryRepository Categories { get; }
+    public IActivityPlaceRepository ActivityPlaces { get; }
     // ==============================
     public UnitOfWork(
         AppDbContext db
@@ -24,6 +25,8 @@ public sealed class UnitOfWork : IUnitOfWork
         , IUserRepository users
         , IActivityOccurrenceRepository occurrences
         , ICategoryRepository categories
+        , IActivityPlaceRepository activityPlaces
+
     )
     {
         _db = db;
@@ -33,6 +36,7 @@ public sealed class UnitOfWork : IUnitOfWork
         Users = users;
         Occurrences = occurrences;
         Categories = categories;
+        ActivityPlaces = activityPlaces;
     }
 
     public Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)

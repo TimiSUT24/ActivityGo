@@ -45,6 +45,9 @@ using Microsoft.OpenApi.Models;
 using System.Text;
 using System.Threading.Tasks;
 using Infrastructure.BackgroundJobs;
+using Application.ActivityPlace.Interface;
+using Application.ActivityPlace.Service;
+using Application.ActivityPlace.Mapper;
 
 namespace Api
 {
@@ -64,6 +67,7 @@ namespace Api
             builder.Services.AddScoped<IWeatherService, WeatherService>();
             builder.Services.AddScoped<ITokenService, TokenService>();
             builder.Services.AddScoped<ICategoryService, CategoryService>();
+            builder.Services.AddScoped<IActivityPlaceService, ActivityPlaceService>();
             //Fake Weather client for testing and development without API key
             builder.Services.AddSingleton<IWeatherClient, FakeWeatherClient>();
             //AutoMapper
@@ -77,7 +81,8 @@ namespace Api
                typeof(BookingProfile), 
                typeof(PlaceProfile), 
                typeof(StatisticsProfile), 
-               typeof(WeatherProfile));
+               typeof(WeatherProfile),
+               typeof(ActivityPlaceProfile));
 
             // ===  Connection string + DbContext (SQL Server) ===
             builder.Services.AddDbContext<AppDbContext>(opts =>
@@ -136,6 +141,7 @@ namespace Api
             builder.Services.AddScoped<IUserRepository, UserRepository>();
             builder.Services.AddScoped<IActivityOccurrenceRepository, ActivityOccurrenceRepository>();
             builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+            builder.Services.AddScoped<IActivityPlaceRepository, ActivityPlaceRepository>();
 
             // === Hosted Service ===
             builder.Services.AddHostedService<BookingStatusRefresher>();

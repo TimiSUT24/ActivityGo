@@ -27,6 +27,24 @@ namespace Application.ActivityOccurrence.Service
 
         public async Task<ActivityOccurrenceDto> AddAsync(CreateActivityOccurenceDto dto, CancellationToken ct)
         {
+            var activity = await _uow.Activities.GetByIdAsync(dto.ActivityId, ct);
+            if(activity == null)
+            {
+                throw new ArgumentException($"Activity with ID {dto.ActivityId} does not exist.");
+            }
+
+            var place = await _uow.Places.GetByIdAsync(dto.PlaceId, ct);
+            if(place == null)
+            {
+                throw new ArgumentException($"Place with ID {dto.PlaceId} does not exist.");
+            }
+
+            bool isPlaceLinked = await _uow.ActivityPlaces.AnyAsync(ap => ap.SportActivityId == dto.ActivityId && ap.PlaceId == dto.PlaceId, ct);
+            if (!isPlaceLinked)
+            {
+                throw new ArgumentException($"Place with ID {dto.PlaceId} is not linked to Activity with ID {dto.ActivityId}.");
+            }
+
             var entity = _mapper.Map<Domain.Models.ActivityOccurrence>(dto);
             await _uow.Occurrences.AddAsync(entity, ct);
 
@@ -91,13 +109,14 @@ namespace Application.ActivityOccurrence.Service
             EnvironmentType? environment, 
             bool? onlyAvailable,
             int? minAvailable,
+            string? freeTextSearch,
             CancellationToken ct)
         {
             var (start, end) = Normalize(fromDate, toDate);
 
             var repo = (IActivityOccurrenceRepository)_uow.Occurrences;
             var occurrences = await repo.GetBetweenDatesFilteredAsync(
-                start, end, categoryId, activityId, placeId, environment, onlyAvailable, ct);
+                start, end, categoryId, activityId, placeId, environment, freeTextSearch, ct);
 
             var dtos = _mapper.Map<IReadOnlyList<ActivityOccurrenceWeatherDto>>(occurrences);
             // Uträkning för antal platser kvar.

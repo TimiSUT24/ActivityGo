@@ -1,4 +1,5 @@
-﻿using Application.Place.DTO;
+﻿using Application.ActivityPlace.DTO.Response;
+using Application.Place.DTO;
 
 namespace Application.Place.Interface;
 

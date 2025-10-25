@@ -69,13 +69,13 @@ export default function LoginForm() {
     label: {
       display: "block",
       marginBottom: 6,
-      fontSize: 12,
+      fontSize: 13,
       textTransform: "uppercase",
       color: "#ffef9f",
       textShadow: "2px 2px 0 rgba(0,0,0,0.3)",
     },
     input: {
-      width: "100%",
+      width: "90%",
       padding: "12px 14px",
       borderRadius: 8,
       border: "3px solid #ffd166",
@@ -92,6 +92,7 @@ export default function LoginForm() {
       display: "block",
       textTransform: "uppercase",
       letterSpacing: 1,
+      lineHeight:1.8,  
     },
     button: {
       width: "100%",

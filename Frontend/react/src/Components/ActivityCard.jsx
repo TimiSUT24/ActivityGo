@@ -59,7 +59,7 @@ export default function ActivityCard({
             {activity.name}
           </h3>
           {category && (
-            <div className="mario-card__meta">
+            <div className="mario-card__meta" >
               <span className="mario-chip mario-chip--category">
                 Kategori: {category}
               </span>

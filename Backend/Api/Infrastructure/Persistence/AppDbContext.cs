@@ -18,6 +18,7 @@ namespace Infrastructure.Persistence
         public DbSet<Category> Categories => Set<Category>();
         public DbSet<Booking> Bookings => Set<Booking>();
         public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
+        public DbSet<ActivityPlace> ActivityPlaces => Set<ActivityPlace>();
 
         protected override void OnModelCreating(ModelBuilder b)
         {
@@ -71,6 +72,21 @@ namespace Infrastructure.Persistence
 
                 e.HasIndex(x => new { x.IsActive, x.Environment });
                 e.HasIndex(x => new { x.Latitude, x.Longitude });
+            });
+
+            b.Entity<ActivityPlace>(e =>
+            {
+                e.HasKey(ap => new { ap.SportActivityId, ap.PlaceId });
+
+                e.HasOne(ap => ap.SportActivity)
+                .WithMany(a => a.ActivityPlaces)
+                .HasForeignKey(ap => ap.SportActivityId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+                e.HasOne(ap => ap.Place)
+                .WithMany(p => p.ActivityPlaces)
+                .HasForeignKey(f => f.PlaceId)
+                .OnDelete(DeleteBehavior.Cascade);
             });
 
             b.Entity<ActivityOccurrence>(e =>

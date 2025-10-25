@@ -14,14 +14,16 @@ namespace Infrastructure.Data.Seeding
     {
         public static async Task SeedAsync(AppDbContext context)
         {
-            if (!context.Categories.Any() &&!context.Places.Any() && !context.Activities.Any() && !context.ActivityOccurrences.Any())
+            if (!context.Categories.Any() &&!context.Places.Any() && !context.Activities.Any() && !context.ActivityOccurrences.Any() && !context.ActivityPlaces.Any())
             {
                 // Kategorier
                 var categories = new List<Category>
                 {
-                    new Category { Id = Guid.NewGuid(), Name = "Inomhusspel" },
-                    new Category { Id = Guid.NewGuid(), Name = "Utomhusspel" },
+                    new Category { Id = Guid.NewGuid(), Name = "RacketSport" },
+                    new Category { Id = Guid.NewGuid(), Name = "Kardio" },
                     new Category { Id = Guid.NewGuid(), Name = "Träning" },
+                    new Category { Id = Guid.NewGuid(), Name = "Klättring" },
+                    new Category { Id = Guid.NewGuid(), Name = "Rörlighet" },
                 };
 
                 await context.Categories.AddRangeAsync(categories);
@@ -68,17 +70,52 @@ namespace Infrastructure.Data.Seeding
                 // Aktiviteter
                 var activities = new List<SportActivity>
                 {
-                    new SportActivity { Id = Guid.NewGuid(), Name = "Klättring", Description="Klättervägg för alla nivåer", Environment=EnvironmentType.Indoor, DefaultDurationMinutes=90, Price=120, IsActive=true, CategoryId = categories.First(c => c.Name == "Inomhusspel").Id, ImageUrl = "https://images.unsplash.com/photo-1520156557489-31c63271fcd4" },
-                    new SportActivity { Id = Guid.NewGuid(), Name = "Pingis", Description="Bordtennis", Environment=EnvironmentType.Indoor, DefaultDurationMinutes=60, Price=50, IsActive=true, CategoryId = categories.First(c => c.Name == "Inomhusspel").Id, ImageUrl = "https://plus.unsplash.com/premium_photo-1672176758793-86714e201c27" },
-                    new SportActivity { Id = Guid.NewGuid(), Name = "Badminton", Description="Dubbel/Enkel matcher", Environment=EnvironmentType.Indoor, DefaultDurationMinutes=60, Price=80, IsActive=true, CategoryId = categories.First(c => c.Name == "Inomhusspel").Id, ImageUrl = "https://images.pexels.com/photos/2202685/pexels-photo-2202685.jpeg" },
-                    new SportActivity { Id = Guid.NewGuid(), Name = "Padel", Description="Padel utomhus", Environment=EnvironmentType.Outdoor, DefaultDurationMinutes=90, Price=150, IsActive=true, CategoryId = categories.First(c => c.Name == "Utomhusspel").Id, ImageUrl = "https://plus.unsplash.com/premium_photo-1708692919998-e3dc853ef8a8" },
+                    new SportActivity { Id = Guid.NewGuid(), Name = "Klättring", Description="Klättervägg för alla nivåer", Environment=EnvironmentType.Indoor, DefaultDurationMinutes=90, Price=120, IsActive=true, CategoryId = categories.First(c => c.Name == "Klättring").Id, ImageUrl = "https://images.unsplash.com/photo-1520156557489-31c63271fcd4" },
+                    new SportActivity { Id = Guid.NewGuid(), Name = "Pingis", Description="Bordtennis", Environment=EnvironmentType.Indoor, DefaultDurationMinutes=60, Price=50, IsActive=true, CategoryId = categories.First(c => c.Name == "RacketSport").Id, ImageUrl = "https://plus.unsplash.com/premium_photo-1672176758793-86714e201c27" },
+                    new SportActivity { Id = Guid.NewGuid(), Name = "Badminton", Description="Dubbel/Enkel matcher", Environment=EnvironmentType.Indoor, DefaultDurationMinutes=60, Price=80, IsActive=true, CategoryId = categories.First(c => c.Name == "RacketSport").Id, ImageUrl = "https://images.pexels.com/photos/2202685/pexels-photo-2202685.jpeg" },
+                    new SportActivity { Id = Guid.NewGuid(), Name = "Padel", Description="Padel utomhus", Environment=EnvironmentType.Outdoor, DefaultDurationMinutes=90, Price=150, IsActive=true, CategoryId = categories.First(c => c.Name == "RacketSport").Id, ImageUrl = "https://plus.unsplash.com/premium_photo-1708692919998-e3dc853ef8a8" },
                     new SportActivity { Id = Guid.NewGuid(), Name = "Utegym-pass", Description="Träning i utegymmet", Environment=EnvironmentType.Outdoor, DefaultDurationMinutes=60, Price=0, IsActive=true, CategoryId = categories.First(c => c.Name == "Träning").Id, ImageUrl = "https://plus.unsplash.com/premium_photo-1661751792396-4a384fcc1c50" },
-                    new SportActivity { Id = Guid.NewGuid(), Name = "Yoga", Description="Inomhus yoga", Environment=EnvironmentType.Indoor, DefaultDurationMinutes=75, Price=100, IsActive=true, CategoryId = categories.First(c => c.Name == "Träning").Id, ImageUrl = "https://images.pexels.com/photos/1051838/pexels-photo-1051838.jpeg" },
-                    new SportActivity { Id = Guid.NewGuid(), Name = "Spinning", Description="Cykelpass med instruktör", Environment=EnvironmentType.Indoor, DefaultDurationMinutes=45, Price=90, IsActive=true, CategoryId = categories.First(c => c.Name == "Träning").Id, ImageUrl = "https://plus.unsplash.com/premium_photo-1746192629752-cdf94c4afef8" },
+                    new SportActivity { Id = Guid.NewGuid(), Name = "Yoga", Description="Inomhus yoga", Environment=EnvironmentType.Indoor, DefaultDurationMinutes=75, Price=100, IsActive=true, CategoryId = categories.First(c => c.Name == "Rörlighet").Id, ImageUrl = "https://images.pexels.com/photos/1051838/pexels-photo-1051838.jpeg" },
+                    new SportActivity { Id = Guid.NewGuid(), Name = "Spinning", Description="Cykelpass med instruktör", Environment=EnvironmentType.Indoor, DefaultDurationMinutes=45, Price=90, IsActive=true, CategoryId = categories.First(c => c.Name == "Kardio").Id, ImageUrl = "https://plus.unsplash.com/premium_photo-1746192629752-cdf94c4afef8" },
                     new SportActivity { Id = Guid.NewGuid(), Name = "Crossfit", Description="Intensivt utepass", Environment=EnvironmentType.Outdoor, DefaultDurationMinutes=60, Price=110, IsActive=true, CategoryId = categories.First(c => c.Name == "Träning").Id, ImageUrl = "https://plus.unsplash.com/premium_photo-1661963322010-722f78acc02c" },
                 };
 
                 await context.Activities.AddRangeAsync(activities);
+
+                //ActivityPlaces
+                var activityPlaces = new List<ActivityPlace>();
+                foreach (var activity in activities)
+                {
+                    // Match by environment
+                    var allowedPlaces = new List<Place>();
+
+                    if (activity.Environment == EnvironmentType.Indoor)
+                    {
+                        allowedPlaces.Add(place1);
+                    }                       
+                    else
+                    {
+                        if (activity.Name.Contains("Padel"))
+                        {
+                            allowedPlaces.Add(place2);
+                        }
+                        else
+                        {
+                            allowedPlaces.Add(place3);
+                        }
+                    }
+
+                    foreach (var place in allowedPlaces)
+                    {
+                        activityPlaces.Add(new ActivityPlace
+                        {
+                            SportActivityId = activity.Id,
+                            PlaceId = place.Id
+                        });
+                    }
+                }
+
+                await context.ActivityPlaces.AddRangeAsync(activityPlaces);
 
                 // Occurrences
                 var occurrences = new List<ActivityOccurrence>();
@@ -98,14 +135,13 @@ namespace Infrastructure.Data.Seeding
                             DateTime start = date.AddHours(hour);
                             DateTime end = start.AddMinutes(activity.DefaultDurationMinutes);
 
-                            var placeId = activity.Environment == EnvironmentType.Indoor ? place1.Id :
-                                          activity.Name.Contains("Padel") ? place2.Id : place3.Id;
+                            var place = activityPlaces.First(ap => ap.SportActivityId == activity.Id);
 
                             occurrences.Add(new ActivityOccurrence
                             {
                                 Id = Guid.NewGuid(),
                                 ActivityId = activity.Id,
-                                PlaceId = placeId,
+                                PlaceId = place.PlaceId,
                                 StartUtc = start,
                                 EndUtc = end,
                                 CapacityOverride = null,

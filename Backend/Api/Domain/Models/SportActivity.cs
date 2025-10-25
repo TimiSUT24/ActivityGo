@@ -23,4 +23,5 @@ public class SportActivity : BaseEntity
 
     // Navigering
     public ICollection<ActivityOccurrence> Occurrences { get; set; } = new List<ActivityOccurrence>();
+    public ICollection<ActivityPlace> ActivityPlaces { get; set; } = new List<ActivityPlace>();
 }

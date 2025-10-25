@@ -1,4 +1,5 @@
-﻿using Application.Place.DTO;
+﻿using Application.ActivityPlace.DTO.Response;
+using Application.Place.DTO;
 using Application.Place.Interface;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
