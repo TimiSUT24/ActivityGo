@@ -841,6 +841,8 @@ function Occurrences() {
   const { ready } = useAuth();
   const [items, setItems] = useState([]);
   const [err, setErr] = useState("");
+  const [page, setPage] = useState(1);
+  const pageSize = 50;
 
   // 👇 Nya listor för select + tabell-lookup
   const [activities, setActivities] = useState([]);
@@ -985,8 +987,9 @@ function Occurrences() {
       if (A > B) return sort.dir === "asc" ?  1 : -1;
       return 0;
     });
-    return sorted;
-  }, [items, filters, sort, activityNameById]);
+    const start = (page - 1 ) * pageSize;
+    return sorted.slice(start, start + pageSize);
+  }, [items, filters, sort, activityNameById, page]);
 
   return (
     <div style={baseStyles.section}>
@@ -1115,7 +1118,18 @@ function Occurrences() {
             Återställ
           </button>
         </div>
-      </div>
+        <div style={{ display: "flex", gap: 10, marginTop: 10, justifyContent:"center", alignItems:"center"}}>
+          <button disabled={page === 1} onClick={() => setPage(p => p - 1)} style={{borderRadius:"10px", borderColor:"#ffd166", color:"white", backgroundColor:"#0b1b36"}}>⬅ Föregående</button>
+          <span>Sida {page}</span>
+          <button
+            disabled={page * pageSize >= items.length}
+            onClick={() => setPage(p => p + 1)}
+            style={{borderRadius:"10px", borderColor:"#ffd166", color:"white", backgroundColor:"#0b1b36"}}
+          >
+            Nästa ➡
+          </button>
+        </div>
+      </div>    
       <div style={{ maxHeight: 700, overflowY: "auto"}}>
       <table style={baseStyles.table}>
         <thead>

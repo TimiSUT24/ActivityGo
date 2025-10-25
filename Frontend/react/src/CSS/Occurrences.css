@@ -196,7 +196,7 @@
   background: rgba(255, 255, 255, 0.88);
 }
 .occurrence-card.brick-frame {
-  background: #fff;
+  background: rgba(255, 255, 255, 0.88);
 }
 
 /* ---- Mario-typografi i korten (din tidigare stil) ---- */
@@ -464,8 +464,7 @@
 }
 
 .mario-meta {
-  display: inline-flex;
-  align-items: center;
+  display:flex;
   gap: 8px;
   font-family: "Press Start 2P", cursive, system-ui;
   font-size: 0.78rem;
@@ -475,6 +474,7 @@
   border-radius: 10px;
   padding: 8px 12px;
   box-shadow: 0 3px 0 rgba(0, 0, 0, 0.15);
+  width:fit-content;
 }
 .mario-meta strong {
   color: #064b2d;

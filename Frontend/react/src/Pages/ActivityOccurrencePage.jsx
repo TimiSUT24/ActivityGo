@@ -10,6 +10,8 @@ export default function ActivityOccurrencePage() {
   const [activities, setActivities] = useState([]);
   const [places, setPlaces] = useState([]);
   const [allPlaces, setAllPlaces] = useState([]);
+  const [page, setPage] = useState(1);
+  const pageSize = 50;
 
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -29,6 +31,18 @@ export default function ActivityOccurrencePage() {
 
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedId, setSelectedId] = useState(null);
+
+  //Pagination
+  const pagedData = useMemo(() => {
+    const start = (page - 1 ) * pageSize;
+    const end = start + pageSize;
+    return data.slice(start,end);
+  },[data, page])
+
+  useEffect(() => {
+    setPage(1);
+
+  }, [filters, data]);
 
   // Dropdown-data
 
@@ -338,29 +352,52 @@ export default function ActivityOccurrencePage() {
       {loading && <div className="occurrence-status">Laddar…</div>}
 
       {!loading && !err && data.length > 0 && (
-        <div className="occurrence-meta mario-meta">
-          <img
+        <div className="occurrence-meta mario-meta">       
+          <div style={{ display: "flex", gap: 10, marginTop: 10, justifyContent:"center", alignItems:"center"}} className="pagination">
+            <img
             src="/IMG/Mario-Mushroom-Step-10.webp"
             alt=""
             width={16}
             height={16}
-            className="mario-icon"
-          />
-          <span>Antal:</span>
-          <strong>{data.length}</strong>
-        </div>
+            className="mario-icon"                    
+            />
+            <span>Antal:</span>
+            <strong>{data.length}</strong>  
+            <button disabled={page === 1} onClick={() => setPage(p => p - 1)} style={{borderRadius:"10px", borderColor:"#ffd166", color:"white", backgroundColor:"#0b1b36"}}>⬅ Föregående</button>
+            <span>Sida {page}</span>
+            <button
+              disabled={page * pageSize >= data.length}
+              onClick={() => setPage(p => p + 1)}
+              style={{borderRadius:"10px", borderColor:"#ffd166", color:"white", backgroundColor:"#0b1b36"}}
+              >
+              Nästa ➡
+            </button>
+          </div>
+          </div>          
       )}
+      <style>
+            {`
+              @media (max-width: 465px) {
+            .pagination {
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 10px !important;
+          }
 
+          .mario-meta{
+              justify-self: center !important;
+          }
+        }
+      `}</style>
       {!loading && !err && (
         <div className="occurence-grid">
-          {data.length > 0 &&
-            data.map((it) => (
-              <OccurrenceCard
-                key={it.id}
-                item={it}
-                onBook={(id) => handleBook(id)}
-              />
-            ))}
+          {pagedData.map((o) => (
+            <OccurrenceCard
+              key={o.id}
+              item={o}
+              onBook={() => handleBook(o.id)}
+            />
+          ))}
         </div>
       )}
       <BookingModal
