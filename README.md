@@ -1,4 +1,8 @@
 # 🎯 ActiviGo – Activity Booking Platform
+![.NET](https://img.shields.io/badge/.NET-8.0-blueviolet?style=flat-square&logo=dotnet)
+![React](https://img.shields.io/badge/Frontend-React%20(Vite)-61DAFB?style=flat-square&logo=react)
+![Database](https://img.shields.io/badge/Database-SQL%20Server-CC2927?style=flat-square&logo=microsoftsqlserver)
+![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)
 
 A complete booking system for sports and leisure activities, built with **ASP.NET Core (REST API, EF Core)** and **React**.  
 Supports both indoor and outdoor activities with weather integration.
@@ -16,6 +20,7 @@ Supports both indoor and outdoor activities with weather integration.
 - [⚙️ Technologies Used](#-technologies-used)
 - [📦 NuGet Packages](#-nuget-packages)
 - [⚙️ Getting Started](#️-getting-started)
+- [👥 Team Workflow](#-team-workflow)
 - [🙌 Contributors](#-contributors)
 - [📄 License](#-license)
 
@@ -178,6 +183,7 @@ Planned improvements and extra features:
 - 👥 Capacity limits enforced per occurrence
 - 🔄 Double-booking prevention (no overlapping times)
 - 🌦️ Outdoor flag triggers weather forecast integration
+---
 
 ## ⚙️ Technologies Used
 
@@ -230,6 +236,30 @@ dotnet run --project ActiviGo.API
 API available at: https://localhost:5001/swagger
 React frontend available at: http://localhost:5173/
 ```
+---
+
+## 👥 Team Workflow
+
+🧩 Branch Strategy
+
+- main → stable production
+
+- dev → integration branch
+
+- feature/* → new functionality
+
+🔁 Pull Request Routine
+
+- Create branch from dev
+
+- Commit with clear message
+
+- Push and open PR → reviewed
+
+- Merge into dev after approval from atleast 1 team member
+
+- Merge to main for release
+
 ---
 
 ## 🙌 Contributors
