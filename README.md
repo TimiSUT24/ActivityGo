@@ -217,8 +217,8 @@ This project uses the following NuGet packages:
 
 ```bash
 1. Clone the repository:
-   git clone https://github.com/JonssonF/TooliRent.git
-   cd TooliRent
+   git clone https://github.com/TimiSUT24/ActiviGO.git
+   cd ActiviGO
 2. Configure the database
 
 The project uses Entity Framework Core (Code-First).
